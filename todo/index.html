@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>待办小助手 · 轻量清单</title>
+<style>
+:root{--ink:#202633;--muted:#7b8594;--line:#e8ebf1;--primary:#4b68d4;--primaryLight:#eef2ff;--surface:#fff;--bg:#f6f8fc;--red:#d84a4a;--green:#318866}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at top left,#eaf0ff 0%,transparent 45%),var(--bg);color:var(--ink);font-family:system-ui,-apple-system,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;min-height:100vh}
+.shell{width:min(760px,calc(100% - 32px));margin:62px auto 50px}.top{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:23px}.brand{display:flex;align-items:center;gap:14px}.logo{width:48px;height:48px;border-radius:15px;display:grid;place-items:center;color:#fff;background:linear-gradient(140deg,#6685ed,#4d5ec7);box-shadow:0 6px 20px #6179d136;font-size:24px}.heading{font-size:25px;font-weight:750;letter-spacing:-.4px}.sub{font-size:13px;color:var(--muted);margin-top:4px}.date{color:#717b90;font-size:13px;white-space:nowrap}.panel{background:var(--surface);border:1px solid #edf0f5;border-radius:20px;box-shadow:0 12px 36px #2d426611;padding:25px}
+.summary{display:flex;justify-content:space-between;align-items:end;gap:10px;margin-bottom:21px}.summaryTitle{font-size:18px;font-weight:700}.stats{font-size:13px;color:var(--muted)}.stats strong{font-size:20px;color:var(--primary);font-weight:750}
+.add-form{display:flex;gap:10px;margin-bottom:15px}.add-form input[type=text]{height:46px;flex:1;min-width:0;border:1px solid #dce2ec;border-radius:11px;padding:0 15px;font:inherit;font-size:15px;outline:none;transition:.15s}.add-form input[type=text]:focus{border-color:#8296e8;box-shadow:0 0 0 3px #8296e821}.add-form button{border:0;background:var(--primary);color:white;border-radius:11px;padding:0 23px;font-size:14px;font-weight:650;cursor:pointer;white-space:nowrap}.add-form button:hover{background:#3e57bb}
+.settings{display:flex;align-items:center;gap:11px;flex-wrap:wrap;margin-bottom:24px;font-size:13px;color:var(--muted)}.date-control{border:1px solid var(--line);border-radius:9px;background:white;display:flex;align-items:center;gap:8px;padding:7px 10px}.date-control input{border:0;background:transparent;color:#4b5361;font:inherit;outline:0;min-width:110px}.quick{border:0;border-radius:8px;background:var(--primaryLight);color:#566bc2;padding:8px 11px;cursor:pointer;font:inherit}.quick:hover{background:#e2e9ff}.quick.active{background:#d9e3ff;color:#284bb4}
+.filters{display:flex;align-items:center;gap:7px;border-bottom:1px solid var(--line);margin-bottom:4px;padding-bottom:14px}.filter{border:0;background:transparent;color:#6a7383;padding:8px 13px;border-radius:9px;cursor:pointer;font:inherit;font-size:13px}.filter.active{background:var(--primaryLight);color:#425fc6;font-weight:650}.spacer{flex:1}.clear{background:none;border:none;color:#9aa2b0;font-size:12px;cursor:pointer;padding:7px}.clear:hover{color:var(--red)}
+.tasks{margin:0;padding:0;list-style:none}.task{display:flex;align-items:center;gap:13px;padding:17px 3px;border-bottom:1px solid #f0f2f6;min-height:75px}.task:last-child{border-bottom:none}.check{appearance:none;width:21px;height:21px;border:1.8px solid #bdc6d6;border-radius:7px;display:grid;place-items:center;margin:0;cursor:pointer;flex:none;transition:.15s}.check:checked{background:var(--primary);border-color:var(--primary)}.check:checked::after{content:'✓';font-size:14px;color:white;font-weight:700}.taskBody{min-width:0;flex:1}.taskTitle{font-size:15px;line-height:1.5;word-break:break-word}.task.done .taskTitle{color:#a2a9b4;text-decoration:line-through}.meta{margin-top:3px;font-size:12px;color:#9aa3b0}.meta.overdue{color:var(--red)}.meta.today{color:var(--green)}.delete{border:0;background:#f8f9fb;color:#adb5c0;width:30px;height:30px;border-radius:8px;cursor:pointer;font-size:18px;flex:none}.delete:hover{background:#fff0f0;color:var(--red)}.empty{padding:60px 0 54px;text-align:center;color:var(--muted)}.emptyIcon{font-size:38px;margin-bottom:14px}.emptyTitle{font-size:15px;color:#596274;font-weight:600}.emptyHint{font-size:13px;margin-top:8px}.foot{text-align:center;color:#a0a9b6;font-size:12px;margin:20px auto;line-height:1.7}
+@media(max-width:500px){.shell{margin:29px auto;width:min(100% - 22px,760px)}.panel{padding:18px 15px}.heading{font-size:22px}.date{display:none}.add-form button{padding:0 17px}.stats strong{font-size:18px}.summaryTitle{font-size:16px}.filters{gap:1px}.filter{padding:8px 9px}}
+</style>
+</head>
+<body>
+<main class="shell">
+ <header class="top"><div class="brand"><div class="logo" aria-hidden="true">✓</div><div><div class="heading">待办小助手</div><div class="sub">把想做的事记下来，一件件完成。</div></div></div><time class="date" id="nowLabel"></time></header>
+ <section class="panel" aria-label="待办清单">
+  <div class="summary"><div class="summaryTitle">我的待办</div><div class="stats">还有 <strong id="remaining">0</strong> 件事待完成</div></div>
+  <form class="add-form" id="addForm"><input id="taskInput" type="text" maxlength="150" placeholder="输入一件待办事项，例如：跟进客户需求" autocomplete="off" aria-label="待办内容" required/><button type="submit">＋ 添加</button></form>
+  <div class="settings"><span>计划完成：</span><div class="date-control"><input id="dueDate" type="date" aria-label="计划完成日期"/></div><button type="button" class="quick" id="todayBtn">今天</button><button type="button" class="quick" id="tomorrowBtn">明天</button><button type="button" class="quick" id="noDateBtn">不设日期</button></div>
+  <nav class="filters" aria-label="筛选待办"><button class="filter active" data-filter="pending">待完成</button><button class="filter" data-filter="all">全部</button><button class="filter" data-filter="done">已完成</button><div class="spacer"></div><button type="button" class="clear" id="clearDone" title="清除全部已完成事项">清除已完成</button></nav>
+  <ul class="tasks" id="tasks"></ul><div class="empty" id="empty"><div class="emptyIcon">🗒️</div><div class="emptyTitle" id="emptyTitle">还没有待办，添加第一件吧</div><div class="emptyHint" id="emptyHint">从一件简单的小事开始。</div></div>
+ </section>
+ <div class="foot">数据只保存在当前浏览器中，不会上传到服务器。<br/>换设备或清除浏览器数据后可能丢失，请勿在此记录敏感信息。</div>
+</main>
+<script>
+(function(){
+ 'use strict';
+ const KEY='simple_todo_assistant_v1';
+ const $=(id)=>document.getElementById(id);
+ const today=()=>{let d=new Date(); return [d.getFullYear(),String(d.getMonth()+1).padStart(2,'0'),String(d.getDate()).padStart(2,'0')].join('-');};
+ const dayOffset=(n)=>{let d=new Date();d.setDate(d.getDate()+n);return [d.getFullYear(),String(d.getMonth()+1).padStart(2,'0'),String(d.getDate()).padStart(2,'0')].join('-');};
+ let tasks=[];try{const saved=JSON.parse(localStorage.getItem(KEY)||'[]');if(Array.isArray(saved)){tasks=saved.filter(t=>t&&typeof t.text==='string'&&typeof t.id==='string').map(t=>({id:t.id,text:t.text,due:typeof t.due==='string'?t.due:'',done:!!t.done,created:Number(t.created)||Date.now()}));}}catch(err){console.warn('无法读取本地待办数据',err);}
+ let filter='pending';
+ const persist=()=>{try{localStorage.setItem(KEY,JSON.stringify(tasks));}catch(err){alert('无法保存到浏览器。请检查是否使用了隐私模式或浏览器存储已满。');}};
+ const fmt=(date)=>{const a=date.split('-');return a.length===3?`${Number(a[1])}月${Number(a[2])}日`:date;};
+ const now=new Date();$('nowLabel').textContent=`${now.getFullYear()}年${now.getMonth()+1}月${now.getDate()}日 · ${'日一二三四五六'[now.getDay()]}`;
+ function render(){
+  const list=$('tasks');list.replaceChildren();
+  const remaining=tasks.filter(t=>!t.done).length;$('remaining').textContent=remaining;
+  const shown=tasks.filter(t=>filter==='all'||(filter==='pending'&&!t.done)||(filter==='done'&&t.done)).sort((a,b)=>a.done-b.done||(a.due||'9999').localeCompare(b.due||'9999')||b.created-a.created);
+  $('empty').hidden=shown.length>0;$('empty').style.display=shown.length?'none':'block';
+  if(!shown.length){$('emptyTitle').textContent=filter==='pending'&&tasks.length?'待办都完成啦！':filter==='done'?'还没有完成的事项':'还没有待办，添加第一件吧';$('emptyHint').textContent=filter==='pending'&&tasks.length?'做得不错，可以放松一下。':'从一件简单的小事开始。';}
+  for(const task of shown){
+   const li=document.createElement('li');li.className='task'+(task.done?' done':'');
+   const cb=document.createElement('input');cb.type='checkbox';cb.className='check';cb.checked=task.done;cb.setAttribute('aria-label','标记完成：'+task.text);cb.addEventListener('change',()=>{task.done=cb.checked;persist();render();});
+   const body=document.createElement('div');body.className='taskBody';const name=document.createElement('div');name.className='taskTitle';name.textContent=task.text;body.appendChild(name);
+   if(task.due){const meta=document.createElement('div');meta.className='meta';const prefix=task.due===today()?'今天':task.due===dayOffset(1)?'明天':fmt(task.due);meta.textContent=task.done?`${prefix} · 已完成`:task.due<today()?`${fmt(task.due)} · 已逾期`:prefix+'完成';if(!task.done&&task.due<today())meta.classList.add('overdue');else if(!task.done&&task.due===today())meta.classList.add('today');body.appendChild(meta);}
+   const del=document.createElement('button');del.type='button';del.className='delete';del.textContent='×';del.title='删除待办';del.setAttribute('aria-label','删除：'+task.text);del.addEventListener('click',()=>{tasks=tasks.filter(t=>t.id!==task.id);persist();render();});
+   li.append(cb,body,del);list.append(li);
+  }
+  document.querySelectorAll('.filter').forEach(b=>{b.classList.toggle('active',b.dataset.filter===filter);b.setAttribute('aria-pressed',String(b.dataset.filter===filter));});
+  $('clearDone').hidden=!tasks.some(t=>t.done);
+ }
+ $('addForm').addEventListener('submit',ev=>{ev.preventDefault();const text=$('taskInput').value.trim();if(!text)return;tasks.unshift({id:typeof crypto!=='undefined'&&crypto.randomUUID?crypto.randomUUID():String(Date.now())+'_'+Math.random(),text,due:$('dueDate').value,done:false,created:Date.now()});persist();$('taskInput').value='';$('taskInput').focus();filter='pending';render();});
+ document.querySelectorAll('.filter').forEach(btn=>btn.addEventListener('click',()=>{filter=btn.dataset.filter;render();}));
+ $('todayBtn').addEventListener('click',()=>{$('dueDate').value=today();});$('tomorrowBtn').addEventListener('click',()=>{$('dueDate').value=dayOffset(1);});$('noDateBtn').addEventListener('click',()=>{$('dueDate').value='';});
+ $('clearDone').addEventListener('click',()=>{if(confirm('确定要清除所有已完成的待办吗？')){tasks=tasks.filter(t=>!t.done);persist();render();}});
+ render();
+})();
+</script>
+</body></html>

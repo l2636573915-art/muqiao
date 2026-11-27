@@ -17,6 +17,13 @@ a{color:var(--teal);text-underline-offset:4px}
 .shell{display:grid;grid-template-columns:320px minmax(0,1fr);min-height:100vh}
 .rail{background:var(--rail);color:var(--rail-text);padding:26px 20px;min-width:0}
 .rail-inner{position:sticky;top:22px}
+.rail-tabs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:4px;margin-bottom:15px;padding:4px;border:1px solid #456468;border-radius:12px;background:#123033}
+.rail-tabs button{min-height:42px;border:0;border-radius:8px;background:transparent;color:var(--rail-text);font-size:.9rem;font-weight:650;padding:5px}
+.rail-tabs button[aria-pressed=true]{color:#12463e;background:#d5ede4}
+.rail-tabs button:hover:not([aria-pressed=true]){background:#264d4e}
+.course-list.term-index{max-height:calc(100vh - 265px)}
+.term-index button{min-height:42px}
+.term-index small{color:inherit;opacity:.85;font-size:.75rem}
 .rail summary{font-weight:680;font-size:1.12rem;padding:4px 0 12px}
 .control{display:grid;gap:4px;margin-bottom:12px;font-size:.875rem;color:var(--rail-muted)}
 .control input,.control select{width:100%;min-height:44px;border:1px solid #567374;border-radius:10px;padding:8px 10px;background:#224447;color:white}
@@ -132,6 +139,23 @@ h3{font-size:clamp(1.24rem,2.6vw,1.75rem);line-height:1.38;letter-spacing:-.02em
 .sources{border-top:1px solid var(--line);padding-top:14px;font-size:.85rem;gap:8px 14px}
 .sources a{font-weight:650}
 .footer{margin-top:20px;color:var(--muted);font-size:.82rem}
+.glossary-intro{margin-bottom:20px}
+.glossary-intro p{color:var(--muted);margin-top:7px}
+.glossary-common,.term-related{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.glossary-common{margin-bottom:17px}
+.glossary-common .btn,.term-related .btn{min-height:38px;padding:5px 10px}
+.glossary-common .btn[aria-pressed=true]{border-color:var(--teal);background:var(--tint);color:var(--teal)}
+.term-card{display:grid;gap:13px;padding:clamp(17px,4.2vw,33px);overflow-wrap:anywhere}
+.term-category{color:var(--teal);font-size:.85rem;font-weight:700}
+.term-card h2{font-size:clamp(1.65rem,3.7vw,2.45rem)}
+.term-aliases{color:var(--muted);font-size:.87rem}
+.term-definition{font-size:clamp(1rem,2.5vw,1.18rem)}
+.term-example{background:var(--tint);border-left:3px solid var(--teal);border-radius:0 10px 10px 0;padding:12px 14px}
+.term-example h3{font-size:.88rem;color:var(--teal);margin-bottom:4px}
+.term-sources{display:flex;flex-wrap:wrap;gap:6px 12px;border-top:1px solid var(--line);padding-top:10px;font-size:.84rem;color:var(--muted)}
+.term-related{padding-top:6px}
+.term-no-results{padding:20px;color:var(--muted)}
+@media(max-width:640px){.course-list.term-index{max-height:28vh;min-height:0}}
 @media(max-width:830px){.shell{grid-template-columns:250px minmax(0,1fr)}.rail{padding:22px 15px}.top{align-items:start;flex-direction:column;gap:14px;margin-bottom:22px}.meter{width:100%;max-width:260px}}
 @media(max-width:640px){.shell{display:flex;flex-direction:column}.rail{padding:10px 16px}.rail summary{padding:6px 0}.rail-inner{position:static}.course-list{max-height:35vh;min-height:0}main{padding:19px 15px 32px}.nav .subtle{order:-1;flex-basis:100%;text-align:center}.answer{padding-block:16px}}
 @media(max-width:820px){.map-branches{grid-template-columns:1fr}.map-fork::before{inset-inline:50%;border-right:0}.map-fork{padding-top:5px}}
@@ -143,7 +167,12 @@ h3{font-size:clamp(1.24rem,2.6vw,1.75rem);line-height:1.38;letter-spacing:-.02em
 <body>
 <div class="shell">
   <aside class="rail">
-    <details class="rail-inner" id="directory" open>
+    <div class="rail-inner">
+    <nav class="rail-tabs" aria-label="训练营栏目">
+      <button type="button" id="training-tab" aria-pressed="true" aria-controls="training-view">课程目录</button>
+      <button type="button" id="terms-tab" aria-pressed="false" aria-controls="terms-view">术语解释</button>
+    </nav>
+    <details id="directory" open>
       <summary>课程目录</summary>
       <label class="control">搜索课程<input id="search" type="search" placeholder="例如 补货、TEMU、对账" autocomplete="off"></label>
       <label class="control">业务主题<select id="theme"><option value="">全部主题</option></select></label>
@@ -151,9 +180,17 @@ h3{font-size:clamp(1.24rem,2.6vw,1.75rem);line-height:1.38;letter-spacing:-.02em
       <p class="result" id="results" role="status"></p>
       <nav id="course-list" class="course-list" aria-label="选择课程"></nav>
     </details>
+    <div id="terms-sidebar" hidden>
+      <label class="control">搜索术语<input id="term-search" type="search" placeholder="例如 SKU、拒付、到岸成本" autocomplete="off"></label>
+      <label class="control">业务分类<select id="term-category-filter"><option value="">全部分类</option></select></label>
+      <p class="result" id="term-results" role="status"></p>
+      <nav class="course-list term-index" id="term-list" aria-label="选择术语"></nav>
+    </div>
+    </div>
   </aside>
   <main>
     <noscript>请在允许 JavaScript 的浏览器中打开，以使用课程、问答和进度记录。</noscript>
+    <div id="training-view">
     <header class="top">
       <div><h1>跨境电商业务训练营</h1><p id="catalog-summary"></p></div>
       <div class="meter"><label for="progress" id="progress-label">已掌握</label><progress id="progress"></progress></div>
@@ -248,10 +285,287 @@ h3{font-size:clamp(1.24rem,2.6vw,1.75rem);line-height:1.38;letter-spacing:-.02em
       <p class="footer">问答和情景为学习整理。具体审核、投放与履约规则以目标站点现行要求为准。</p>
       <p class="footer" id="storage-note">学习记录保存在当前浏览器，移动文件或换浏览器时，记录可能需要重新建立。</p>
     </section>
+    </div>
+    <section id="terms-view" aria-labelledby="glossary-title" hidden>
+      <header class="glossary-intro">
+        <h1 id="glossary-title" tabindex="-1">跨境电商术语解释</h1>
+        <p id="glossary-summary"></p>
+      </header>
+      <nav class="glossary-common" id="term-common" aria-label="常用术语"></nav>
+      <p class="term-no-results" id="term-empty" hidden>没有匹配的术语。试试英文缩写、中文名，或切回全部分类。</p>
+      <article class="card term-card" id="term-card" aria-labelledby="term-title">
+        <p class="term-category" id="term-topic"></p>
+        <h2 id="term-title" tabindex="-1" aria-live="polite"></h2>
+        <p class="term-aliases" id="term-aliases"></p>
+        <p class="term-definition" id="term-definition"></p>
+        <section class="term-example" aria-labelledby="term-example-label">
+          <h3 id="term-example-label">放到业务里</h3>
+          <p id="term-example"></p>
+        </section>
+        <nav class="term-related" id="term-related" aria-label="相关术语" hidden></nav>
+        <div class="term-sources" id="term-sources"></div>
+      </article>
+      <p class="footer">平台收费、申报期限、准入和接口细节随站点与时间变化，实际操作以当前规则为准。</p>
+    </section>
   </main>
 </div>
 
 <!-- 每行一课：编号 | 名称 | 业务步骤（用 → 分隔） | 问题 | 答案 ...；最后一题为情景练习。 -->
+<script type="text/plain" id="term-data">
+001|平台与经营|亚马逊|Amazon,Amazon Marketplace|面向不同国家或地区的电商平台。卖家通过各站点刊登商品、接单，按所选方式配送。|美国站已经有页面，开德国站时还要核对当地商品要求和文案。
+002|平台与经营|独立站|DTC站点,自建商城,Shopify|商家自己运营的购物网站，可以用 Shopify 等工具搭建，自己负责引流、收款和售后。|用 Google Ads 引来访客，让他们在你的站点直接下单。
+003|平台与经营|Temu|拼多多跨境|跨境电商平台，卖家的报价、发货、售后责任会随着托管模式变化。|同一 SKU 走全托管和半托管，运营要先确认真实出货和收入的口径。
+004|平台与经营|全平台|多平台,全渠道|运营语境中的统计范围，指当前业务纳入的多个平台。具体覆盖哪些平台由报表或任务说明决定。|报表写“全平台销量”时，先确认是否也包含独立站。
+005|平台与经营|Ozon|Ozon Marketplace|以俄罗斯市场为主的在线零售与卖家平台。|把商品发布到 Ozon 前，先核对对应类目属性、当地语言和可用发货路线。
+006|平台与经营|1688|阿里巴巴1688|面向国内采购的批发平台，常用于找源头工厂、看样和比较批量报价。|把三家的颜色、MOQ、含税和运输条款对齐，再比较。
+007|平台与经营|Home Depot|The Home Depot,家得宝|以家装、建材和家居工具为主的北美零售商与销售渠道。|做浴室收纳调研时，可用它的商品页面了解尺寸、材料和价格带。
+008|平台与经营|YouTube|YouTube Shorts|视频平台，跨境运营会用它展示用法、做测评或吸引访客。|发布一段安装教程，让买家看到工具、耗时和适用场景。
+009|平台与经营|Shopee|虾皮|覆盖东南亚等市场的电商平台，各地站点的语言、售价和配送选项可能不同。|同时卖到马来西亚和泰国时，分别确认货币、标题与配送承诺。
+010|平台与经营|沃尔玛|Walmart,Walmart Marketplace|零售商和第三方卖家平台。零售供货与第三方店铺的业务角色不同。|做 Walmart Marketplace 时，按卖家平台规则核对刊登和履约。
+011|平台与经营|TikTok|TikTok Shop,短视频电商|TikTok 是内容平台。开通相应市场的 TikTok Shop 后，可用短视频或直播带动购买。|主播展示商品效果，观众通过视频里的购物入口下单。
+012|商品与内容|商品|Product,Item|卖家要展示和销售的东西。一个商品可以有多个可独立销售的规格。|同一款理线夹有黑白两色，商品款式相同，库存按两个 SKU 管。
+013|商品与内容|评论|Review,商品评价|买家对商品本身的体验反馈。店铺反馈主要反映卖家的服务体验。|“线夹太窄”是商品问题，“包裹晚到”可进一步查配送服务。
+014+091|商品与内容|A+ 内容|A+,A+页面,Enhanced Brand Content|有相应资格的亚马逊卖家可在详情页增加的图文展示模块，适合解释功能和使用方法。|把安装步骤和实测对比做成图文模块，帮助买家理解如何使用。
+015|商品与内容|主图|Main Image,首图|买家在搜索结果或商品页面先看到的商品图，通常要符合目标平台的专门规范。|先让买家看清这是一包 6 个线夹，再用副图展示使用场景。
+016|商品与内容|竞品|Competitor,竞争商品|买家可能拿来做同场比较的其他商品，判断时看用途、人群、规格和价格。|比理线夹价格时优先选同站点、同用途和相近件数的商品。
+017|商品与内容|视频|Video,商品视频|用连续画面说明商品如何使用、大小如何或效果怎样的内容素材。|拍实际桌面安装过程，让买家看到线夹适合的线径。
+018|库存与履约|物流单|运单,Waybill,Shipping Label|承运和追踪一票货的物流凭证，通常有运单号、收发货信息等。|仓库交运后，把运单号关联到实际包裹和订单。
+019|库存与履约|FBA 货件|FBA Shipment,Amazon 入库货件|卖家送到亚马逊仓的一批货，关联入库计划、装箱、标签和收货记录。|计划发 100 件，平台只收 95 件，就用货件编号查接收差异。
+020|商品与内容|Listing|刊登,商品详情页,Product Detail Page|平台上买家看商品和下单的一页，通常包括标题、图片、卖点、属性等。|上传成功后打开 Listing，核对每个颜色和购买入口。
+021|广告与增长|广告报表|Ad Report,Advertising Report|记录广告曝光、点击、花费和归因转化的表。下载时要选好站点、时间和粒度。|从搜索词报表找出花了钱但与商品不相关的查询。
+022|库存与履约|订单|Order,销售订单|买家购买后生成的一笔交易任务，通常有商品、数量、金额和履约状态。|后台有订单但支付未确认时，按平台规则判断何时发货。
+023|库存与履约|库存|Inventory,Stock|商品数量的记录。仓内实际数量、在途和可售数量代表不同状态。|100 件在仓但只有 80 件可售，备货时用 80 件估算还能卖几天。
+024|结算与财务|账单|Statement,交易账单|一定期间内收入、退款、扣费、转账等项目的汇总或明细。|平台净结算 990 元，再对照银行流水确认这一笔到账。
+025|结算与财务|银行流水|Bank Statement,资金流水|银行账户的逐笔进出账记录，用来核实际到账和付款。|平台显示已打款时，用流水的金额、时间或追踪号匹配。
+026|结算与财务|发票|Invoice,商业发票|记录交易、商品和金额的凭证。税务发票与报关商业发票要按用途区分。|对供应商付款前，把发票金额与采购和实收资料核对。
+027|结算与财务|利润|Profit,毛利,净利|收入扣除按约定口径计入的成本和费用后的余额。毛利和净利扣除范围不同。|售价 20，采购物流和平台等相关成本共 15，当前口径下剩 5。
+028|商品与内容|字幕|Captions,Subtitles|视频里随时间出现的文字，用来还原口播或补充说明。|将三步安装流程做成英文字幕，并检查出现时点与画面同步。
+029|采购与供应|供应商|Supplier,Vendor|给商家提供商品、原材料或生产服务的合作方。|两家单价接近时，还要比质量、交期和补货能力。
+030|广告与增长|关键词|Keyword,词库|运营用来描述商品、组织内容或设置广告目标的词。|把 cable clips 作为投放词，再查看买家实际搜了什么。
+031|采购与供应|报价单|Quotation,Quote|供应商给出的价格和交易条件表，通常包括规格、起订量、交期和有效期。|一家报不含运费，另一家报到仓价，先换成同口径再比。
+032|商品与内容|SKU|Stock Keeping Unit,卖家商品编码,库存单位,Merchant SKU|卖家用来管理库存、报价和发货的商品规格编码。|同一款理线夹有黑白两色，每种颜色单独建一个 SKU。
+033|广告与增长|搜索词|Search Query,买家查询,Customer Search Term|买家真实输入的查询，可以与商家预设的广告关键词不同。|你投放 cable clips，买家搜的是 cable clips for desk。
+034|商品与内容|QA（商品问答）|Q&A,Product Questions,顾客问答,Quality Assurance|本库评论分析场景里是商品问答。其他团队说 QA 时，也可能指 Quality Assurance，也就是质量保证。|买家问“能夹 8 mm 的线吗”属于商品问答，视频上线前做 QA 是检查质量。
+035|合规与售后|客服会话|Customer Conversation,Ticket,工单|围绕一次买家诉求的沟通记录，可以来自站内信、邮件或聊天。|买家问包裹没收到，客服保留订单号、证据和处理进度。
+036|商品与内容|ASIN|Amazon Standard Identification Number,亚马逊标准商品编号|亚马逊目录中的商品标识。多个卖家的报价可以对应同一目录商品。|平台已有完全一样的型号时，先核对能否在现有 ASIN 下添加报价。
+037|商品与内容|新品 ASIN|New ASIN|团队正在筹备上架或刚开始经营的商品在亚马逊目录中的编号。|首次开售后按新品 ASIN 核验页面、库存和广告状态。
+038|商品与内容|竞品 ASIN|Competitor ASIN|亚马逊上作为竞品研究对象的商品编号，用来快速找到同一个页面。|在调研表填竞品 ASIN、规格与快照日期。
+039|广告与增长|广告活动|Campaign|投放管理的一层，通常管理目标、预算和下属广告组。|给新品建一个自动探索活动，设置单日预算。
+040|广告与增长|广告组|Ad Group|广告活动下的一组投放对象或广告，用来组织相近的商品和定向。|同一活动里给两类产品各建一个广告组。
+041|广告与增长|Targeting|广告定向,投放目标,Target|告诉平台把广告展示给哪些搜索、商品位置或符合条件的受众。|用一组相关商品 ASIN 做商品定向，测试哪些流量会成交。
+042|平台与经营|店铺|Store,Shop|卖家在平台上的经营账号或店铺单元，用来管理商品、订单和数据权限。|两家店铺卖同一商品，分析时把账号和结算记录分开。
+043|平台与经营|站点|Marketplace,国家站,市场站点|平台面向不同市场的运营单元，常有自己的货币、类目和当地规则。|亚马逊美国站的售价和加拿大站的售价分别管理。
+044|广告与增长|捡漏广告活动|低价试投,低出价探索|运营团队的常用叫法，指用相对低的出价尝试获得成本合适的流量。|为相关长尾词设低价试投，评估量级与转化后再决定放大。
+045|商品与内容|新品|New Product,新款|团队新推出或正在引入的新商品，内部认定时间按各团队约定。|理线夹首批库存到仓前，用新品任务表跟踪建档和上线。
+046|商品与内容|A+ 图片|A+ Image,增强内容图片|放进 A+ 模块的图像素材，需配合版式和商品事实。|用实物尺寸图配合说明文字回答能装在哪里。
+047|商品与内容|A+ 文案|A+ Copy,增强内容文案|A+ 图文模块里的说明文字，通常阐明卖点和使用场景。|分段写材料、使用方式与适用边界，并与实测结果对应。
+048|商品与内容|多站点内容|Marketplace Localization,多站点本地化|同一商品为不同市场准备的页面版本，包括词语、单位和合规说明。|德国站图片和文案都用一致的当地单位，且数值来自同一实测。
+049|数据与系统|Listing 任务|刊登任务,上架任务|一次商品创建、修改或本地化的工作记录，含 SKU、站点、负责人和发布结果。|白色款部分失败，用任务记录回链并定向重传。
+050|数据与系统|飞书任务表|飞书多维表任务,任务台账|用飞书表格记录任务、负责人与状态的一种协作方式。|把每个 SKU 的素材、合规和上架分别设为待办并回写结果。
+051|商品与内容|产品信息|产品属性,商品主数据,Product Information|描述商品事实的资料，比如材料、规格、型号、适配对象和包装数量。|核实一包 6 件后，标题、图片和后台数量都采用同一值。
+052|商品与内容|新品图片|New Product Images,新品素材|为新商品准备的整体图片包，可分主图、尺寸图、使用图等。|同个素材包按 SKU 与站点版本命名，上传时不会用错。
+053|商品与内容|Amazon 前台主图|Amazon Main Image,亚马逊买家侧主图|买家实际在页面或搜索结果看到的第一张商品图。|后台显示图片处理成功后，再到买家页面确认黑白两款主图正确。
+054|商品与内容|多站点图片|Marketplace Images,各站素材|按目标市场分别验收的图片资产，即使共用实物底图也可有不同文本和单位。|共用理线夹实拍，分别制作英文英寸版和德文厘米版。
+055|商品与内容|德语图|German Creative,DE 素材|为德语用户准备的图片版本，可应用于符合场景的德语市场页面。|把包装数量说明用德语表达，再核对单位和文案。
+056|商品与内容|法语图|French Creative,FR 素材|面向法语用户的图片版本，文案与计量单位要贴合该站点。|法国站验收时同时检查法语副图和页面属性里的尺寸。
+057|商品与内容|意大利语图|Italian Creative,IT 素材|为意大利语展示准备的图片素材，文字要与实际商品和本地版本一致。|图上安装提示用意大利语，并保留原始实拍供审核。
+058|商品与内容|西班牙语图|Spanish Creative,ES 素材|面向西班牙语用户的图片，各市场用词或说明可能不同。|同一张尺寸图的西语标注按目标站点复核。
+059|商品与内容|产品图片|Product Images,商品图|展示实物外观、细节、尺寸、包装或真实使用方式的可视资料。|若场景图用了道具，要让买家知道道具是否随货。
+060|商品与内容|多语言图片|Multilingual Images,多语种素材|同一类图片制作多个语言版本，也可能包含不同的单位和本地表达。|同张安装图保留一个底稿，分别输出英语和法语版。
+061|商品与内容|多站点 A+|Localised A+,多市场A+内容|按国家站点维护的 A+ 内容，资格、审核与模块设置按当地要求核对。|美国站 A+ 通过不代表德国站自动发布，另做适配和验收。
+062|商品与内容|德国站 A+ 草稿|DE A+ Draft|为亚马逊德国站准备、尚未完成审核与发布的 A+ 页面内容。|保存德语图片和文案，核商品事实后提交德国站审核。
+063|商品与内容|新品资料|New Product Pack,上架资料包|新品从采购交到运营和仓库的一整套资料，包括商品、合规、图片和规格。|资料包缺装箱尺寸时，物流报价和刊登准备都要补证。
+064|库存与履约|FNSKU|Fulfillment Network Stock Keeping Unit,亚马逊物流库存编号|亚马逊 FBA 系统中的库存识别编号，在采用相应标识方式时印在商品标签上。|发货前按实际货件要求核 FNSKU 与卖家 SKU 是否对上。
+065+107|合规与售后|GPSR|General Product Safety Regulation,欧盟通用产品安全法规|欧盟的通用产品安全规则，跨境卖家要根据商品和销售方式核对安全信息、标识和责任主体等要求。|上欧盟站前，逐类目确认页面需展示哪些制造商或责任人信息。
+066|库存与履约|货件|Shipment,批次货物|按同一运输或入仓计划处理的一批实物货，具体平台可能有专门编号。|一个货件含十箱，可能关联多个运单并分批签收。
+067|库存与履约|物流轨迹|Tracking Events,运踪|包裹从揽收、转运到妥投的时间和状态记录。|买家说未收到时，查看最后一次扫描和签收证据。
+068|合规与售后|GPSR 图片|商品安全图片,合规标识图片|平台可能要求上传的产品、包装或标签图片，用于证明对应安全信息。|实际包装有警示标识时，提交可清楚辨认的照片。
+069|平台与经营|运营负责人|运营 Owner,业务负责人|对特定店铺、SKU 或任务的进度和结果负责的人。|刊登异常先分配到对应站点的运营负责人，再记录复验。
+070|商品与内容|美工任务|设计任务,创意制作任务|把图片、排版或视频要求交给设计师的具体工作单。|写清尺寸图要解决的问题、实测数据、目标站点和截止时间。
+071|库存与履约|测试发货记录|Trial Shipment,试发记录|用小批货验证打标、交运、入仓或签收时留下的记录。|首发 10 件，记录出库与收货差异，确认稳定再放量。
+072|平台与经营|站点价格|Marketplace Price,本地售价|某个市场下该商品的售价或报价，通常与当地币种、税和活动设置相关。|美国站 19.99 美元和英国站 19.99 英镑是两条价格记录。
+073|数据与系统|飞书公式|多维表格公式,Formula Field|用输入字段自动算出结果的公式，比如汇总金额或判断缺资料。|用库存量除以日销得到覆盖天数，日销为零时标记待核算。
+074|库存与履约|箱单|Packing List,装箱单|列出每箱装了哪些 SKU、数量、重量或体积的单据。|实际少收两件时，把箱单、发货单和签收结果放在一起核。
+075|库存与履约|发货单|Dispatch Note,送货单|仓库按它拣货和交接，通常记录应发或实发的货、数量和收货方。|发货当天在单上记录两箱实发和承运商接收信息。
+076|库存与履约|仓库发货|Warehouse Dispatch,仓库出货|仓库把已拣选、核验和打包的货交给承运方的动作。|打印面单后，还要核实包裹真的交运再确认发货。
+077|库存与履约|发货记录|Dispatch Record,发运台账|留存何时发、发给谁、发哪些货和使用哪个运输编号的数据。|批发货部分失败时，用发货记录定位仍在库的订单。
+078+101|库存与履约|头程物流|头程,First Mile,入仓前运输|跨境卖家把货从原产地运到目标市场仓库或入仓节点的那一段，可能含报关、清关和派送入仓。|从中国工厂运到美国 FBA 仓，通常算在备货头程成本里。
+079|库存与履约|发货时间|Ship Date,交运时间|货物发出的时间点。建单、打面单和承运商揽收可能有不同时间。|要算真实发货时效，先定义使用仓库出库还是交运扫描。
+080|库存与履约|物流表|物流台账,Shipping Tracker|把货件、运单、承运商、轨迹和费用整理到一起的表。|按批次更新预计到仓与签收，为补货和财务提供依据。
+081|库存与履约|追踪编号|Tracking Number,运单号,追踪号|承运商用于查某个包裹或运输任务的编号。|一个订单拆两包时记录两个追踪号，避免误判少发。
+082|库存与履约|船司|Shipping Line,Ocean Carrier,海运承运人|负责经营海运船舶或航线的承运公司。货代可帮卖家向船司安排舱位。|海运延期时，通过货代核对船司的实际开船和到港信息。
+083|库存与履约|预计到港|ETA,Estimated Time of Arrival|预计抵达指定港口的时间，随航线和实际运输变化。到港后还有清关、转运或入仓。|预计 10 日到港，运营不要把 10 日直接当作可售日期。
+084|库存与履约|物流费用|Shipping Cost,Freight Cost,运费|把货从一地点运到另一地点的费用，报价可能只含部分运输或附加项目。|比较货代的海运价时，把燃油、清关和到仓派送算在一致口径。
+085|库存与履约|物流进度|Shipment Status,运输进度|在当前时点，货处在待揽收、运输、入仓或妥投等哪一阶段。|轨迹表记录全部事件，进度栏只显示今天最后确认的状态。
+086|库存与履约|FBA|Fulfillment by Amazon,亚马逊物流|卖家把货备入亚马逊物流网络，由其按计划仓储、拣货和配送。|卖家先安排货件入仓，之后通过可售库存确认何时能开售。
+087|库存与履约|FBM|Fulfilled by Merchant,卖家自配送,自发货|卖家负责用自有仓或合作仓发货，并自行保障配送承诺。|发货前确认本地仓库存、订单截止时间和实际承运线路。
+088|数据与系统|ERP|Enterprise Resource Planning,企业资源计划,电商ERP|把商品、订单、库存、采购、物流和财务数据连起来的管理系统。|用同一 SKU 把渠道订单关联到仓库扣库存，再追踪结算。
+089|广告与增长|BSR|Best Sellers Rank,畅销商品排名|亚马逊商品在特定类目里的畅销排序，随类目和时点变化。|记录同类别的排名快照用来比较，不把排名直接当实测销量。
+090|广告与增长|ABA|Amazon Brand Analytics,亚马逊品牌分析,Brand Analytics|符合条件的品牌卖家用来理解搜索与购买行为的一组亚马逊报表。|纳入搜索查询表现，区分有曝光没点击和有点击没购买。
+092|广告与增长|SP、SB、SD|SP/SB/SD,SP,SB,SD,Sponsored Products,Sponsored Brands,Sponsored Display,商品广告,品牌广告,展示广告|亚马逊的常见广告类型缩写，分别侧重推广商品、品牌展示或采用展示类定向。|新品运营选 SP 做商品测试，再按资格和目标看品牌或展示投放。
+093|广告与增长|Bulk 报告|Bulk,Bulksheets,Bulk Operations,广告批量表|用于批量读取、创建或调整广告配置的表格。运营要区分用来看数据的字段和要提交修改的字段。|改出价后，逐行查看处理报告并只重试失败行。
+094|广告与增长|词根|Keyword Root,核心词根|多个搜索词共有的关键部分，方便按意思做归类。|cable clips for desk 和 small cable clips 都可归入 cable clips。
+095|广告与增长|ROAS|Return on Ad Spend,广告支出回报率,广告回报|用广告归因销售额除以广告花费，看每花 1 元广告带回来多少销售额。|花 100 元带来 400 元广告归因销售，ROAS 是 4 倍。
+096|广告与增长|ACOS|Advertising Cost of Sales,广告销售成本比,ACoS|用广告花费除以广告归因销售额，看销售额里有多少比例花在了广告上。|花 30 元、广告归因销售 100 元，ACOS 为 30%。
+097|广告与增长|MER|Marketing Efficiency Ratio,整体营销效率|常用总营收除以整体营销投入或广告投入，具体看团队所用分母。|全店收入 2000、所用营销支出 400，按当前口径 MER 为 5 倍。
+098|采购与供应|MOQ|Minimum Order Quantity,最小起订量,起订量|供应商愿意接受的最小采购数量，也可能按颜色或规格分别计算。|一家要求黑白两色各订 100 件，合计至少 200 件。
+099|广告与增长|KOL|Key Opinion Leader,达人,意见领袖|在特定领域能影响受众购买判断的内容创作者或意见领袖。|找做家庭办公测评的达人展示真实用法，并核量和费用。
+100|库存与履约|海外仓|Overseas Warehouse,当地仓|设在目标市场或附近的仓库，货提前到当地，出单后能本地发货。|在英国仓放首批货，客户下单后从当地配送。
+102|库存与履约|末程|Last Mile,尾程,最后一公里|包裹从本地配送节点到买家手上的最后一段运输。|货到海外仓后，贴本地快递面单运到买家门口。
+103|库存与履约|超卖|Overselling,卖超|实际可发的货少于已经承诺给买家的数量，常发生在库存同步延迟时。|只剩 1 件却被两个站点同时卖出，后一个订单会缺货。
+104|库存与履约|呆滞库存|Slow-moving Inventory,滞销库存,超龄库存|销售速度很低、长期占用仓储和资金的库存。超龄则强调库存年龄，两者可重叠。|入仓半年还有大量余货，可评估促销、调拨或退出。
+105|合规与售后|VAT|Value Added Tax,增值税|许多市场对商品或服务价值征收的增值税。义务取决于卖家主体、订单和销售模式。|做欧盟结算时，先确认平台代收税和商家自申报的交易。
+106|合规与售后|HS 编码|HS Code,商品海关编码,海关归类|海关用来归类商品的编码。国际体系基础为六位，许多国家在其后再加本地位数。|物流报价前按商品材料和用途核归类，因为税率可能随之变化。
+108|合规与售后|9710 订单|9710,跨境电商B2B直接出口|中国海关监管方式 9710 下的跨境电商企业对企业直接出口业务记录。|境内企业通过跨境平台将货直接卖给境外企业时，核实能否按 9710 申报。
+109|数据与系统|BI|Business Intelligence,商业智能,经营看板|把多个来源的数据变成可筛选、可对比的经营指标和图表。|把广告、库存和利润按站点及 SKU 放在一张看板里排异常。
+110|数据与系统|多维表格|Bitable,表格数据库|像表格一样操作，又能关联记录、分角色分配和形成不同视图的工具。|把新品、站点和素材分为三张表，通过 SKU 关联。
+111|合规与售后|仅退款|Returnless Refund,免退退款|买家获得退款，实物商品按适用规则无需寄回。适用范围由站点或售后政策决定。|低价小件的回寄成本很高时，平台或卖家可能按规则走仅退款。
+112|广告与增长|COSMO|Amazon COSMO,常识知识图谱|亚马逊公开研究中的电商常识知识系统，用来描述产品和买家需求之间的联系。|同是线夹，清楚表达“桌下走线”能帮助理解商品使用场景。
+113|平台与经营|Rufus AI|Rufus,亚马逊购物助手|亚马逊推出的面向买家的 AI 购物助手，可帮助问商品、比较和找选项，入口会随站点变化。|买家问两款的安装区别时，清晰且准确的页面属性有助于理解。
+114|广告与增长|A10 算法|A10,亚马逊搜索排序|卖家圈对亚马逊搜索排序机制的非官方称呼。排序权重没有可依赖的公开 A10 参数表。|做页面优化时看相关性和真实转化数据，用对照检验动作。
+115|商品与内容|Search Terms（后台搜索词）|Generic Keywords,后台关键词,后台词|卖家后台用于补充商品检索的字段。字段限制按站点及类目核对。|标题已覆盖核心词，可在允许的字段里补充有用的同义表达。
+116|广告与增长|否定词库|Negative Keywords,否定关键词,排除词|广告不希望匹配的一组搜索词，用来减少与商品不相关的点击。|卖理线夹却不断匹配“纸夹”，核实后将相关错意图词加否定。
+117|广告与增长|GEO（生成式搜索优化）|Generative Engine Optimization,生成式引擎优化|让 AI 搜索更容易理解和引用准确信息的一类内容优化做法。|商品描述写明实测线径、适配边界和证据，便于搜索理解。
+118|结算与财务|Referral Fee（销售佣金）|Referral Fee,亚马逊销售佣金,平台佣金|订单成交时由平台按适用规则收取的销售佣金。类别、站点或价格段可能影响费率。|测单件利润时，把销售佣金和 FBA 配送费分开列。
+119|广告与增长|CVR（转化率）|CVR,Conversion Rate,转化率|完成目标动作的次数除以对应基数。基数可以是访问、点击或会话，但比较时要统一。|100 次同口径访问产生 5 笔订单，订单转化率是 5%。
+120|广告与增长|VOC（客户之声）|VOC,Voice of Customer,用户声音,客户声音|从评论、退货原因、问答和访谈等渠道整理出的买家真实需求与痛点。|把“尺寸没说清”和“实物确实不适用”分成两类改进动作。
+121|广告与增长|GPM（千次观看成交额）|GPM,GMV per Mille,千次观看GMV|一千次观看对应的成交金额，常用于直播和短视频经营分析。|1 万次观看带来 3000 元成交额，按这一口径 GPM 为 300 元。
+122|合规与售后|CPSIA（美国儿童产品安全改进法）|CPSIA,Consumer Product Safety Improvement Act|美国关于消费品特别是儿童产品安全的法律之一。具体测试、证明和标识按商品与法规核对。|上美国站儿童产品前，确认适用安全标准、实验室和证明要求。
+123|合规与售后|CE 标志|CE认证,CE Marking,欧盟合格评定|部分适用欧盟法规的产品使用的合规标志，证明产品按适用要求完成合格评定。|先判断某类产品是否需要 CE，再确认测试、技术文件和符合性声明。
+124|合规与售后|Made in USA 声称标准|美国制造,Made in USA,原产地声称|在美国使用“美国制造”宣传时要满足适用的原产地声称要求，限定式表述与无条件表述有区别。|美国组装但关键零件来自国外，应核证据后选择可支持的表述。
+125+151|结算与财务|到岸成本|Landed Cost,到仓综合成本|把货送到约定目的地的总取得成本，可包括采购、运输、保险、关税和相关处理费。先写清费用计到哪。|采购 7、物流及关税等 3，按约定口径每件到仓成本为 10。
+126|广告与增长|CRO（转化率优化）|CRO,Conversion Rate Optimization,转化优化|通过找出用户在哪一步放弃并修正体验，提高完成下单等目标的比例。|移动端支付流失大，先核支付失败和运费显示，再测试修改。
+127|广告与增长|购物车放弃率|Cart Abandonment Rate,弃购率|加购后没有完成购买的比例，要明确使用同一批会话、用户或购物车作为分母。|100 个加购会话里 30 个下单，按会话口径弃购率 70%。
+128|广告与增长|流失客户|Churned Customer,沉默客户|在业务约定的时间内不再购买、续订或活跃的客户。判断标准与商品复购周期有关。|日用品可按长期未复购买分群，耐用品需要不同观察窗口。
+129+182|结算与财务|拒付|Chargeback,信用卡拒付,Chargeback Refund|买家通过发卡行对交易提出争议，支付方可能暂扣或退回这笔款。与卖家主动退款是不同过程。|收到未收到货的拒付时，核签收和交易凭证，按支付渠道流程处理。
+130|合规与售后|Visa CE 3.0 有力证据|Visa Compelling Evidence 3.0,CE 3.0|Visa 对特定争议采用的一套证据规则，符合资格的历史交易数据可用于举证。|出现欺诈争议时，先由支付服务商核是否符合该规则与数据要求。
+131|数据与系统|PayPal-Request-Id 幂等键|PayPal Request ID,Idempotency Key|部分 PayPal 接口可用的请求标识，让同一笔请求重试时能被识别。|扣款请求超时，按接口规则用同一请求标识核实或重试，防止重复扣款。
+132|合规与售后|PCI DSS SAQ 分级|PCI DSS,SAQ,支付卡安全自评问卷|支付卡数据安全标准下，商家按实际收款方式和卡数据接触范围选适用自评问卷。|跳转到支付服务商页面和自己收集卡信息，适用的评估范围可能不同。
+133|合规与售后|WCAG 2.1 AA|Web Content Accessibility Guidelines,网页无障碍AA|网页无障碍指南的一组成功标准，AA 表示满足该版本 A 和 AA 级要求。|检查键盘能否操作结账，表单是否有标签，文字对比度是否足够。
+134|广告与增长|客户生命周期分层|Customer Lifecycle Segmentation,客户分群|按新客、复购、活跃和流失等阶段分组，给各组适合的内容和服务。|首次购买后发送使用指南，已退订者从营销发送名单排除。
+135|结算与财务|重新上架费|Restocking Fee,退货整备费|退货使商品需要检查、处理或不能按新品售卖时，部分规则下可能适用的费用。|有退货使用痕迹时，先核平台规则与证据，再判断能否收费。
+136|采购与供应|三单匹配|Three-way Matching,三单校验|把采购订单、收货记录和供应商发票对在一起，核价格、数量和实际收到什么。|采购 100 件、实收 95 件、发票开 100 件，先处理 5 件差异。
+137|采购与供应|2/10 Net 30|2 10 net 30,付款折扣条款|常见付款条件，10 天内付款可获 2% 折扣，否则 30 天内付全额。起算日看合同。|应付 1000 元，满足折扣条件可付 980 元。
+138|广告与增长|多触点归因|Multi-touch Attribution,MTA|按一套方法把同一笔转化的贡献分给买家经过的多个渠道或广告触点。|买家先看视频后搜品牌再下单，可按约定模型分摊贡献。
+139|库存与履约|再订货点|Reorder Point,ROP,补货触发点|库存下降到某水平就计划补货的门槛，通常考虑等待到货期间的需求及安全库存。|预计等待期间卖 80 件，另留 20 件缓冲，则可把触发点设在 100。
+140|采购与供应|开放采购额度 OTB|Open-to-Buy,OTB,可用采购额度|在销售和库存计划下，扣掉已承诺采购后还能再买多少的预算。|本期可采购 10 万，已锁定 7 万，按预算口径还可买 3 万。
+141|广告与增长|EMQ（事件匹配质量）|Event Match Quality,Meta EMQ|Meta 用来描述服务端事件里可用于匹配账户的客户信息质量的指标。|购买事件匹配异常时，核事件字段、用户同意和数据处理方式。
+142|结算与财务|滚动准备金|Rolling Reserve,滚动保证金|支付机构按约定暂留部分交易款，经过一段时间再逐批释放，以覆盖退款或拒付风险。|本月留存部分款项，下月按规则核还款与尚未释放的余额。
+143|结算与财务|BNPL（先买后付）|Buy Now Pay Later,分期支付|消费者下单后按服务商安排分期或延后付款，商家结算方式看协议。|结账页提供分期入口前，先测手续费与到账影响。
+144|合规与售后|KYC 实名认证|Know Your Customer,KYC,客户身份核验|平台或支付机构核对商家或客户身份、企业及实际控制人资料的流程。|换企业收款资料时，按要求重新提交主体证明。
+145|广告与增长|盈亏平衡 ROAS|Break-even ROAS,保本ROAS|广告投入刚好耗尽广告前贡献利润时所需的销售额与广告费之比。|广告前贡献利润率为 25%，其他条件不变时，保本 ROAS 约为 4 倍。
+146|库存与履约|售罄率|Sell-through Rate,库存售出比例|某批或某周期卖出的件数占对应可售量或入库量的比例，报表间分母可能不同。|收到 100 件，卖出 70 件，按到货数量口径售罄率是 70%。
+147|合规与售后|TCPA 合规|Telephone Consumer Protection Act,TCPA|美国规范特定电话和短信触达的一类规则，适用时要核同意、退订与发送要求。|准备群发营销短信前，核名单订阅记录和退订通道。
+148|广告与增长|LTV/CAC 比率|LTV CAC,Lifetime Value,Customer Acquisition Cost,客户价值与获客成本|用一个客户预计带来的生命周期价值，与获取这个客户的成本比较。价值要说明用收入还是贡献利润。|每个客户贡献价值 300、获客花 100，按此口径是 3 倍。
+149|结算与财务|回本周期|Payback Period,获客回收周期|累计收益补回初始投入要多久。计算要明确使用现金流还是贡献利润。|获客花 120，每月贡献 40，其他条件不变，预计 3 个月回本。
+150|合规与售后|IOSS（进口一站式方案）|Import One-Stop Shop,IOSS,欧盟进口增值税一站式|欧盟用于部分合资格低价值进口远程销售的增值税申报简化安排。|直发欧盟消费者前，确认交易是否适用及由谁代收申报。
+152|采购与供应|供应链健康基准|Supply Chain Health Benchmarks,供应链指标基线|团队比较交期、质量、缺货和到货稳定性等表现的一组历史或目标参考。|把近三个月实际交期与承诺交期对比，识别补货经常迟到的供应商。
+153|广告与增长|评论速率反推法|Review Velocity,评价推测销量|用新评论增长和假定评论率去估计销量的方法。评论率未知，结果只能作粗略参考。|近月新增 20 条评论，假设 2% 的买家留下评论，会推到约 1000 单，此数需要其他数据验证。
+154|广告与增长|电商增长公式|增长拆解,Revenue Decomposition|把收入拆成流量、转化率和订单均价等因素，帮助定位变化来自哪里。|1000 次访问、5% 下单、客单 20 元，按这一口径约有 1000 元销售额。
+155|结算与财务|结算报告|Settlement Report,结算报表,亚马逊结算报告|说明一个结算周期有哪些销售、退款、费用与调整的逐笔记录。|看到打款少于前台销售额，先用报告查各项扣减。
+156|结算与财务|Flat File V2 结算报表|Flat File V2,结算报告V2,GET_V2_SETTLEMENT_REPORT_DATA_FLAT_FILE_V2|亚马逊结算明细的一种平面文件格式，便于把订单、费用和金额导入系统。|将金额与交易类型列映射到财务台账，回验总额。
+157|结算与财务|日期范围汇总报告|Date Range Summary Report,付款日期范围汇总报告|按选择日期汇总一段时间的收入、费用、税及其他类别，用来看总体结构。|算上月平台费用总额时先看汇总，遇到差异再查逐笔报告。
+158|结算与财务|日期范围交易报告|Date Range Transaction Report,付款日期范围交易报告|按所选日期提供每笔交易和费用行的明细文件。|按订单号追一笔分两次发生的退款。
+159|结算与财务|付款一览视图|Payments Statement View,Statement View,结算一览|卖家后台集中查看结算区间、净额和预留信息的总览页面。|运营先确认本期预计出款，再打开明细核来源。
+160|结算与财务|交易视图|View Transactions,查看交易|卖家后台按订单、退款、付款或调整查看资金活动的界面。|针对一笔异常订单筛退款记录，确认是哪天过账。
+161|结算与财务|结算事件组|FinancialEventGroup,Financial Event Group,结算组|亚马逊财务接口中把有关财务事件归为一组的对象，可关联起止时间、状态与转账。|导入时以结算组编号归集明细，再和实际打款配对。
+162|结算与财务|结算周期|Settlement Period,结算区间|平台把某一段交易汇总处理、计算应转款的时间区间。周期和到账天数因账户、站点和规则而异。|月底的退款可能进下一结算期，要按真实区间对账。
+163|结算与财务|打款|Disbursement,Payout,转账,平台回款|平台把可支付资金转到卖家收款账户的动作。发起打款、在途和实际到账是不同状态。|后台显示已发起时，还要用银行流水确认实际到账。
+164|结算与财务|账户级储备金|Account Level Reserve,储备金,预留金额,Reserve|平台暂时保留的一部分卖家余额，满足条件再释放。它影响现金周转，通常要和已发生费用区分。|本期应收 1000 元，暂留 100 元，核剩余款时单列这 100 元。
+165|结算与财务|ACH Trace ID|TraceId,转账追踪号,Amazon Transfer ID,ACH追踪号|用于在美国 ACH 转账体系中定位一笔款的追踪编号。能否在渠道侧看到要看账单和银行。|两次到账金额一样时，优先用追踪号区分。
+166|结算与财务|延迟交易|Deferred Transaction,递延交易,DD+7|已记录但尚未达到可支付时间或条件的交易，释放后才进入后续支付。|月底订单已发货但没进入本笔打款，可先查是否仍在延迟状态。
+167|结算与财务|ACCS|Amazon Currency Converter for Sellers,亚马逊货币转换,亚马逊全球收款|亚马逊为卖家提供的打款币种转换服务，具体币种、汇率及费用按账单核对。|美元销售额以人民币收到时，留原币、换汇额和费用。
+168|结算与财务|FBA 配送费|Fulfillment Fee,Fulfilment Fee,Pick & Pack,FBAPerUnitFulfillmentFee,FBA履约费|亚马逊物流为商品出仓、打包和配送收取的费用，可能受尺寸、重量等因素影响。|包装改大后重新核对应档位的配送成本。
+169|结算与财务|月度仓储费|Monthly Inventory Storage Fee,Storage Fee,FBA仓储费|商品占用 FBA 仓储空间产生的常规费用。|比较两款包装体积，测在仓期间每月会多花多少。
+170|结算与财务|库龄附加费|Aged Inventory Surcharge,Long-Term Storage Fee,LTSF,长期仓储费|符合站点规则且在仓时间较长的库存，可能在常规仓储费之外被加收费用。|滞销品清货前，比较继续留仓、移除与变现的成本。
+171|结算与财务|低库存水平费|Low-Inventory-Level Fee,低库存费|部分适用市场或商品的 FBA 费用，在符合低历史库存等条件时可能触发。|若单件履约成本变高，核对费用明细中的适用条件。
+172|结算与财务|超量仓储费|Inventory Overage Fee,超量费|实际占用库存空间超过适用额度时，可能付的额外仓储费。|旺季大批入仓前先查额度，并按空间和波次安排发货。
+173|结算与财务|入库缺陷费|Inbound Defect Fee,FBAInboundDefectFee|货件到仓的装箱、标签、预处理等不符合入库要求时，可能产生的费用。|某批被收费用时，调出发货箱单和标签照片复核。
+174|结算与财务|退款管理费|Refund Administration Fee,退款行政管理费|卖给客户后发生退款时，平台按规则从原佣金返还中留取的管理费用。|对账同时看“退款佣金回退”和“退款管理费”，算出净影响。
+175|结算与财务|专业卖家订阅费|Professional Selling Plan,Subscription Fee,月租费|某些平台专业卖家计划按月收的固定费用。|估算小店盈亏时把月租与每笔成交的销售佣金分开。
+176|结算与财务|优惠券费|Coupon Fee,Coupon Participation Fee,Coupon Performance Fee|设置或使用平台优惠券时可能产生的费用，计费环节和金额按现行规则核对。|活动预算把给买家的优惠额和平台收取的券费用分别列出。
+177|结算与财务|秒杀费|Deals Fee,Lightning Deal Fee,Deal Participation Fee,RunLightningDealFee|参加促销活动时，平台可能收取的报名或绩效费用。|先核活动费、折扣和额外履约，再算毛利是否达标。
+178|结算与财务|退款佣金回退|RefundCommission,Refund Commission,退款佣金|订单退款时，之前收取的销售佣金按规则部分或全部冲回的交易项目。|订单退款影响收入，佣金返还和管理费还需分别核对。
+179|结算与财务|重计费|Order Retrocharge,Retrocharge,RetrochargeEvent,追征税|平台在某些已退款或调整的订单里重新向买家收费并产生对应结算变动。报表口径需核实。|同一订单先退款后重新扣款，按事件时间和类型整理，不当成两笔新销售。
+180|合规与售后|SAFE-T 索赔|SAFE-T Claim,SAFE-T Reimbursement,SAFETReimbursementEvent|亚马逊在适用条件下允许卖家就特定退款或售后损失申请赔偿的一种流程。|买家退回了错误商品时，先确认订单资格再留图、物流和退款证据。
+181|合规与售后|A-to-z 保障索赔|A-to-z Guarantee Claim,A-to-Z Claim,买家交易保障索赔|亚马逊买家在符合条件时，针对送达、商品或退款问题申请的平台保障流程。|买家因未收货申诉时，用订单、发货与签收记录回应。
+183|结算与财务|调整事件|AdjustmentEvent,Adjustment,亚马逊费用调整|平台对原有资金或库存处理做修正时生成的一类业务事件。|仓内丢失后补偿，日后找到商品可能再冲回现金调整。
+184|结算与财务|FBA 库存赔偿|FBA Inventory Reimbursement,库存赔偿,FBA inventory credit|按适用规则对 FBA 中的库存丢失、损坏等事件给卖家的赔付或修正。|仓库差异结案后，核赔偿编号与实际财务金额；后续找回还需核冲回。
+185|结算与财务|清算账户法|Clearing Account,清算账户,Amazon clearing account|用一个中转会计账户承接平台应结算的净额，等银行到账时再对销。|预期到账 990 元时先记在中转账户，银行到账后逐笔核掉。
+186|结算与财务|结算对账双口径|cash basis,activity basis,支付时间口径,发生时间口径|用交易发生或过账时间看业务发生，用结算或支付时间看钱何时转出。两种期间可能不同。|月底成交次月打款，当月经营数据有交易，资金要到次月对到账。
+187|数据与系统|SP-API|Selling Partner API,亚马逊开放接口,selling-partner-api|亚马逊给授权卖家和开发者的接口体系，可用来读取或管理订单、刊登、库存、报表等。|ERP 经卖家授权后拉订单和可售库存，减少手工下载。
+188|数据与系统|Finances API|Finances v0,Finances 2024-06-19,listFinancialEvents,listTransactions|亚马逊用于读取财务交易、事件或余额的接口族。不同版本返回字段和对象不同。|做对账时明确使用哪个接口版本和哪种交易时间。
+189|数据与系统|Transfers API|listPayouts,initiatePayout,Transfers 2024-06-01|亚马逊与卖家资金划转相关的接口族，支持查询打款信息，特定条件下支持按需发起。|系统查询打款状态和追踪号后，再向资金流水匹配。
+190|数据与系统|领星亚马逊结算中心|领星结算中心,Lingxing SettlementCenter|领星 ERP 用来集中查看亚马逊结算汇总与明细的模块。可同步范围与频率按产品实际能力核对。|在模块里定位结算周期，再和平台原报告复核差额。
+191|数据与系统|领星回款管理|领星回款,jiesuanzhongxin|领星 ERP 用于跟踪平台资金从订单到结算、到账及后续核销的模块。|ERP 预计转账和收款账户流水匹配后，人工处理无法归属的差异。
+192|数据与系统|领星利润核算|领星利润报表,ProfitStatementnew,利润核算三口径|领星 ERP 用来归集商品收入和费用的模块，可按不同业务时间口径看已结算或预估结果。|月末报表发现两种结果不同，先查未结算订单和估算费用是否被纳入。
+193|结算与财务|结转余额|Carried Forward,Carried Forward Balance,Amazon Deferred Balances|本期未结清或未释放、带到下期继续处理的金额。|月底尚有 200 元未释放，单列到下期并与释放记录核对。
+194|平台与经营|半托管|Semi-Managed,零售制,Temu半托管|Temu 的一类经营模式，卖家承担更多库存和履约责任。定价与平台要求看具体合同和市场。|选择海外仓路线时，要确认库存、贴标与买家配送由谁负责。
+195|平台与经营|全托管|Full-Managed,供货制,Temu全托管|Temu 的一类供货模式，卖家按约定供货，平台通常负责更多零售运营和后续履约。具体分工按当前协议。|卖家用核定供货价判断利润，避免用买家零售价当自己的收入。
+196|采购与供应|核价|核价机制,平台核价,报价审核|平台对商家申报的供货价或售价做评估并反馈结果的过程，口径随经营模式变化。|平台建议低价后，把新价格与到货成本、物流和利润底线对比。
+197|数据与系统|Temu 开放平台|Temu Open Platform,Temu Partner Platform,开放平台|Temu 给授权应用处理商品、订单、发货、库存等数据的开放接口平台。|ERP 经卖家授权后同步备货单，再按允许的接口回填。
+199|库存与履约|备货单|Replenishment ID,补货指令,供货发货单|平台给商家发出的备货或供货指令，通常含数量、SKU、收货仓和交期。|按备货单备给平台仓，不能用它当作消费者销售订单对账。
+201|库存与履约|JIT|Just-in-Time,预售模式,按需供货|按订单或需求信号及时准备并发货的方式。本库里指 Temu 特定全托管预售供货场景。|先挂测品链接，有对应需求再核供货时效并送仓。
+202|库存与履约|VMI|Vendor Managed Inventory,备货模式,供应商管理库存|传统含义是供应商管理库存。本库 Temu 场景用它指先备货入仓、再按平台规则开售的方式。|先送一批到指定仓，等确认入仓后安排开售，同时承担余货风险。
+203|库存与履约|Y2 站点|Y2,半托管·国内直发,国内直发|本库 Temu 半托管采用的国内直发路线，出单后从中国出货，实际中转及时限以线路为准。|商品仍在国内仓时，先核目标站点支持哪些直发节点。
+204|合规与售后|品质分|商品品质分,质量分,Quality Score|平台用来评价商品质量和售后表现的指标，可能影响相应运营或售后处理。|同一 SKU 质量反馈集中上升时，回查供应批次和售后原因。
+206|采购与供应|调价通知|动态调价通知,降价提醒,Price Adjustment Notice|平台通知商家关注或处理价格变化的消息，响应期限和结果要看具体通知。|收到建议降价后，先测新价格下的成本，再按时操作。
+207|数据与系统|权限包|Permission Package,API Scope,接口权限包|开放平台把相关接口权限打成一组，按应用和卖家授权控制能读写哪些数据。|仅做订单分析时，优先申请适用的只读订单权限。
+208|平台与经营|店铺类型|店铺模式,Store Type|同一平台对店铺角色或经营模式的分类，不同类型的数据、资质和经营责任可能不同。|在全托管和半托管店之间切换前，先核商品、订单和结算是否分开。
+209|合规与售后|信息工单|Information Ticket,Temu售后工单|平台记录消费者诉求并安排卖家反馈的任务单，处理时限和入口以当前后台为准。|收到买家催补配件的工单，核订单、要求与证据后回复。
+210|商品与内容|类目属性模板|Category Attribute Template,类目模板,属性模板|平台按类目要求填写的字段和取值规则，包含规格、品牌、材质或变体主题等。|先下载目标类目模板，再反推采购需要提供哪些规格和证明。
+211|合规与售后|违规次数清零|违规记录清零,违规计次重置|某些平台规则会在约定窗口后重新计算特定类型违规次数，适用条件按规则版本及后台认定。|有旧知识产权投诉时，核后台记录和当前周期，不预设所有投诉自动清零。
+X01|商品与内容|GTIN|Global Trade Item Number,商品贸易项目代码|全球通用的商品标识标准，UPC 和 EAN 是常见的编码形式。它与卖家自己编的 SKU 用途不同。|换包装件数时，先按标识规则确认是不是一个需要新 GTIN 的商品。
+X02|商品与内容|UPC / EAN|UPC,EAN,Universal Product Code,European Article Number,商品条码|常见的商品编号及条码体系。北美常见 UPC，许多市场常见 EAN，使用以目标平台和商品标准为准。|提交商品编号时，确认条码能对应品牌、型号和包装规格。
+X03|商品与内容|GTIN 豁免|GTIN Exemption,条码豁免|某些符合条件的品牌和类目可经平台批准不提交 GTIN 的发布路径。|手工商品没有通用条码时，先核类目和品牌是否可申请豁免。
+X04|商品与内容|变体与父子体|Variation,Parent ASIN,Child ASIN,颜色变体,变体主题|把同款不同颜色或尺寸放在一个商品家族。父级用于组织关系，买家实际选择的是可售子款。|父级下有黑色和白色两个子 SKU，分别维护库存和图片。
+X05|广告与增长|TACOS|Total Advertising Cost of Sales,TACoS,总广告成本率|用广告花费除以同口径的总销售额，包含自然销售，可观察整体经营对广告的依赖。|广告花费 30，广告归因销售 100、全店销售 300，则 ACOS 为 30%，TACOS 为 10%。
+X06|广告与增长|CTR（点击率）|CTR,Click-through Rate,点击率|点击次数除以曝光次数，用于看展示是否吸引目标用户。|展示 1000 次、点击 25 次，点击率为 2.5%。
+X07|库存与履约|可售库存|Available Stock,Sellable Inventory,可用库存|当前真的可以向买家承诺发货的商品数量。预留、在途和不可售货品要按口径分开。|仓内有 100 件但只有 80 件可卖，补货测算以 80 件等真实可售数据为基础。
+X08|库存与履约|库存覆盖天数|Days of Supply,库存天数,库存可售天数|按预期销量判断当前可售库存大约能卖几天，可随季节或促销变化。|可售 120 件，预计日销 10 件，预计够卖 12 天。
+X09|库存与履约|安全库存|Safety Stock,库存缓冲|为应对供货延迟或销量波动额外留出的库存。|预计等货期间卖 80 件，再留 20 件应对延迟。
+X10|商品与内容|Buy Box（购物车）|Featured Offer,黄金购物车,推荐报价|亚马逊详情页买家通常通过主要购买按钮看到的推荐报价位置。多个报价可以争取这个位置。|有库存且报价生效但没拿到推荐报价，仍要核对其他购买入口和报价竞争力。
+X11|商品与内容|Suppressed（商品受抑制）|Search Suppression,Listing抑制,搜索抑制|商品因资料或合规等问题在某些位置被限制展示，需要按后台问题定位。|上架后搜不到时，核标题、主图、必填属性等后台提示。
+X12|广告与增长|CPC（每次点击费用）|CPC,Cost per Click,点击成本|广告总花费除以点击次数，说明平均一次点击花多少钱。|花 40 元拿到 80 次点击，平均 CPC 是 0.5 元。
+X13|广告与增长|CPM（千次曝光费用）|CPM,Cost per Mille,千次展示成本|每 1000 次广告曝光对应的成本。|花 100 元获得 5 万次展示，CPM 是 2 元。
+X14|广告与增长|CPA（每次转化成本）|CPA,Cost per Action,Cost per Acquisition,每单成本|为得到一次定义好的转化平均花多少钱。转化可以是下单、注册等。|广告花 200 元获得 10 单，以订单为目标时 CPA 是 20 元。
+X15|广告与增长|PPC（按点击付费）|PPC,Pay per Click,点击付费广告|广告以点击为主要计费事件的方式。是否值得投要结合转化和利润评估。|买家点击计费后可能离开，投手要同时看 CPC 和下单率。
+X16|广告与增长|广告归因窗口|Attribution Window,归因期,转化归因|按平台规则，广告触点发生后多长时间内出现的购买可以计入广告功劳。|昨天的点击可能今天才转化，别用尚未成熟的数据直接关广告。
+X17|广告与增长|GMV（商品交易总额）|GMV,Gross Merchandise Value,成交额|一定期间内的商品交易金额。取消、退款、税和运费是否包含要看报表口径。|活动 GMV 提升后，还要关注净收入、利润和退货。
+X18|广告与增长|AOV（平均订单金额）|AOV,Average Order Value,客单价,平均订单价值|订单销售额除以订单数，反映平均每单金额。|100 单共 5000 元，按该口径客单价为 50 元。
+X19|广告与增长|A/B 测试|AB测试,Split Test,对照试验|让可比人群分别看到不同方案，再用事先约定的指标比较。|测试两版主图时尽量保持售价和其他变量一致。
+X20|广告与增长|Smart Bidding（智能出价）|Smart Bidding,Google Ads 智能出价|Google Ads 用自动策略按预期转化或转化价值调整出价的功能。|设置目标 ROAS 前，先核订单金额是否真正回传。
+X21|平台与经营|B2B / B2C|B2B,B2C,Business-to-Business,Business-to-Consumer|B2B 是企业卖给企业，B2C 是企业卖给消费者。采购量、报价和服务流程经常不同。|海外批发商按箱采购属于 B2B，个人买一包线夹属于 B2C。
+X22|商品与内容|UGC（用户生成内容）|UGC,User-Generated Content,买家素材|用户创作的图片、视频或文字。用于商品页、付费投放等商业场景前应确认授权范围。|买家同意商品页使用，付费广告仍要核是否另需许可。
+X23|商品与内容|SRT 字幕|SRT,SubRip,字幕文件|一种按时间段保存字幕的常用文件格式。|视频改剪后，字幕起止时间也要随版本重验。
+X24|数据与系统|OCR|Optical Character Recognition,文字识别|把图片或扫描件里的文字读成可编辑字段。|扫描采购单后，用原件复核 OCR 识别的起订量和金额。
+X25|采购与供应|PO（采购订单）|PO,Purchase Order,采购单|买方发给供应商的订购单，约定采购什么、数量、价格和交付条件。|收货时按 PO、箱单和实物逐项比对。
+X26|平台与经营|KPI（关键绩效指标）|KPI,Key Performance Indicator,绩效指标|团队用来判断业务是否达成目标的少数关键指标，应给出计算口径。|试跑期用可售率、履约时效和单件贡献利润做考核。
+X27|广告与增长|BFCM（黑五网一）|BFCM,Black Friday,Cyber Monday,黑色星期五,网络星期一|黑色星期五与网络星期一这一段欧美促销季的简称。|提前对齐活动售价、库存和邮件发送对象。
+X28|库存与履约|FOB / CIF / DDP|FOB,CIF,DDP,Incoterms,贸易术语|常用贸易交付条款，规定交货地点、费用、风险和清关等责任。详细义务需看约定条款版本。|拿两份运价时先核报价含到哪，避免把不含税的货价与到仓价直接比。
+X29|合规与售后|IP（知识产权）|IP,Intellectual Property,知产,知识产权|商标、专利、著作权等权利。商品实物、包装、图片和文字都可能涉及。|换供应商后，重新核实新供应商能否转授相关素材。
+X30|数据与系统|Webhook（事件通知）|Webhook,回调,事件回调|一个系统的事件发生时，主动给另一个系统发送通知。|支付成功后通知订单系统；同一事件重复到达时按事件 ID 去重。
+X31|数据与系统|幂等|Idempotency,防重复,重复处理保护|同一业务请求重复收到时，造成的实际业务变化最多按一次处理。|点击重试上传后先查批次状态，只补失败项，防止重复创建。
+X32|数据与系统|RPA（机器人流程自动化）|RPA,Robotic Process Automation,流程自动化|软件按规则代人做可重复的系统操作，例如下载报表、整理文件和状态回填。|每天准时下载广告报表，把失败和缺失交给运营确认。
+X33|数据与系统|API（应用程序接口）|API,Application Programming Interface,接口|系统约定好的沟通入口，按权限和参数读取数据或提交业务请求。|用接口获取货件状态，再按货件 ID 回写管理表。
+X34|结算与财务|对账|Reconciliation,资金核对|对照两处或多处记录，找出同一笔业务的金额、时间或状态差异。|先对订单与平台账单，再对平台净额和银行流水。
+X35|结算与财务|核销|Write-off,匹配销账,应收核销|把已经确认的收付款对应到具体应收或应付单据，减少未结余额；不同系统用词可能不同。|应收 1000、已确认收到 600，核销 600 后剩 400。
+X36|库存与履约|POD（交付证明）|POD,Proof of Delivery,签收凭证|证明货已交付或签收的记录。物流场景中的 POD 与按需印制这一同缩写用途不同。|处理少收或未收到货时，查看签收时间、地点和货件编号。
+X37|平台与经营|Seller Central（卖家平台）|Seller Central,亚马逊卖家后台|亚马逊卖家管理刊登、订单、价格、广告入口与报表的后台。|上传后到后台看处理报告，再到买家页面做验收。
+X38|商品与内容|五点描述|Bullet Points,Bullets,商品要点|详情页用短条目讲商品卖点和限制的字段，实际支持及规则随类目。|按尺寸、兼容性、安装方式、随货数量和限制写可核实的说明。
+X39|数据与系统|商品资料管理（PIM）|PIM,Product Information Management,商品信息管理|集中管理规格、文案、素材和站点版本的方法或工具。|已确认装量从 12 件变 10 件，从主资料同步到各市场待审页面。
+X40|数据与系统|WMS（仓库管理系统）|WMS,Warehouse Management System,仓储系统|用来管理收货、库位、库存状态、拣货和出库的系统。|实收 100 件其中 5 件破损，在 WMS 分别更新为可用 95 和隔离 5。
+X41|合规与售后|类目准入|Category Approval,商品准入,限制类目|平台或监管允许商家销售某类商品前，要求完成的资质、许可或证明核验。|新品下单前检查站点可售类目和需要的安全文件。
+X42|合规与售后|品牌备案|Brand Registry,Amazon Brand Registry,亚马逊品牌注册|权利人按要求登记品牌的项目，可提供品牌保护和部分内容、数据功能。|规划 A+ 与品牌分析时，先确认品牌账号资格和角色权限。
+X43|平台与经营|软启动|Soft Launch,小规模试跑,试销|先用有限商品或流量真实运行，验证规则、内容、物流、售后和单位利润。|新市场先上少量代表性 SKU，达标再扩大目录。
+X44|数据与系统|FAQ（常见问题）|FAQ,Frequently Asked Questions,常见问答|把客服或商品页面反复遇到的问题整理成可重复使用的回答。|把适用线径、包装数量和安装方式整理成常见问题，并与主规格同步。
+X45|广告与增长|流量漏斗|Conversion Funnel,转化漏斗,购物漏斗|把曝光、点击、加购和下单按过程拆开，看到访客在哪一步最容易流失。|点击量稳定而订单减少，优先检查页面转化、库存和配送。
+X46|广告与增长|SEO（搜索优化）|SEO,Search Engine Optimization,自然搜索优化|让页面更容易被搜索引擎找到并准确理解，从而有机会获得自然流量。|在页面标题和描述写清商品和用途，观察自然查询表现。
+X47|库存与履约|SKU 映射|SKU Mapping,货号对应,编码映射|把同一实物在卖家、平台、仓库和 ERP 中的不同标识对到一起。|给每个卖家 SKU 留 ASIN、FNSKU 和仓库货号，防止打错标。
+X48|采购与供应|交期|Lead Time,供货周期,补货周期|从提出需求或确认订单到交付的时间，测算时注明包含哪些步骤。|从下单到可售若需 30 天，补货决策要覆盖期间需求。
+X49|广告与增长|VIP 客户|VIP,Very Important Person,重要客户,高价值会员|按消费、会员等级或复购等规则选出的重点服务人群。|给符合条件且已订阅的会员开放大促提前场。
+X50|数据与系统|数据口径|Metric Definition,统计口径,指标口径|决定从哪里取数、统计哪些对象、如何去重，以及按什么时间和币种计算。|比较转化率前先确定是否都是按同一站点的访问会话计算。
+</script>
 <script type="text/plain" id="course-data">
 START|亚马逊新品上架八阶段|商品建档→合规检查→市场研究→关键词研究→内容生产→视觉生产→上架准备→上传运营|商品建档时为什么先确定 SKU 和变体？|同一款桌面理线夹的黑白两色可以各建一个 SKU，再确认目标类目允许使用颜色变体主题。SKU 管卖家自己的库存与报价，ASIN 标识平台目录商品。交付商品主数据表和变体关系表，文案、素材、报价和结果都按 SKU 对齐。|合规检查要给下游什么？|核查站点和类目准入、适用认证、危险品和知识产权。把证明材料、禁止使用的表述和待复核项交给文案与设计。比如只实测了木质和金属桌面，就按已验证的范围描述适用性。|市场研究结束后应确定什么？|明确谁会买、遇到什么问题、为什么会选择这款。用竞品 ASIN、定价和评论交叉验证，再把目标人群、使用场景、价格带与可兑现的卖点交给关键词和内容团队。|关键词表怎样交给运营？|记录每个词的来源、相关度和用途。品类词可用于标题，尺寸和场景词可用于五点或描述，符合要求的补充词可用于后台搜索词，广告测试词单独管理。|内容和视觉怎样衔接？|文案先确认商品事实、标题、五点、描述和站点语言版本；有资格时规划 A+。设计据此确定每张图解决的购买问题，并按 SKU 核对颜色、包装数量、规格和文案承诺。|视觉生产需要验收什么？|主图、尺寸图、场景图和包装图按目标站点要求验收。尺寸图只用实测值，包装图只展示随货内容。审核通过的图片、视频和可选 A+ 素材按站点及 SKU 交接。|上架准备要把哪些条件落实？|用采购、平台佣金、物流及预计退货费用核算利润，确认 FBA 或 FBM 履约、首批库存和预计可售日期。合并主数据、文案、视觉和合规材料，经复核后提交。|怎么判断成功上架？|分别确认后台处理成功、前台展示正确、买家可购买。逐个检查变体、库存、价格与配送，记录 SKU 与 ASIN 对应关系，再进入广告、评价和库存跟进。|黑色款可购买，白色款后台提交成功却不可购买，下一步做什么？|定位白色 SKU，核对报价是否生效、可售库存和履约状态，查看是否缺属性或受到限制。记录异常和负责人，修复后复验白色款的购买入口，再决定是否推广。
 001|评论反推选品链路|评论采集→痛点聚类→高频问题→机会判断→产品定义|评论中的高频差评怎样变成选品线索？|按竞品、版本和使用场景整理评论，把同义问题聚类，再区分产品设计缺陷、配送损坏和个别偏好。设计缺陷若跨多款商品重复，且买家真正在意，才值得进入候选机会表。|候选机会如何交给产品团队？|把原始评论证据、受影响人群、发生场景、现有替代方案和拟改进指标放在同一张表。用成本、供应能力和小样验证可行性，输出可验收的产品规格。|大量差评说“太小”，可以直接要求工厂放大一倍吗？|先辨别是规格真的不适用，还是页面没把尺寸说清。用评论场景和竞品尺寸分布判断目标用户，再决定改规格、补尺寸图或新增规格款。
@@ -1144,6 +1458,158 @@ if (!storageAvailable) byId("storage-note").textContent = "这个浏览器当前
 byId("catalog-summary").textContent = (courses.length - 1) + " 条业务链路 · " + totalCards + " 道练习题";
 renderCourse();
 renderProgress();
+
+// The glossary and training use separate views so switching leaves an in-progress answer intact.
+const termTopics = ["平台与经营","商品与内容","广告与增长","采购与供应","库存与履约","结算与财务","合规与售后","数据与系统"];
+const termEntries = dataRows("term-data").map(([id,topic,title,aliases,definition,example]) => {
+  if (!id || !termTopics.includes(topic) || !title || !definition || !example) {
+    throw new Error("术语资料不完整 " + id);
+  }
+  const sources = id.startsWith("X") ? [] : id.split("+").map(value => "TERM-CB-" + value);
+  return {id,topic,title,aliases:aliases ? aliases.split(",") : [],definition,example,sources};
+});
+const termById = new Map(termEntries.map(term => [term.id,term]));
+if (termById.size !== termEntries.length) throw new Error("术语编号重复");
+const commonTermIds = ["032","036","064","020","086","087","096","095","105","120"];
+const relatedTermGroups = [
+  ["032","036","064","X01","X02","X04","X47"],
+  ["020","014+091","115","X38","X42","X11"],
+  ["019","086","087","100","078+101","102"],
+  ["095","096","X05","145","097"],
+  ["021","030","033","116","X06","X16"],
+  ["023","X07","X08","X09","139","146","104"],
+  ["024","155","157","158","162","163","164","166","186","X34","X35"],
+  ["065+107","068","105","123","150","X41"],
+  ["031","098","136","X25","X48","125+151"],
+  ["129+182","130","111","180","181"],
+  ["194","195","196","199","201","202","203"],
+  ["088","X32","X33","X39","X40","187"],
+  ["013","034","120","X22"]
+];
+const termPriority = new Map(commonTermIds.map((id,i) => [id,i]));
+let activeTerm = termById.get("032");
+let activeView = "training";
+const pageOffsets = {training:0,terms:0};
+function termSearchValue(value) {
+  return value.normalize("NFKC").toLowerCase().replace(/[\s_–—-]+/gu,"");
+}
+function rankTerm(term,query) {
+  if (!query) return 4;
+  const names = [term.title,...term.aliases,...term.sources].map(termSearchValue);
+  if (names.includes(query)) return 0;
+  if (names.some(name => name.startsWith(query))) return 1;
+  if (names.some(name => name.includes(query))) return 2;
+  return termSearchValue(term.definition + term.example).includes(query) ? 3 : -1;
+}
+function renderTermEntry(term) {
+  byId("term-card").hidden = !term;
+  byId("term-empty").hidden = Boolean(term);
+  for (const button of byId("term-common").children) {
+    if (button.dataset.term) button.setAttribute("aria-pressed",String(button.dataset.term === term?.id));
+  }
+  if (!term) return;
+  byId("term-topic").textContent = term.topic;
+  byId("term-title").textContent = term.title;
+  byId("term-aliases").textContent = term.aliases.length ? "另可搜索 · " + term.aliases.join(" / ") : "";
+  byId("term-aliases").hidden = term.aliases.length === 0;
+  byId("term-definition").textContent = term.definition;
+  byId("term-example").textContent = term.example;
+  const related = [...new Set(relatedTermGroups.filter(group => group.includes(term.id)).flat())]
+    .filter(id => id !== term.id).slice(0,6);
+  const relatedNav = byId("term-related");
+  relatedNav.hidden = related.length === 0;
+  relatedNav.replaceChildren(make("span","一起理解"),...related.map(id => glossaryButton(termById.get(id))));
+  const sources = byId("term-sources");
+  if (term.sources.length === 0) {
+    sources.replaceChildren(make("span","训练营补充术语"));
+    return;
+  }
+  const labels = term.sources.map(id => {
+    if (location.protocol !== "file:") return make("span",id);
+    const link = make("a",id);
+    link.href = original + id + ".html";
+    link.target = "_blank";
+    link.rel = "noopener noreferrer";
+    link.setAttribute("aria-label","打开本地知识库原卡 " + id);
+    return link;
+  });
+  sources.replaceChildren(make("span","知识库原卡 · 草稿"),...labels);
+}
+function glossaryButton(term) {
+  const button = make("button",term.title);
+  button.type = "button";
+  button.className = "btn";
+  button.dataset.term = term.id;
+  button.addEventListener("click",() => {
+    byId("term-search").value = "";
+    byId("term-category-filter").value = "";
+    activeTerm = term;
+    renderTermList();
+    byId("term-title").focus();
+  });
+  return button;
+}
+function renderTermList() {
+  const query = termSearchValue(byId("term-search").value.trim());
+  const topic = byId("term-category-filter").value;
+  const matches = termEntries.filter(term => !topic || term.topic === topic)
+    .map(term => ({term,rank:rankTerm(term,query)}))
+    .filter(row => row.rank >= 0)
+    .sort((a,b) => a.rank-b.rank || (termPriority.get(a.term.id) ?? 999)-(termPriority.get(b.term.id) ?? 999))
+    .map(row => row.term);
+  if (!matches.includes(activeTerm)) activeTerm = matches[0] || null;
+  const index = byId("term-list");
+  const offset = index.scrollTop;
+  index.replaceChildren(...matches.map(term => {
+    const button = make("button","");
+    button.type = "button";
+    button.dataset.term = term.id;
+    button.setAttribute("aria-current",String(activeTerm === term));
+    button.append(make("span",term.title),make("small",term.topic));
+    button.addEventListener("click",() => {
+      activeTerm = term;
+      renderTermList();
+      byId("term-title").focus();
+    });
+    return button;
+  }));
+  index.scrollTop = offset;
+  byId("term-results").textContent = matches.length + " 个术语";
+  renderTermEntry(activeTerm);
+}
+function switchStudyView(view) {
+  if (activeView === view) return;
+  pageOffsets[activeView] = window.scrollY;
+  activeView = view;
+  const glossary = view === "terms";
+  byId("training-tab").setAttribute("aria-pressed",String(!glossary));
+  byId("terms-tab").setAttribute("aria-pressed",String(glossary));
+  byId("training-view").hidden = glossary;
+  byId("directory").hidden = glossary;
+  byId("terms-view").hidden = !glossary;
+  byId("terms-sidebar").hidden = !glossary;
+  if (glossary) renderTermList();
+  window.scrollTo(0,pageOffsets[view]);
+}
+for (const topic of termTopics) {
+  const option = make("option",topic);
+  option.value = topic;
+  byId("term-category-filter").append(option);
+}
+const originalTermCount = termEntries.reduce((total,term) => total + term.sources.length,0);
+const extraTermCount = termEntries.filter(term => term.sources.length === 0).length;
+byId("glossary-summary").textContent = originalTermCount + " 张知识库术语原卡（同义词合并展示） · " +
+  extraTermCount + " 个训练营补充术语。可按中文、英文全称、缩写或编号搜索。";
+byId("term-common").append(make("span","常用术语"),...commonTermIds.map(id => glossaryButton(termById.get(id))));
+byId("training-tab").addEventListener("click",() => switchStudyView("training"));
+byId("terms-tab").addEventListener("click",() => switchStudyView("terms"));
+for (const [id,event] of [["term-search","input"],["term-category-filter","change"]]) {
+  byId(id).addEventListener(event,() => {
+    byId("term-list").scrollTop = 0;
+    activeTerm = null;
+    renderTermList();
+  });
+}
 </script>
 </body>
 </html>

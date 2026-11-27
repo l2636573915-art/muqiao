@@ -1,0 +1,1149 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>跨境电商业务训练营</title>
+<style>
+:root{color-scheme:light;--ink:#172c32;--muted:#50666a;--paper:#f4f7f5;--card:#fff;--line:#d7e2dd;--teal:#0b6959;--tint:#e5f4ed;--amber:#825006;--warm:#fff3d8;--rail:#173438;--rail-text:#dcece8;--rail-muted:#b6d0c9;--radius:20px}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);font:16px/1.6 "Segoe UI","PingFang SC","Microsoft YaHei",sans-serif}
+button,input,select{font:inherit}
+button,a,input,select,summary{-webkit-tap-highlight-color:transparent}
+button,summary,select{cursor:pointer}
+a{color:var(--teal);text-underline-offset:4px}
+:focus-visible{outline:3px solid #0ba387;outline-offset:3px}
+[hidden]{display:none!important}
+.shell{display:grid;grid-template-columns:320px minmax(0,1fr);min-height:100vh}
+.rail{background:var(--rail);color:var(--rail-text);padding:26px 20px;min-width:0}
+.rail-inner{position:sticky;top:22px}
+.rail summary{font-weight:680;font-size:1.12rem;padding:4px 0 12px}
+.control{display:grid;gap:4px;margin-bottom:12px;font-size:.875rem;color:var(--rail-muted)}
+.control input,.control select{width:100%;min-height:44px;border:1px solid #567374;border-radius:10px;padding:8px 10px;background:#224447;color:white}
+.control input::placeholder{color:#c2d8d2}
+.filter{display:flex;gap:8px;align-items:center;font-size:.875rem}
+.filter input{accent-color:#80dcbd;inline-size:16px;block-size:16px}
+.result{color:var(--rail-muted);font-size:.82rem;margin:10px 0 4px}
+.course-list{display:grid;gap:4px;max-height:calc(100vh - 310px);min-height:142px;overflow:auto;padding:4px 4px 6px 2px;scrollbar-color:#749693 transparent}
+.course-list button{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;align-items:center;text-align:left;padding:9px 10px;border:1px solid transparent;border-radius:10px;color:var(--rail-text);background:transparent;min-height:42px;font-size:.875rem}
+.course-list button:hover{background:#264d4e}
+.course-list button[aria-current=true]{background:#d5ede4;color:#12463e;font-weight:680}
+.course-count{font-size:.75rem;white-space:nowrap;font-variant-numeric:tabular-nums}
+main{width:min(100%,1090px);margin:0 auto;padding:36px clamp(20px,5vw,70px) 44px;min-width:0}
+.top{display:flex;justify-content:space-between;align-items:end;gap:24px;margin-bottom:32px}
+h1,h2,h3,p{margin:0}
+h1{font-size:clamp(1.65rem,3.45vw,2.65rem);line-height:1.14;letter-spacing:-.04em}
+.top p,.subtle{color:var(--muted);font-size:.88rem}
+.top p{margin-top:8px}
+.meter{width:clamp(135px,23%,210px);flex-shrink:0}
+.meter label{display:block;font-size:.8rem;font-weight:650;margin-bottom:4px}
+progress{display:block;width:100%;height:8px;accent-color:var(--teal)}
+.overview{margin-bottom:26px;padding:18px;border:1px solid var(--line);border-radius:16px;background:#edf3ef;display:grid;gap:12px}
+.overview-head{display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:4px 12px}
+.overview-head h2{font-size:1.14rem}
+.overview-current{font-size:.85rem;color:var(--teal);font-weight:680}
+.map-route{display:grid;gap:9px}
+.map-phase{display:grid;gap:5px;min-width:0}
+.map-phase h3{color:var(--ink);font-size:.90rem;font-weight:650}
+.map-start{max-width:510px;width:100%;justify-self:center}
+.map-start h3{text-align:center}
+.map-lane{display:grid;grid-template-columns:minmax(0,1fr) 19px minmax(0,1fr);align-items:stretch}
+.map-arrow{align-self:center;text-align:center;color:#4e746b;font-size:1rem;line-height:1}
+.map-fork{position:relative;text-align:center;font-size:.82rem;color:var(--muted);padding:8px 0 2px}
+.map-fork::before{content:"";position:absolute;inset:0 25% 0;border-top:1px solid #9bb6ad;border-left:1px solid #9bb6ad;border-right:1px solid #9bb6ad}
+.map-fork span{position:relative;background:#edf3ef;padding:0 8px}
+.map-branches{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.map-branch{padding:9px 10px 10px;border-radius:12px;background:#e0ede7}
+.map-branch.supply{background:#e6edf4}
+.supply .map-arrow{color:#4a6680}
+.map-join{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px 12px;align-items:center;padding:9px 10px;border-top:1px solid var(--line)}
+.map-join p{color:var(--muted);font-size:.84rem}
+.map-join .map-stage{min-height:44px;padding-inline:10px}
+.map-stage{min-height:61px;padding:7px 4px;border:1px solid var(--line);border-radius:9px;background:var(--card);color:var(--ink);font-weight:650;font-size:.85rem;line-height:1.3;text-align:center;overflow-wrap:anywhere}
+.map-deliverable{display:block;margin-top:4px;color:var(--muted);font-size:.72rem;font-weight:500}
+.map-stage:hover{border-color:var(--teal)}
+.map-stage[aria-pressed=true]{border-color:var(--teal);background:var(--tint);color:var(--teal);box-shadow:inset 0 0 0 1px var(--teal)}
+.map-stage[aria-current=step]{background:var(--teal);border-color:var(--teal);color:white}
+.map-stage[aria-current=step] .map-deliverable{color:#e0f4ec}
+.map-relationships{display:flex;flex-wrap:wrap;align-items:center;gap:5px 8px;color:var(--muted);font-size:.82rem}
+.map-relationships button{min-height:44px;padding:5px 9px}
+.map-reference{margin:0;font-size:.84rem;color:var(--muted)}
+.map-context{border-top:1px solid var(--line);padding-top:11px;display:grid;gap:10px;min-width:0}
+.map-context h3{font-size:.96rem}
+.map-io{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px 16px;margin:0}
+.map-io dt{color:var(--muted);font-size:.82rem;font-weight:650}
+.map-io dd{margin:2px 0 0;font-size:.88rem;overflow-wrap:anywhere}
+.map-return{font-size:.84rem;color:var(--muted)}
+.map-return button{padding:3px 0;background:none;border:0;color:var(--teal);font:inherit;text-decoration:underline;text-underline-offset:3px}
+.map-courses summary{color:var(--teal);font-size:.88rem;font-weight:680;padding:4px 0}
+.map-course-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:5px 8px;margin-top:5px;max-height:220px;overflow:auto;padding:4px}
+.map-course-list button{display:flex;justify-content:space-between;gap:6px;text-align:left;font-weight:500;overflow-wrap:anywhere}
+.map-course-list button[aria-current=true]{background:var(--tint);border-color:var(--teal);color:var(--teal);font-weight:680}
+.map-course-list .course-count{align-self:center;color:var(--muted)}
+.course{border-top:1px solid var(--line);padding-top:21px}
+.course-head{display:flex;justify-content:space-between;align-items:flex-end;gap:12px 20px;flex-wrap:wrap}
+.batch-controls{display:grid;gap:4px;justify-items:end;text-align:right}
+.batch-progress{font-size:.83rem;color:var(--muted)}
+.batch-controls .btn:disabled{opacity:.65}
+.course-meta{font-size:.85rem;color:var(--teal);font-weight:680;margin-bottom:5px}
+h2{font-size:clamp(1.45rem,3vw,2rem);line-height:1.23;letter-spacing:-.025em;overflow-wrap:anywhere}
+.flow{list-style:none;display:flex;flex-wrap:wrap;gap:6px;margin:14px 0 22px;padding:0;align-items:center}
+.flow li{display:flex;align-items:center;gap:6px;color:var(--muted);font-size:.82rem}
+.flow span{border:1px solid var(--line);border-radius:6px;background:var(--card);padding:3px 8px;color:var(--ink)}
+.flow-button{border:1px solid var(--line);border-radius:6px;background:var(--card);padding:5px 8px;color:var(--ink);min-height:38px}
+.flow-button:hover{border-color:var(--teal)}
+.flow li[aria-current=step] .flow-button{background:var(--tint);color:var(--teal);border-color:var(--teal);font-weight:650}
+.card{border:1px solid var(--line);border-radius:var(--radius);background:var(--card);overflow:hidden;box-shadow:0 8px 30px #1734380d}
+.card-intro{padding:clamp(18px,4vw,30px);display:grid;gap:12px}
+.card-meta{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;font-size:.85rem;color:var(--muted)}
+.card-kind{font-weight:700;color:var(--teal)}
+.card-location{border:0;padding:4px 0;background:none;color:var(--teal);font:inherit;text-decoration:underline;text-underline-offset:3px}
+.card-kind.practice{color:var(--amber)}
+h3{font-size:clamp(1.24rem,2.6vw,1.75rem);line-height:1.38;letter-spacing:-.02em}
+.btn{border:1px solid var(--line);border-radius:10px;background:var(--card);color:var(--ink);padding:8px 14px;min-height:44px;font-weight:650;font-size:.88rem}
+.btn:hover{border-color:var(--teal);background:var(--tint)}
+.btn:disabled{opacity:.46;cursor:default}
+.primary{background:var(--teal);color:white;border-color:var(--teal)}
+.primary:hover{background:#095746}
+.quiz-form,.quiz-field{display:grid;gap:9px}
+.quiz-form{margin-top:4px}
+.quiz-form .primary{justify-self:start}
+.quiz-field label,.quiz-choices legend{font-size:.9rem;font-weight:650}
+.quiz-field textarea{resize:vertical;padding:11px 12px;border:1px solid #aabdb5;border-radius:10px;min-height:104px;width:100%;color:var(--ink);background:var(--card);font:inherit}
+.quiz-choices{display:grid;gap:7px;min-width:0;margin:0;padding:0;border:0}
+.quiz-choices legend{margin-bottom:6px}
+.quiz-option{display:flex;gap:9px;align-items:flex-start;padding:9px 11px;border:1px solid var(--line);border-radius:9px;cursor:pointer}
+.quiz-option:has(input:checked){background:var(--tint);border-color:var(--teal)}
+.quiz-option input{margin-top:6px;accent-color:var(--teal);flex:none}
+.quiz-error{color:var(--amber);font-size:.87rem;font-weight:650}
+.grade-title{margin:0;font-size:1.1rem;color:var(--teal)}
+.grade-title[data-grade=review]{color:var(--amber)}
+.grade-points{display:grid;gap:3px;margin:0;padding-left:1.2em;font-size:.9rem}
+.grade-points li[data-hit=false]{color:var(--amber)}
+.submitted{background:var(--card);border-radius:9px;padding:8px 11px;overflow-wrap:anywhere}
+.answer{padding:20px clamp(18px,4vw,30px);background:var(--tint);border-top:1px solid var(--line);display:grid;gap:10px}
+.answer-label{color:var(--teal);font-size:.85rem;font-weight:700}
+.answer p{white-space:pre-line}
+.actions,.nav,.sources{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.actions .btn[aria-pressed=true]{background:var(--teal);color:white;border-color:var(--teal)}
+.actions .review[aria-pressed=true]{background:var(--warm);color:var(--amber);border-color:#e1c580}
+.nav{margin:12px 0 20px;justify-content:space-between}
+.nav .subtle{margin-inline:auto}
+.sources{border-top:1px solid var(--line);padding-top:14px;font-size:.85rem;gap:8px 14px}
+.sources a{font-weight:650}
+.footer{margin-top:20px;color:var(--muted);font-size:.82rem}
+@media(max-width:830px){.shell{grid-template-columns:250px minmax(0,1fr)}.rail{padding:22px 15px}.top{align-items:start;flex-direction:column;gap:14px;margin-bottom:22px}.meter{width:100%;max-width:260px}}
+@media(max-width:640px){.shell{display:flex;flex-direction:column}.rail{padding:10px 16px}.rail summary{padding:6px 0}.rail-inner{position:static}.course-list{max-height:35vh;min-height:0}main{padding:19px 15px 32px}.nav .subtle{order:-1;flex-basis:100%;text-align:center}.answer{padding-block:16px}}
+@media(max-width:820px){.map-branches{grid-template-columns:1fr}.map-fork::before{inset-inline:50%;border-right:0}.map-fork{padding-top:5px}}
+@media(max-width:430px){.map-join{grid-template-columns:1fr;padding-inline:0}.map-join .map-stage{width:100%}}
+@media(max-width:430px){.overview{padding:12px}.map-io,.map-course-list{grid-template-columns:1fr}.map-stage{font-size:.82rem}.map-return button{min-height:44px}}
+@media print{.shell{display:block}.rail,.overview,.nav,.actions,.quiz-form,.meter{display:none}main{padding:0}}
+</style>
+</head>
+<body>
+<div class="shell">
+  <aside class="rail">
+    <details class="rail-inner" id="directory" open>
+      <summary>课程目录</summary>
+      <label class="control">搜索课程<input id="search" type="search" placeholder="例如 补货、TEMU、对账" autocomplete="off"></label>
+      <label class="control">业务主题<select id="theme"><option value="">全部主题</option></select></label>
+      <label class="filter"><input id="review-only" type="checkbox">仅显示含待复习卡的课程</label>
+      <p class="result" id="results" role="status"></p>
+      <nav id="course-list" class="course-list" aria-label="选择课程"></nav>
+    </details>
+  </aside>
+  <main>
+    <noscript>请在允许 JavaScript 的浏览器中打开，以使用课程、问答和进度记录。</noscript>
+    <header class="top">
+      <div><h1>跨境电商业务训练营</h1><p id="catalog-summary"></p></div>
+      <div class="meter"><label for="progress" id="progress-label">已掌握</label><progress id="progress"></progress></div>
+    </header>
+    <section class="overview" aria-labelledby="map-title">
+      <div class="overview-head">
+        <h2 id="map-title">跨境电商全景业务链路</h2>
+        <span class="overview-current" id="map-current" aria-live="polite"></span>
+      </div>
+      <div class="map-route" role="group" aria-label="从商品决策分流到运营和供应链，再进入结算">
+        <section class="map-phase map-start" aria-labelledby="map-prepare-title">
+          <h3 id="map-prepare-title">共同起点</h3>
+          <div class="map-lane" id="map-prepare"></div>
+        </section>
+        <p class="map-fork"><span>定品后可并行推进</span></p>
+        <div class="map-branches">
+          <section class="map-phase map-branch" aria-labelledby="map-operate-title">
+            <h3 id="map-operate-title">商品运营线</h3>
+            <div class="map-lane" id="map-operate"></div>
+          </section>
+          <section class="map-phase map-branch supply" aria-labelledby="map-supply-title">
+            <h3 id="map-supply-title">库存与履约线</h3>
+            <div class="map-lane" id="map-supply"></div>
+          </section>
+        </div>
+        <div class="map-join">
+          <p>刊登和库存就绪后开售。成交订单交给履约，销售、退款与履约费用汇入结算。</p>
+          <div id="map-settle"></div>
+        </div>
+      </div>
+      <div class="map-relationships" id="map-relationships" aria-label="其他业务支线"></div>
+      <div class="map-context" id="map-context">
+        <h3 id="map-stage-title"></h3>
+        <dl class="map-io">
+          <div><dt>承接什么</dt><dd id="map-input"></dd></div>
+          <div><dt>交付给谁</dt><dd id="map-output"></dd></div>
+        </dl>
+        <p class="map-return" id="map-return"></p>
+        <details class="map-courses" id="map-courses">
+          <summary id="map-courses-label">相关问答课程</summary>
+          <div class="map-course-list" id="map-course-list" aria-label="选中环节的课程"></div>
+        </details>
+      </div>
+      <p class="map-reference">这是一张经营学习地图。各平台的准入、刊登、履约和结算规则按具体站点及经营模式核对。</p>
+    </section>
+    <section class="course" aria-labelledby="course-title">
+      <div class="course-head">
+        <div><p class="course-meta" id="course-meta"></p><h2 id="course-title"></h2></div>
+        <div class="batch-controls">
+          <p class="batch-progress" id="batch-progress" aria-live="polite"></p>
+          <button type="button" class="btn" id="next-batch" aria-describedby="batch-progress">换一批</button>
+        </div>
+      </div>
+      <ol class="flow" id="flow" aria-label="业务步骤"></ol>
+      <article class="card" aria-labelledby="question">
+        <div class="card-intro">
+          <div class="card-meta"><span class="card-kind" id="card-kind"></span><button type="button" class="card-location" id="card-location" aria-controls="map-context"></button><span id="card-status"></span></div>
+          <h3 id="question" aria-live="polite"></h3>
+          <form class="quiz-form" id="quiz-form" novalidate>
+            <fieldset class="quiz-choices" id="quiz-choices" hidden>
+              <legend>选择一个答案</legend>
+              <div class="quiz-choices" id="quiz-options"></div>
+            </fieldset>
+            <div class="quiz-field" id="quiz-text" hidden>
+              <label for="answer-input">你的答案</label>
+              <textarea id="answer-input" rows="3" maxlength="1800" aria-describedby="quiz-help" placeholder="写下你的判断、依据或下一步动作"></textarea>
+              <p class="subtle" id="quiz-help">简答按业务要点初评，提交后可对照参考答案。</p>
+            </div>
+            <p class="quiz-error" id="quiz-error" role="alert" hidden></p>
+            <button type="submit" class="btn primary" aria-controls="answer">提交并批改</button>
+          </form>
+        </div>
+        <section class="answer" id="answer" hidden>
+          <h4 class="grade-title" id="grade-title" tabindex="-1"></h4>
+          <p class="submitted" id="submitted"></p>
+          <ul class="grade-points" id="grade-points" hidden></ul>
+          <div class="answer-label" id="answer-label">参考答案</div>
+          <p id="answer-text"></p>
+          <div class="actions">
+            <button type="button" class="btn" id="retry">重新作答</button>
+            <button type="button" class="btn review" id="mark-review" aria-pressed="false">待复习</button>
+            <button type="button" class="btn" id="mark-known" aria-pressed="false">已掌握</button>
+          </div>
+        </section>
+      </article>
+      <div class="nav" aria-label="卡片翻页">
+        <button type="button" class="btn" id="previous">上一张</button>
+        <span class="subtle" id="position" aria-live="polite"></span>
+        <button type="button" class="btn" id="next">下一张</button>
+      </div>
+      <div class="sources" id="sources" aria-label="知识库原卡"></div>
+      <p class="footer">问答和情景为学习整理。具体审核、投放与履约规则以目标站点现行要求为准。</p>
+      <p class="footer" id="storage-note">学习记录保存在当前浏览器，移动文件或换浏览器时，记录可能需要重新建立。</p>
+    </section>
+  </main>
+</div>
+
+<!-- 每行一课：编号 | 名称 | 业务步骤（用 → 分隔） | 问题 | 答案 ...；最后一题为情景练习。 -->
+<script type="text/plain" id="course-data">
+START|亚马逊新品上架八阶段|商品建档→合规检查→市场研究→关键词研究→内容生产→视觉生产→上架准备→上传运营|商品建档时为什么先确定 SKU 和变体？|同一款桌面理线夹的黑白两色可以各建一个 SKU，再确认目标类目允许使用颜色变体主题。SKU 管卖家自己的库存与报价，ASIN 标识平台目录商品。交付商品主数据表和变体关系表，文案、素材、报价和结果都按 SKU 对齐。|合规检查要给下游什么？|核查站点和类目准入、适用认证、危险品和知识产权。把证明材料、禁止使用的表述和待复核项交给文案与设计。比如只实测了木质和金属桌面，就按已验证的范围描述适用性。|市场研究结束后应确定什么？|明确谁会买、遇到什么问题、为什么会选择这款。用竞品 ASIN、定价和评论交叉验证，再把目标人群、使用场景、价格带与可兑现的卖点交给关键词和内容团队。|关键词表怎样交给运营？|记录每个词的来源、相关度和用途。品类词可用于标题，尺寸和场景词可用于五点或描述，符合要求的补充词可用于后台搜索词，广告测试词单独管理。|内容和视觉怎样衔接？|文案先确认商品事实、标题、五点、描述和站点语言版本；有资格时规划 A+。设计据此确定每张图解决的购买问题，并按 SKU 核对颜色、包装数量、规格和文案承诺。|视觉生产需要验收什么？|主图、尺寸图、场景图和包装图按目标站点要求验收。尺寸图只用实测值，包装图只展示随货内容。审核通过的图片、视频和可选 A+ 素材按站点及 SKU 交接。|上架准备要把哪些条件落实？|用采购、平台佣金、物流及预计退货费用核算利润，确认 FBA 或 FBM 履约、首批库存和预计可售日期。合并主数据、文案、视觉和合规材料，经复核后提交。|怎么判断成功上架？|分别确认后台处理成功、前台展示正确、买家可购买。逐个检查变体、库存、价格与配送，记录 SKU 与 ASIN 对应关系，再进入广告、评价和库存跟进。|黑色款可购买，白色款后台提交成功却不可购买，下一步做什么？|定位白色 SKU，核对报价是否生效、可售库存和履约状态，查看是否缺属性或受到限制。记录异常和负责人，修复后复验白色款的购买入口，再决定是否推广。
+001|评论反推选品链路|评论采集→痛点聚类→高频问题→机会判断→产品定义|评论中的高频差评怎样变成选品线索？|按竞品、版本和使用场景整理评论，把同义问题聚类，再区分产品设计缺陷、配送损坏和个别偏好。设计缺陷若跨多款商品重复，且买家真正在意，才值得进入候选机会表。|候选机会如何交给产品团队？|把原始评论证据、受影响人群、发生场景、现有替代方案和拟改进指标放在同一张表。用成本、供应能力和小样验证可行性，输出可验收的产品规格。|大量差评说“太小”，可以直接要求工厂放大一倍吗？|先辨别是规格真的不适用，还是页面没把尺寸说清。用评论场景和竞品尺寸分布判断目标用户，再决定改规格、补尺寸图或新增规格款。
+002|竞品深度拆解链路|建立竞品池→采集页面→拆解卖点→价格、评论与图片分析→优化建议|什么产品才算有效竞品？|先匹配目标人群、使用场景和功能，再匹配价位与规格。可把直接竞品和替代品分列。跨站点价格、不同套装件数和不同促销状态，要统一口径再比较。|拆解结果怎么变成具体建议？|交付竞品 ASIN 对照表，记录价格快照、图片顺序、主卖点、评论证据和采集日期。每条优化建议注明对应证据、预期解决的问题以及负责验证的岗位。|一家头部竞品销售很高、价格也更低，你会马上跟价吗？|先核对件数、规格、促销、配送与积累评价。算自己的成本和利润底线，并检查是否能靠规格或内容差异竞争，再决定是否做小范围价格测试。
+003|Listing 运营链路|竞品采集→关键词采集→文案生成→评分排序→上架准备|新品 Listing 应从哪里起草？|用商品主数据锁定事实，用竞品和评价识别购买问题，用词库安排搜索词位置。运营将品牌、规格、禁用表述和目标语言一起交给文案生成环节。|文案有多稿时，评分能决定哪一版直接上线吗？|评分用来排序，重点看相关性、卖点清晰、可读性和字段齐全。运营终审逐句核对产品事实、站点规则及关键词。输出选中稿、修改记录和上传版本。|高分稿写了“防水”，主数据中没有测试结论，怎么办？|把该声称标为待证实，查测试报告与适用条件。证据缺失时改成已验证的材料和适用场景，复核通过再进入上传包。
+004|评论 VOC 分析链路|采集→清洗→标签分类→差评聚类→用户洞察→优化建议|VOC 分析和查看平均星级有什么区别？|VOC 是用户声音，重点是买家在什么场景里为何满意或不满。清洗重复评论，按版本和站点拆分，再给材质、易用性、包装、物流等问题打标签。|分析结果怎样落地？|输出主题、样本数、代表评论、影响人群和改进动作。产品问题交产品团队，尺寸理解问题交页面运营，破损集中在特定运输批次时交供应链。|评论总量很少，三条差评都说破损，应怎么报告？|如实标注小样本与时间范围，先查包装批次和退货记录是否有同样信号。将结论写为需验证的风险，同时保留原始证据与负责人。
+005|产品场景图生成链路|自家产品图→分析参考→锁定真实结构→生成方案→多版本出图→质检|给设计或 AI 的场景图任务应包含什么？|准备实物多角度照片、准确尺寸、材质颜色、目标使用场景和品牌风格。参考图只拆解光线、视角及信息层级，明确产品几何与标识需保持一致。|生成多张图后怎样验收？|按 SKU 对照实物，核查轮廓、接口、比例、套装数量和使用方式，再检查平台适用的图像规则。记录通过版本及拟使用的位置。|画面更漂亮，但 AI 多生成了一个接口，能用作副图吗？|先返工修正接口并重新核对。若生成环节不能稳定保持结构，就使用真实产品图合成场景背景，保留实物照片作为验真依据。
+006|竞对参考素材替换链路|拆解参考→识别自家商品→规划原创构图→合成→局部修复→验收|竞品素材能给设计提供什么？|可提炼构图目的，例如先展示使用环境再突出细节。把自家产品实拍和有授权的背景、道具用于新稿，并记录素材来源及授权范围。|局部修复时重点看哪些地方？|看轮廓遮罩、透视、阴影和反光是否一致，检查品牌标志、包装与商品规格有没有被意外更改。最终交付独立设计源稿和可核验的素材清单。|参考图上的独特插画和文案很有效，设计师想直接保留，怎么处理？|先核对是否拥有对应使用权。无法确认时，用自己的插画、文字和构图表达同类卖点，并复核商品事实。
+007|数码 3C 卖点图生成链路|识别产品→规划场景→制作参数图→制作功能图→整套交付|参数图优先解决什么问题？|兼容性与关键规格最能帮助买家下单。核对产品型号、接口、连接方式、尺寸和测试条件，统一单位、版本号与资料来源。|怎样把参数变成一套图？|先列用户问题，再给每张图分配独立任务。接口图表达连接方式、参数图展示核验数值、场景图展示使用条件。所有图和商品详情共用一份规格表。|同系列高配版支持某协议，低配版的素材可沿用吗？|按 SKU 核查型号能力。共用版式可以，文字、接口和协议标签应换成该版本已验证的内容；发布前检查变体图片绑定。
+008|视频爆款内容分析链路|采集视频与指标→脚本拆解→提出原因假设→沉淀模板|拆解高表现视频时先看什么？|记录平台、日期、品类、账号规模和可得的播放或互动指标，再把视频拆成开场、场景、卖点证明和行动引导。尽量加入同类普通样本做对照。|怎样把观察变成可复用脚本？|保留可测试的结构与镜头作用，例如开场展示痛点、随后实测。把流量渠道或账号差异记为可能影响因素，用自家原创素材测试，并说明成功指标。|某视频播放最高，同时正好用了新开场，能断定开场有效吗？|把开场列为候选因素。控制商品、投放和发布时间等条件做对照测试，看留存或点击是否重复改善，再更新模板。
+009|剪映草稿自动化链路|准备素材→规划镜头→生成草稿→批量处理→人工复核|自动生成草稿之前要提供什么？|提供已授权的素材、命名和版本、镜头顺序、字幕时间轴、画幅以及需要固定的产品画面。让项目模板接收有明确编号和长度的素材。|草稿生成后如何交接？|输出可编辑草稿、素材清单和预览。剪辑师核对镜头、缺失素材、字幕同步、音量和安全区，再审核并导出成片。|批量生成后发现两个 SKU 的镜头对调，先修模板还是成片？|先停用对应批次的成片，按 SKU 与素材 ID 找到映射错误，修正输入或模板后重生成受影响的草稿并逐项复核。
+010|采购报价文件结构化链路|上传报价→识别类型→提取字段→标准表→复核→回填|供应商报价如何整理成能直接比较的表？|统一商品编码、规格、单位、币种、MOQ、阶梯单价、交期和有效期，同时记录含税及是否含运费。保留原文件与页码，缺值设为待确认。|什么情况下要阻止回填采购系统？|字段缺失、重复报价、金额与明细不符、币种或单位无法判定时转采购复核。确认后写入带来源与审核记录的台账。|一家报价按箱，另一家按件，哪个便宜？|向供应商确认每箱件数和报价条款，统一到单件含相同费用的口径后再比较。未确认换算比例之前保留原值，不参与排序。
+011|物流单据结构化链路|上传运单→识别字段→结构化→异常校验→系统录入|从运单中要抓哪些信息？|按业务需要提取承运商、运单号、箱数、重量、目的地、关联货件和日期。存原件与原值，用统一格式另存标准字段供物流台账关联。|录入前怎样避免错配？|把运单号和货件编号与发货计划核对，检查箱数、目的地、重量单位和重复记录。识别结果不确定时由物流负责人复核。|图片模糊，可能是两个相近的运单号，怎么做？|标记低置信并暂停自动录入，向承运商或原始电子单核对。确认唯一编号再关联，留下修订前后值和证据。
+012|亚马逊经营数据分析与业务动作链路|拉取市场与后台数据→统一口径→指标分析→运营动作→复评|经营分析要把哪些数据放在一起？|将业务报告、订单、广告、库存、结算或绩效按问题关联，先对齐站点、日期、币种和 SKU 或 ASIN。有些报表粒度不同，汇总到可比维度再看。|从指标变化怎么推到业务动作？|先定位变化来自访客、转化、售价、库存还是流量结构。每项动作写明证据、负责人、涉及 SKU 和复评时间，同时记录可能的混杂因素。|销量减少但广告点击没少，先查什么？|核对同期可售库存、购物车、价格和页面变化，再看业务报告转化及广告流量构成。按站点和 SKU 分解，找到销量下降主要发生的位置。
+013|亚马逊 Listing 优化链路|采集业务报告→匹配竞品→Listing 质检→改写→字段优化→变更复核|已有 Listing 为什么要先诊断再改写？|建立流量、转化和页面内容基线，核对库存、价格和竞品情况。运营按标题、五点、图片、搜索词分别列问题，确定最值得改的字段。|改完怎么评估效果？|记录修改版本、站点、ASIN、时间和目标指标。用前后可比窗口观察访客、点击或转化，同时标注促销、库存和广告变化，必要时只测一类改动。|页面转化下降恰逢断货，应该先重写标题吗？|先分离断货和恢复期，查看可售时段的转化表现与购物车状态。补货后有持续问题，再用竞品和用户反馈支持内容改版。
+014|亚马逊图片优化链路|输入现有图→竞品参考→场景图方案→视觉优化→人工复核→归档|已有图片要优化，应该先查哪张？|从要解决的购买问题出发。点击弱先检查主图辨识度与规格表达；买家常误解尺寸或配件时，重点补尺寸图或包装清单图。|如何保留优化前后的可比证据？|记录 ASIN、图片槽位、修改时间、原图和新图版本，核对目标站点的图像规范。观察点击或转化时标注广告、价格与库存变动。|改图后销量上涨，同时做了大额促销，能归功于图片吗？|先记录两项同时变化。选择更可比的时段或在适用条件下做受控测试，根据对应指标判断改图可能贡献。
+015|亚马逊库存管理与补货链路|获取库存报告→区分可售与不可售→估算覆盖→判断风险→执行|运营为什么要看库存状态，而非只看总库存？|仓内可售、预留、不可售和在途会影响不同决策，不能全部当已可销售。用可售库存和预期销量估算覆盖天数，再把到货和入仓时间放在同一时间轴。|补货表应交付什么？|为每个站点 SKU 记录可售量、日销口径、预计到货、补货周期、安全库存与建议发货量。区分可能断货、需要催运和滞销三类，给出动作和负责人。|可售只够十天，在途预计十五天后可售，最先判断什么？|先确认日销是否包含促销和断货偏差，再核实预计可售日期及交期波动。若仍有缺口，计算可接受的加急量，协同控制投放或调整履约。
+016|FBA 发货全链路|库存触发→创建货件→生成单据→物流下单→文件交接→成本回传|补货建议怎样变成实际 FBA 货件？|把目标 SKU、数量和到仓日期交给仓储物流，确认装箱、标签、实际重量和平台创建的目的仓。根据最终装箱数据生成运单和交接清单。|什么时候能把货转成可售预期？|仓库交接、承运商签收、平台收货和可售是不同事件。按货件号记录轨迹、签收证明、接收差异与费用，入仓后用平台库存状态更新台账。|承运商签收了，但亚马逊数量比发货少，直接把货件标完成吗？|标记收货差异，核对箱单、签收证明和平台接收进度。满足取证和调查条件后转异常或索赔，并保留历史数量。
+017|亚马逊索赔链路|识别异常→确认索赔类型→准备证据→提交→跟进→赔付核对|发现库存或配送异常后，何时进入索赔？|先区分在途、待收货、数量差异、损坏及已自动补偿的情况。按站点现行政策核查事件资格和时间窗口，再为可申诉项建立记录。|索赔从提单到结案要记录哪些东西？|记录货件、SKU、异常数量、原始凭证、工单号、平台答复与实际到账金额。平台结案后对照赔付或调账流水，让财务据此确认处理结果。|同一个货件差异已有赔付，但仓库又收到同类异常，怎么办？|对照具体商品和数量，确认是否同一事件、是否补收或冲回。重复部分合并已有记录，新且符合条件的差异才单独处理。
+018|亚马逊广告数据整理与排名监控链路|拉报表→统一字段→采集关键词位置→监控排名→跟踪投放状态|广告报表和关键词排名分别解释什么？|报表看展示、点击、花费和归因订单，排名快照看特定站点、位置和采样条件下的搜索可见性。记录自然位置和广告位置，按同口径趋势比较。|怎样建可用的监控表？|按站点、日期、ASIN、活动或关键词建关联，统一币种与归因时间。监控表分开展示排名变动、投放状态、预算受限和异常证据。|排名从第 8 掉到第 20，但广告转化稳定，要立刻加预算吗？|复查采样地区、时段和位置类型，再看连续趋势、曝光、预算与自然流量的关系。先确定问题属于可见性、采样波动还是投放供给。
+019|亚马逊广告分析与周报链路|汇总报表→识别浪费与潜力→跨店对比→行动建议→周报|怎样判断一个搜索词值得保留、降价还是排除？|结合实际相关性、点击、花费、转化、利润目标与归因成熟度。高相关但样本少的词继续观察，足量数据下长期超成本的词考虑降价或排除。|广告周报怎样交付给运营？|把异常词、机会词和店铺对照分列，写明比较区间、证据、建议动作、负责人和复查日期。跨店铺比较时先统一币种、站点和归因口径。|某词近两天花费上升、暂时无单，是否应该立即否定？|核对词是否相关，以及点击与归因是否足以判断。明显错意图可优先处理，相关词结合历史表现和成熟窗口再决定。
+020|亚马逊广告调控系统搭建链路|采集→配置规则→预算与结构监控→异常提醒→审核动作→复盘|将运营经验写成规则需要哪些条件？|给规则定义适用站点和活动、指标窗口、最小样本、预算边界、处理动作和例外。避免同一活动同时命中相互冲突的加减预算规则。|怎样上线规则比较稳妥？|先用历史数据回放，再以仅提示模式查看命中和误报。记录建议、人工确认、执行时间与前后配置，设置调整上限及可回查的变更记录。|多个规则同时建议提高同一活动预算，如何处理？|按活动汇总为一条建议，检查优先级、总额度和库存风险，由审批人决定调整值，保留规则命中记录以便追溯。
+021|付款与结算报表链路|下载付款与结算报表→核对费用→标记异常→归档|付款报告为什么需要搭配结算明细？|付款报告用于确认期间和打款结果，结算明细解释销售、退款、平台费用和其他调整，再和银行或收款工具实际到账匹配。|结算资料包至少包含什么？|同一店铺和账期的结算编号、报表原件、实际到账凭证、费用分类结果和差异清单。保留原币及折算依据。|打款到账少于预计金额，先检查哪几项？|先检查是否在同一转账和账期，再看预留、跨期退款、平台费、收款手续费及汇兑影响。证据不足时保留差异，交给对账负责人。
+022|跨境财务场景地图链路|采集→处理→对账→核销→核算→入账→合规|七个财务步骤各交付什么？|采集拿原始证据，处理产出统一数据，对账给出差异，核销确认哪笔欠款已结清，核算产出收入费用及利润，入账生成会计凭证，合规整理申报与审计资料。|财务自动化从哪个环节切入？|先看哪里耗时、规则清不清楚、证据是否可追。可以用一店一账期验证报表采集、字段标准化和对账，确认异常分流后再接入核销或凭证系统。|老板问“能否自动出利润”，但平台账单缺了一期，先做什么？|列出缺失账期和数据源，补齐原始证据并对账。阶段数据可以标为暂估，正式核算前由财务确认范围和差异处理结果。
+023|店铺绩效与巡店链路|采集状态→巡检订单、库存、广告与商品→识别风险→指派→复核归档|巡店和做经营周报有什么区别？|巡店面向需及时处理的异常，例如履约超时、商品不可售、库存告急、账户健康提示。周报更侧重趋势和资源分配。巡店要能定位到店铺及具体对象。|异常通知必须有哪些信息？|带上站点、店铺、订单或 SKU、发现时间、证据、严重程度、处理人和截止时间。原问题修复后再更新状态，避免同一异常反复提醒。|广告仍在花费，巡店同时发现商品不可售，先做什么？|确认受影响 ASIN 和不可售原因，交给运营判断暂停对应推广。修复页面或库存后验证可购买，再按审批或运营规则恢复。
+024|品牌分析链路|下载品牌报表→读取查询与购物篮→分析买家行为→制定运营动作|搜索查询和购物篮信息分别回答什么？|搜索查询帮助看品牌在哪些搜索需求中获得曝光、点击和购买。购物篮信息帮助识别商品被搭配购买的线索。选择店铺有权限且具备对应粒度的报表。|如何把信息转成选品或页面动作？|按查询和产品整理曝光、点击、购买等断点，匹配商品卖点或缺失场景。对搭配信号给出组合包候选，核算需求与成本后小范围验证。|数据显示两件商品常一起买，就应该立即做捆绑销售吗？|检查相关样本、适用站点和时间窗口，验证搭配是否长期存在，再核算定价、包装、库存和履约成本。
+025|跨境财务采集链路|列出数据源→导出→分账号归档→记录余额与结算状态→留日志|每月关账前怎样知道资料集齐了？|用清单列平台、ERP、银行、收款工具和税务的数据源，指定账号、站点、账期、报表及负责人。每份文件有下载时间、完整性校验和缺失原因。|采集日志怎样支持重跑和审计？|保存报表类型、账号、日期区间、文件标识及抓取结果。补采新版本时保留原件和区别，记录哪个版本用于本期处理。|导出任务成功，但文件只有表头，如何入库？|先核对筛选范围和后台是否确实无交易，记录为已验证的零数据或采集失败。标记清楚后再通知下游。
+026|跨境财务处理链路|获取非标文件→字段识别→结构化→清洗→生成台账|PDF 结算单和平台导出表怎样统一？|保留原件，提取结算编号、日期、金额、币种、收入费用分类及原文位置。标准值单独生成，统一日期、正负号和小数精度。|台账交接前如何验收？|校验关键字段、去重、按账单对总额，并抽查原文与结构化值。格式无法判断或金额不平时，把记录放入复核清单。|文件中括号包住金额，系统读成正数，怎样修正？|回查报表对括号和退款的定义，用总额验证负号口径。补齐规则，对同类记录重跑并保留原值与修订记录。
+027|跨境财务对账链路|平台账单→ERP 订单匹配→收款流水匹配→识别差异→跟进|为什么平台、ERP 和银行要分两层匹配？|平台交易明细可对订单或退款，银行到账通常对应一笔包含多订单的结算。先核对交易层，再以结算编号或资金凭证核对打款总额。|差异清单怎样做才好处理？|区分时间差、退款、手续费、汇率差及缺单。留应有金额、实有金额、币种、参考编号、证据和责任人，并跟踪原因与结论。|有三笔订单在平台有、在 ERP 没有，但银行打款已对平，能关账吗？|交易层差异仍需核对订单同步、时间范围和退款记录。记录差异证据，按财务复核结论补录或列作待处理项。
+028|跨境财务核销链路|读取应收应付→匹配收付款→识别未核销项→生成记录→跟进|对账之后为什么还有核销？|对账回答金额和记录能否匹配。核销把已确认的收付款分配到具体应收应付，更新欠款余额，并保留一笔付款如何分摊的记录。|部分回款或多单合并回款怎么处理？|按可证实的匹配关系分配，记录每笔被核销金额与剩余余额。无法定位的资金交财务待确认，避免错误结清。|供应商一笔回款金额等于两张单据总额，但没附清单，能核销吗？|查询付款方、币种、日期和参考号，向负责方确认分摊依据。确认后再按各单金额核销并留凭证。
+029|跨境财务核算链路|归集收入→归集费用→处理汇率与汇损→核算利润→复盘|店铺月销售额高，为什么 SKU 仍可能亏损？|收入还要扣退款、采购、平台佣金、配送、广告和按规则归集的共用费用。用同一账期和币种算 SKU 或站点利润，再解释亏损来源。|利润表如何让别人复核？|标注收入、成本与费用来源，明确汇率日期和规则、分摊依据、暂估项及差异。把总账或结算汇总与经营口径的差异列清。|财务利润与运营表相差很大，优先核对什么？|对齐确认期间、退货、广告归因、成本和汇率，再逐层做收入费用桥接，定位哪些是口径差异、哪些是漏算。
+030|跨境财务凭证与入账链路|确认核算结果→匹配凭证规则→生成→导入→验证|核算结果如何转换为可入账的凭证？|财务确认科目、借贷方向、币种、会计期间和单据归属，按映射生成凭证并检查借贷平衡。附上底稿和业务编号供追溯。|导入结束后怎样证明已经入账？|核对导入成功行、失败行、凭证号、账期与金额总和，通过财务系统状态和总账抽查确认，同时检查是否重复。|导入只成功一半，能原样把整包重提吗？|先核对已成功凭证的业务编号和批次，将失败项单独修复，再按系统规则重试并复核全批汇总。
+031|跨境财务合规资料链路|收集合规材料→整理 VAT 或退税资料→校验→归档→提示风险|申报和审计资料为什么需要按主体、市场和月份归档？|不同经营主体、市场、税号和期间的交易与申报责任可能不同。整理适用的销售、退款、物流单据和申报凭证，保留原始来源及版本。|交给税务负责人之前要做什么？|核对账期、币种、税号、金额与账单是否一致，列出缺失凭证、异常处理及截止时间，由专业负责人确认申报口径。|平台报告与申报底稿中的销售额不一致，怎么办？|先排查税含价、退款、日期和交易归属，再找出解释不了的差额并补证，交税务人员确认处理。
+032|服装视频采集与素材整理链路|采集参考→统一命名→提取 SRT 字幕→归档|参考视频和可用于成片的素材怎样管理？|参考素材保留出处、平台、链接和采集时间以便分析。实际使用素材另存授权范围、SKU 和版本。文件名能关联视频与对应字幕。|提取字幕后为什么仍需人工复核？|语音识别容易误读品牌、面料和专有词，时间戳也可能偏移。通过抽查音画同步与术语，交付可搜索的字幕和片段索引。|两条同名视频分别是原版和二次剪辑，怎样存？|用来源及版本生成不同标识，分别保留链接和授权。字幕和时间段按实际版本绑定，避免把两条的表现数据合并。
+033|服装视频分析与爆款脚本链路|输入视频→解析画面→分段→提炼结构→输出脚本和拍摄计划|服装视频分段时重点提取哪些信息？|逐段记录镜头时间、景别、模特动作、口播和要传达的卖点。例如上身效果、材质细节和不同角度各解决一个购买疑问。|怎样把参考结构变成自己的脚本？|把可借鉴的叙事顺序转化成镜头清单与拍摄要求，用自己的模特、商品、实测尺码和授权素材，复核实际版型及颜色。|参考脚本夸大显瘦效果，准备照稿拍摄怎么办？|改成能够直接展示和核验的版型、实测尺寸或试穿画面，核对模特与商品信息，再确定脚本和字幕。
+034|服装视频剪辑动作链路|素材准备→切片→混剪→生成草稿→插入特写→导出|智能混剪要提前锁定哪些素材规则？|用 SKU、色号、拍摄场景和镜头标签建立素材清单，限定每段时长与用途。标注哪些款式、颜色和配件必须一致。|成片导出前怎样做人工质检？|重点看特写与上下文是否对应、字幕是否挡住服装、音乐和比例是否符合要求，并检查授权。输出成片和对应草稿版本。|主体是深蓝款，自动混剪插入黑色款细节，怎么处理？|查特写候选的色号标签，改过滤条件后替换对应片段，并逐段核对同期出现的款式、配件和字幕。
+035|TEMU 商品管理链路|准备商品资料→批量刊登→核价→识别滞销→处理下架→回填状态|批量上架前要为每个 SKU 准备什么？|准备类目属性、图片、规格、合规材料、成本底线和待核价信息。按商品和变体校验资料完整性，再分批提交并记录平台处理状态。|核价结果和滞销标记怎样驱动后续动作？|核价结果与供货成本、物流及利润底线比较，形成接受或复核建议。滞销需结合观察周期、库存和活动安排，审批完成后再处理下架并回填。|平台核价低于成本，但已经有库存，该怎么处理？|重算实际履约与库存处置成本，评估改包装、调整供货、暂缓刊登或清货路径。由运营和供应链确认决策后更新状态。
+036|TEMU 订单与发货链路|读取订单→筛选可备货→加入发货台→建单→核对发货→处理异常|什么订单可以进入备货与发货环节？|根据托管模式、订单状态、SKU 可用库存、承诺时效和拦截原因筛选。准备订单与实物的映射，异常单从批次分出。|确认发货前后各核对什么？|发货前核对包裹、数量和运单关联，具备实际发货依据后确认。发货后跟踪状态回传，记录失败原因和处理人。|批次里订单已建，但一单缺货，是否整批确认发货？|隔离缺货订单并保留异常处理记录，核对其余订单后按实际发货情况处理。及时沟通补货或平台允许的处置。
+037|TEMU 采购与供应商协同链路|1688 寻源→同口径比价→询价议价→确认条款→留档|供应商比价时，怎样比较同一款的真实成本？|统一用途和规格、起订量、含税口径、包装、交期及运费条款，记录样品与量产价格。低价与质量、补货稳定性一并判断。|微信沟通完还要留下什么？|把接受的报价、有效期、品质要求、交期及责任写入采购协同记录，需要时由供应商书面确认，和采购单关联。|一家报价最低，但拒绝提供样品和规格书，怎么选？|保留该家报价作为未核实候选。优先评估能提供样品、规格与可验证交期的供应商，待证据补齐再做采购判断。
+038|TEMU 退货与库存处理链路|识别滞销→核对仓与货权→退货或调拨→回填→跟踪异常|什么时候考虑退货，什么时候考虑调拨？|先查库存归属、仓别、托管模式、可售状况和处置费用，再评估退回、调拨或其他合规路径。动作前确认平台和仓库是否支持。|退货或调拨完成后要对哪些账？|记录原仓、目的仓、SKU、调拨或退货单号、数量、收货结果与费用。以实际收货和确认状态分别更新仓内、在途及可售库存。|已经发出 100 件调拨，目的仓只确认 95 件，怎么记？|记录已发 100、实际收 95、差异 5，保留签收与箱单资料，交仓库调查并依据复核结果调整。
+039|TEMU 活动与经营数据链路|读取活动规则→核对价格与库存→报名→汇总数据→复盘|报名之前运营要看哪几项？|检查商品资格、活动时间、售价或折扣要求、库存、履约能力和利润底线。提交前列清每个 SKU 的入选或排除理由。|活动复盘怎样回答值不值得再参加？|把报名与实际上线状态对齐，比较活动前、中、后的销量、利润、退货、缺货情况，用可比基线评估增量及资源消耗。|活动预计拉高销量但利润率跌破店铺底线，怎么决定？|按预期增量、清库存价值和实际费用做情景测算。若需要例外，记录预算和结束条件，交负责人审批。
+040|亚马逊广告自动化系统链路|识别新品 ASIN→生成投放结构→运营审核→发布执行→监控|新品投放结构通常怎样拆分？|按目的分别设计自动探索、手动关键词、商品定位等活动，给每项写清目标商品、预算、出价与禁用项，由广告运营验证。|机器执行怎样保留控制权？|先出活动草稿与变更清单，由运营确认店铺、站点和预算。执行后回写活动编号、异常和实际配置，后续规则按审批边界运行。|批量创建返回超时，脚本能直接重跑吗？|先查询已有活动和执行日志，按唯一批次定位已创建项，只重试确认缺失的活动，避免超预算和重复投放。
+041|新品内容生成与多站点本地化链路|登记内容任务→生成 Listing→运营确认→上传审核→本地化素材与 A+|多站点本地化除了翻译还需要做什么？|保持共用商品事实，逐站适配计量单位、语境、搜索词、合规表达和素材。具有资格且确需发布时，另外准备适配站点的 A+ 内容。|飞书任务表在案例中起什么作用？|承接任务登记、生成稿和运营确认，关联源 SKU、站点、素材版本以及亚马逊处理状态。它可以用同等能力的现有任务系统替代。|英文版写了一组尺寸，德语图片转换后和包装规格不一致，怎么办？|按原始规格表重算，核对单位换算和四舍五入，再同时检查德语文案、图片与后台属性。运营确认后才提交该站点。
+042|新品生命周期管理链路|新品登记→基础刊登→标识匹配→站点合规→测试发货→正式发货→物流回写|SKU、ASIN、FNSKU 分别在哪个环节用？|SKU 用于卖家内的库存和操作管理，ASIN 用于平台商品目录，FNSKU 是适用 FBA 场景下的配送库存标识。资料表要保留三者对应及适用站点，避免用错标签。|测试发货到批量发货之间要验证什么？|验证刊登、适用合规材料、标签、装箱与收货状态，再确认目标站点扩展与正式货量。飞书、ERP 或物流台账持续回写节点。|某站点刊登成功，但适用的产品安全资料仍待确认，能同时发货吗？|按目标站点实际要求复核资料缺口并标记受影响的 SKU。对该站点暂停需要合规放行的后续动作，由负责人确认后恢复。
+043|关键词调研与词库搭建链路|确定核心词→前台调研→VOC 拓词→验证→生成词库|从哪里找到可核验的关键词？|用商品名称和关键属性做种子，从前台搜索、竞品标题、相关评论和可用报表找表达。记录来源、站点、日期和词义，再验证与实际商品是否相关。|一份可执行的词库怎样分层？|按品类、属性、场景、长尾、品牌或排除词分组，记录优先级和用途。列表可供标题、五点、后台字段及广告共用，同时保留站点规则复核。|第三方工具给某词很高的搜索量，但搜出来都是另一类商品，怎么处理？|以相关性和真实搜索意图为先，把它标为观察或排除。回查数据源与站点口径，避免高流量词引来不匹配访客。
+044|亚马逊广告四阶段诊断链路|调研竞争环境→重建关键词矩阵→诊断页面→分析广告数据→优化|广告诊断为什么要从竞争和页面开始？|出价只影响部分流量。竞争价格、商品相关性、展示效果、商品可售状态都会影响表现。先把现有活动和核心关键词对应到商品，再看页面是否回答买家需求。|诊断清单怎么指导调整？|先区分曝光不足、点击弱、点击后转化差和获客过贵。给每类问题列证据、拟调整项、观察期和回退条件，并标注归因成熟程度。|核心词点击很多但订单少，而且前台价格明显偏高，应先改出价吗？|核对词意图、库存和价格带，评估页面与报价能否承接流量。先把最可能的转化问题验证清楚，再按目标成本调价或调整投放。
+045|亚马逊市场调研六步链路|提取货源信息→分析前台竞品→挖掘 VOC→拆解对标→验证→调研报告|拿到一个 1688 链接，怎样判断是否值得做美国站？|提取真实商品规格、采购价和条款，再比较美国站同场景竞品的价格、评价、规格及配送。用用户痛点、实际费用和风险评估差异，记录调研日期。|市场报告最终要支持什么决定？|给出进入、补证观察或放弃的理由，附参考 ASIN、实际前台价格、成本假设和待核验数据。将可验证卖点交词库、采购和合规复核。|第三方估算需求很高，前台只找到少量相关竞品，怎么写结论？|先核对关键词、类目和目标人群是否一致。报告分别呈现来源、时间和分歧，列补证动作，在市场容量不明时避免作确定承诺。
+046|新品上架后跟进链路|当日确认→早期抑制巡查→跟进购物车与评价→分析搜索词→调整投放→复盘|上线后的前几天优先检查什么？|逐个确认 ASIN 及变体可售，检查价格、库存、配送、内容和搜索抑制状态。根据广告资格、预算和实际可售情况决定投放，符合条件时再评估官方评价计划。|经营数据如何回到上架前的决策？|搜索词和转化回到词库与页面，退货原因回到内容、包装或产品，库存与补货回到供应链。复盘记录指标、行动和负责人。|上线三天花费较高但转化很少，要直接推翻所有策略吗？|先检查可售状态和流量相关性，再结合历史基线、样本量与归因周期判断。处理明确异常，给需要观察的指标设复查日期。
+047|Google 与 WhatsApp 外贸拓客链路|定义买家画像→查公开商务入口→验证公司→合规联系与跟进|一个搜索结果怎样变成有用的 B2B 线索？|先按地区、品类和公司角色筛选，再对照企业官网确认业务匹配和公开商务联系方式。记录证据与来源，使用公司明确开放的业务联系渠道。|团队怎样接手这批线索？|在线索表记录公司、市场、需求证据、合规联系依据、负责人和状态。触达要有明确业务相关性，遵守当地规则、渠道政策与拒收要求。|搜索到一个号码，但找不到企业官网出处，怎么办？|保留企业名称和待核验理由，换用官方业务联系页面等明确入口。无法核实归属和联系依据时不发起联系。
+048|LinkedIn 外贸外联链路|定义目标公司→识别相关岗位→核验业务线索→合规触达→记录结果|找到可能的决策者时，先核对什么？|核对公司是否在目标市场、岗位是否对应采购或合作职能、资料是否仍有效。优先使用企业官方渠道与公开商务信息，按平台规则接触。|谁来决定继续跟进或停止？|由线索负责人根据对方回复、业务相关性和已授权的渠道判断。把拒收及时登记，避免其他成员重复联系。|职位看起来匹配，但对方已经离开那家公司，怎么办？|更新公司与岗位状态，回到该公司的官方合作入口或现任岗位重新核验。保留失效理由用于减少重复调研。
+049|Reddit VOC 调研五步链路|找社区→筛选帖子→拆解原话→映射业务动作→验证定位|Reddit 上的讨论适合回答什么问题？|适合发现购买前顾虑、使用场景、替代方案和用户实际用词。选相关社区与时间窗口，记录帖子背景和观点分歧。|怎样从帖子形成 Listing 或广告建议？|把观察整理成“场景、痛点、原话、可验证动作”，再和商品评价、搜索词及实际规格交叉验证。将证据强弱标进洞察表。|一个高赞帖子强烈反对某类材料，能代表全部消费者吗？|把意见当作该社区的信号，核对其他社区、评论和地区样本。确定确有目标人群需求后，再调整材料或表达。
+050|跨境市场扩张七步流程|收集经营信息→确认约束→评分→就绪评估→市场深钻→路线图→KPI|评估新市场，先问自己还是先问市场？|两边都要。盘点现有产品、现金、人力、合规和履约能力，同时看目标市场需求、竞争、成本与支付习惯。记录评分权重与关键假设。|目标市场排名第一后怎么落计划？|完成优先市场深度验证，拆成合规准备、软启动、正式放量及复盘，定义资金、负责人、量化判断指标和暂停条件。|预估需求最大，但本地退货成本还没测，是否立即铺全目录？|先补成本和履约数据，选择少量有代表性的 SKU 测试，观察真实毛利和退货表现后再扩大目录。
+051|独立站 CRO 审计六步链路|埋点检查→审计高影响页面→定位漏斗流失→验证原因→排序→修复|转化优化从主页改版开始吗？|从数据可信度和漏斗开始。检查商品页、加购、结账、支付各步及设备差异，找到损失集中的节点。用授权的聚合数据或遮蔽敏感信息的会话证据验证。|如何决定先修哪一个问题？|结合影响范围、证据强度、实施成本和可回退性排序。给每项写清目标事件及验证窗口，先处理确定的高影响故障。|移动端加购正常，支付转化骤降，先查什么？|核对移动端支付失败、配送费用提示、支付方式与地区限制，确认埋点准确，再用测试订单重现。
+052|自动广告关键词收割周流程|拉搜索词报告→筛选成熟词→迁移手动精确→管理重叠→调价与库存检查|从自动广告“收割”的是什么？|用买家真实搜索词筛出相关、已积累转化且成本可接受的候选，给适用词建立手动精确投放。保留历史证据与迁移日期。|什么时候考虑在自动活动中加否定？|手动活动具备审核通过的配置、足够预算且已开始承接时，再评估是否需要否定以减少重叠。结合适用归因窗口、库存和活动边界复查。|一个词刚出一单，但结果还未归因完整，能马上迁移并否定吗？|先确认相关性、样本与可售库存，把它记为候选。等观察窗口和成本证据满足内部标准，再执行迁移，并验证手动活动承接。
+053|到货收货差异处理流程|箱单对采购单→分类差异→取证处置→更新库存和账单|仓库收货时，采购单与箱单分别代表什么？|采购单记录预期订货规格和数量，箱单记录供应商声明的装箱情况。实收是第三个事实，逐行核对 SKU、数量及外包装。|发现短装、损坏或错发时怎么交接？|记录差异类型、受影响数量、照片及签收证据。仓库按状态入库或隔离，采购跟进补发、索赔或退回，财务按确认结果更新应付。|订 100 件，实收 100 件但 5 件破损，库存怎样更新？|记录实收 100、可用 95、隔离 5，按流程取证并联系供应商。待处置确认后同步调整库存与应付。
+054|价格实验生命周期|假设与主指标→设计参数→上线实验→评估→落地|为什么价格实验可以看每访客收入？|价格变化同时影响客单价和转化，每访客收入把两者放到同一流量口径。还应预设利润、退货和用户体验等限制指标。|怎样设计一场可判断的测试？|预先定主指标、分流方式、最小样本、观察期和停止规则。检查随机分组和配置是否正确，复核不确定性和实际利润后再落地。|高价组前两天收入领先，能提前宣布胜出吗？|先检查样本和分流是否达到预设条件，保留完整观察期，再结合波动区间和利润判断。出现预定义风险时按停止规则处理。
+055|指标异动根因排查链|触发告警→分渠道→拆订单量与客单价→区分流量和转化→定位 SKU|销售额突然下跌，如何逐层定位？|先验证数据是否延迟，再按站点和渠道拆贡献。用订单量和客单价分解收入，接着拆访客和转化，筛出影响最大的 SKU 与时间段。|根因排查要交付什么？|给出异常幅度、主要贡献对象、证据或待验证假设、处理动作和负责人。记录修复后指标回归情况以验证判断。|收入下降而订单数没变，优先排查广告流量吗？|先看客单价、商品组合、促销和退款如何变化，再决定是否下钻至流量渠道。把收入降幅按 SKU 分解。
+056|Google Ads 智能出价爬坡计划|校验转化信号→观察学习→设初始目标→分步调整→检查新客价值→周度监控|调整目标 ROAS 前先验证什么？|确认转化追踪、价值回传、币种和转化延迟可靠，并核对账户是否有足够有效数据支撑所选策略。以当前表现和实际利润设置初始目标。|目标如何逐步优化？|把每次调整、理由、幅度、预计观察期和恢复条件记入日志。给学习和归因留出时间，兼顾花费与有效转化量。|提高目标 ROAS 后花费和订单显著下降，如何判断？|先检查转化信号和归因延迟，再看流量是否因目标过紧而收缩。对照阶段目标与利润决定维持、分步放宽或回退。
+057|黑五网一七封邮件活动链路|发信准备→预告→VIP 提前场→倒计时→大促→网一收尾|大促启动前邮件团队要准备什么？|确保发信域名与名单健康，按订阅授权和客户分群安排预告、VIP 和正式活动。每封邮件关联优惠规则、落地页、库存和发信时间。|买过的人要怎么分流？|依据实际下单和取消状态更新分群。后续提醒可面向未购的合资格订阅者，已购者走订单服务或符合条件的其他内容。|库存临时售罄，但提醒邮件已排程，怎么处理？|更新库存及落地页，暂停相关促销邮件或替换为准确的替代信息，重新检查受众和优惠后再发送。
+058|订单状态机迁移链|待支付→确认备货→发货→妥投→售后或退回|为什么订单状态需要定义允许的迁移？|支付、库存、发货提醒和售后会由状态变化触发。先约定待支付、已确认、已发货、已妥投及售后的合法路径，并保留触发时间和审计记录。|同一个事件重复收到怎么办？|使用事件 ID 或业务唯一键检查是否处理过，同时校验订单当前状态。重复事件只记录已处理结果，避免重复扣库存或发通知。|支付成功回调晚到，订单已发货，应该改回已支付吗？|校验回调和过往状态记录，识别它是否为延迟或重复事件。保持当前合法状态，同步遗漏的支付附属信息时保留记录。
+059|UGC 素材授权链路|收集候选→向创作者确认授权→记录许可范围→发布前审核→展示|公开发布的买家照片可以直接放在商品页吗？|先确认创作者或权利人已授权使用，并核查平台规则、授权渠道、地区、用途和期限。保存授权证据，将已授权素材交审核。|授权通过后仍需审核什么？|核查商品与 SKU 是否匹配、画面里的第三方权益、误导性表述、版权及授权范围。记录上线位置和时间，支持撤回与替换。|创作者同意商品页使用，能把同一视频投放付费广告吗？|核对许可是否明确覆盖广告、地域和渠道。若范围只含商品页，另行取得付费广告许可后才可投放。
+060|四阶段跨境扩张路线图|调研注册→软启动→放量与扩目录→优化复制|软启动阶段适合验什么？|用少量 SKU 验证当地合规、页面、支付、履约和售后，再观察真实获客成本、转化和毛利。选能够代表主要风险的商品。|满足什么条件才扩大目录或复制到新市场？|关键指标在约定观察期达标，库存、退货和客服能力可承接增量，且市场合规与单位经济清楚。明确下一批范围和复盘点。|首月销量好但退货率持续上升，应按原计划放量吗？|先定位退货原因及利润影响，把内容、尺码或履约问题修复并验证。根据约定条件重新决定放量时间。
+061|TEMU 市场调研与选品决策链路|定义调研口径→后台与前台取证→交叉估算→需求、利润与合规评估→进入决策|怎样证明一个 TEMU 类目值得试？|用可用的官方后台和同站点竞品快照核对需求，标明销量估算的来源与不确定性。一起评估价格带、差评、预期利润、准入和供货周期。|调研结论如何交给采购与合规？|交付候选商品证据表、竞品对照表和利润合规测算，写明进入、观察或放弃的理由。为每个开放问题指定补证人与停止条件。|市场热度高，但主流售价持续下降，下游应继续找货吗？|用下降后的价格重算利润和成本空间，验证差异化与供应稳定性。若风险超过内部底线，调整为观察或放弃并记录触发因素。
+062|TEMU 产品寻源与报价定品链路|类目模板反推字段→同口径询价→供应商评分→三情景测算→定品|用什么材料发出统一询价？|从目标类目模板反推规格、材质、包装、认证和实拍资料要求，再用同一询价单收集起订量、单价、物流体积及交期。|如何把“报价最低”转化为合理的定品结论？|结合质量、交期、合规凭证和售后评分，按基准、乐观及保守情景测到仓成本和利润。通过门槛后生成产品编码与资料包。|单价达标，但包装后体积和运费可能明显超预算，怎么处理？|取得实测装箱参数与运费报价，重算保守情景。可验证改包装或重新议价，若仍低于内部门槛则停止该方案。
+063|TEMU 知识产权初筛与放行链路|拆分实物、图文与包装元素→检索取证→风险分级→复核签核→归档重筛|初筛怎样做到风险可追溯？|分别核对商标、外观或专利线索，以及实物、包装和图文素材的权属。保存查询词、地区、日期、命中项和授权证据，按低、中、高或不可判定分级。|哪些情况需要复核而不能由初筛岗放行？|有近似权利、授权链不完整、地区覆盖不足或证据无法判断时，按风险转复核。高风险停止推进并上报，换供或更换素材后重新检查。|供应商口头保证“没问题”，但包装有明显第三方元素，怎么办？|暂停放行，保留包装照片与查证记录，请供应商提供可核验的权属和授权链，交指定人员复核。
+</script>
+<!-- 简答题按原题顺序，每题用分号分隔要点，用斜杠列同义表达。 -->
+<script type="text/plain" id="rubric-data">
+START|SKU与变体/SKU/父子体/颜色变体;主数据与映射/主数据/变体关系/资料表|核验准入与资质/准入/认证/知识产权;交接证据和表达限制/证明材料/禁用/限制/待复核|目标人群与场景/人群/目标用户/使用场景;证据支持定位/竞品/差评/价格带/差异化|来源与相关性/来源/相关性/相关度;字段和投放分工/标题/五点/后台搜索词/广告测试|确定文案与商品事实/标题/五点/商品事实;按SKU验图/颜色/规格/包装数量/实物|符合站点规格/站点/平台规范/图片规范;按实物验收与归档/实测/随货/套装/素材包|测算售价和利润/利润/毛利/成本;落实库存和履约/FBA/FBM/库存/可售日期|后台和前台分别核验/后台/前台/展示;确认可售变体并登记/可购买/库存/变体/ASIN|定位具体SKU并排查/白色/SKU/报价/库存;修复后复验可买/复验/重新验收/重新检查/购买入口
+001|评论聚类/聚类/分类/同义;验证高频与真实场景/重复/跨竞品/使用场景/群体|提供证据与人群/证据/原始评论/受影响人群;验证产品方案/小样/成本/规格/样品|区分表达与规格/页面/页面没说明/表达/真实规格;按场景验证/目标人群/竞品尺寸/使用场景/尺寸图
+002|场景匹配/场景/用途/人群;规格价格可比/规格/价位/价格带/统一口径|形成竞品证据/ASIN/快照/评论证据/对照表;明确动作和验证/优化建议/动作/负责人/验证|核对商品和优惠差异/规格/件数/促销/配送;测算利润与试验/成本/利润/试价/测试
+003|产品信息可靠/主数据/商品事实/规格;结合搜索和竞品/词库/关键词/竞品/评价|评分用于比较/排序/相关性/可读性;终审并版本管理/终审/复核/规则/版本|查可用证据/测试/报告/证据;修正并复核/删除/改写/替换/复核
+004|按主题理解用户/场景/标签/痛点;处理样本口径/去重/清洗/站点/版本|交付证据/样本/评论/主题;给出行动或责任/动作/负责人/团队/优化|注明样本有限/样本少/小样本/不足;补查批次证据/包装/批次/退货/交叉
+005|提供实物素材/实拍/尺寸/材质;定义使用与结构要求/场景/品牌/几何/结构|对照实物/实物/接口/轮廓;按SKU及平台规范/sku/规范/站点|修正错画/修正/删除/返工;用原拍验真/实物/实拍/合成
+006|拆解通用表达/构图/视角/信息层级;自有或有授权素材/授权/原创/实拍|检查合成细节/光影/阴影/透视/遮罩;核实商品真实/标志/规格/包装/实物|确认相应权利/授权/使用权/版权;用原创表达替代/自制/重做/独立/原创/自己的插画
+007|核验真实参数/参数/型号/测试;让买家判断适配/兼容/接口/连接|每张图回答购买问题/用户问题/分配/接口图/场景图;统一规格数据/规格表/同一份/核验|按型号区分能力/sku/版本/低配/协议;复核素材绑定/绑定/图片/规格
+008|记录可比数据/样本/平台/日期/互动;拆解镜头结构/开场/镜头/脚本|提出可测假设/假设/结构/镜头作用;使用自家素材验证/原创/测试/自家|辨别其他因素/账号/投放/时段/发布时间;对照验证/对照/留存/点击/测试
+009|准备素材和规范/授权/素材清单/命名;定时间轴或画幅/时间轴/顺序/画幅/镜头|交付草稿与预览/可编辑/草稿/预览;人工复核成片要素/字幕/音量/安全区/复核|修正映射/映射/sku/素材id;重新生成受影响草稿/重跑/重生成/重新生成
+010|统一计价条件/币种/单位/含税/起订量;保留来源证据/原件/原文件/页码|识别阻断错误/金额不符/字段缺失/重复/币种;复核后回填/人工/复核/审核|确认箱规/每箱/装箱数/箱规;换算同一费用口径/单件/换算/含税/运费
+011|提取物流标识/运单号/承运商/货件号;保留物流数量和原单/箱数/重量/原件|与发货计划核对/发货计划/货件编号/箱数;处理重复或不确定/去重/重复/复核|暂停待核实/暂缓/暂停/低置信;与承运商核实/电子单/承运商/原件
+012|收集经营报表/订单/广告/业务报告/库存;统一维度与口径/站点/币种/日期/粒度|分解变化来源/访客/转化/流量/售价;动作可追踪/负责人/复评/证据/时间|检查商品可售和变动/库存/购物车/价格;按流量与转化分解/转化/流量/业务报告
+013|建基线/基线/报告/历史;识别要改的字段/标题/图片/五点/字段|留版本及时间/版本/修改时间/日期;使用可比窗口/对照/可比/促销/库存|先分离断货影响/断货/库存/可售;确认恢复后转化/恢复/转化/补货
+014|根据问题选图片/点击弱/购买问题/误解;确定要改的槽位/主图/尺寸图/包装图|记录图版本与位置/版本/槽位/改图时间;观察可比数据/点击/转化/促销|识别促销混杂/促销/变量/同时变化;对照测试/对照/对比/可比
+015|区分库存状态/预留/在途/可售;结合预计销量与交期/日销/覆盖天数/入仓时间|提供覆盖与时点/库存/覆盖/交期/到货;输出补货动作/补货量/催运/负责人/安全库存|确认时间和销量/日销/可售日期/交期;弥补缺口/加急/补货/限广告/调整履约
+016|对接SKU及装箱/sku/数量/装箱;创建货件并交接/目的仓/标签/交接|区分几个时点/签收/收货/可售;按货件回写证据/货件/接收差异/物流|留接收差异/差异/挂起/核对;查证后调查/箱单/签收证明/索赔
+017|判断异常性质/损坏/已赔付/数量差;查政策与时间窗/资格/政策/时限/窗口|保存过程和证据/工单/凭证/货件;核实际赔付/流水/到账/调账|判定是否同事件/重复/同一货件/同一事件;核冲回与新差异/冲回/补收/新异常
+018|广告报表口径/点击/归因/花费;位置采集口径/自然位置/广告位置/可见性|建立关联和统一口径/站点/日期/asin/币种;输出监控异常/预算/投放状态/排名|复查排名采样/地区/位置/时段/采样;对照连续趋势/趋势/曝光/自然流量
+019|先判断相关性和成熟度/相关性/归因/样本;权衡实际成本/成本/花费/利润|报告证据和异常/机会词/异常词/区间;注明动作与负责人/负责人/建议动作/复查|区分按相关性处理/相关/意图;检查观察窗口/归因/历史/样本/成熟
+020|定义触发与阈值/阈值/窗口/样本;明确限制及例外/预算/优先级/例外|先回放和人工评估/回放/提示模式/审核;留痕及回退/日志/记录/回退|合并冲突建议/汇总/去重/优先级;核总额度再审批/预算/总额/审批
+021|区分结算与到账/结算/到账/打款;解释交易明细/退款/费用/调整|账期与可追溯原件/结算编号/账期/凭证;分类差异保留币种/差异/费用/原币|先核转账和账期/转账/账期/结算;查实际扣减/手续费/预留/退款/汇兑
+022|区分业务步骤/采集/处理/对账/核销;核算入账要求/核算/利润/凭证/入账|选择可验证范围/一店/一账期/规则;先处理采集及对账/采集/对账/标准化|补原始证据/补齐/缺失/原始;暂估与确认口径/暂估/复核/对账
+023|关注及时异常/风险/履约超时/告警;区分周报用途/趋势/周报/绩效|包含异常证据/店铺/sku/证据;明确处理责任/负责人/截止/复验|处理不可售商品/不可售/库存/抑制;暂停和复验/暂停/修复/复核
+024|搜索漏斗信号/曝光/点击/搜索查询;购物篮搭配/购物篮/搭配/一起买|按查询定位漏斗/曝光/断点/点击;用实际成本验证/组合/成本/验证|检查样本和稳定性/时间/长期/样本;核算组合履约/库存/包装/定价/履约
+025|数据源和账期清单/平台/银行/ERP/账期;文件完整性或缺口/完整性/校验/缺失|留采集标识和状态/账号/日志/文件标识;版本可追溯/版本/重跑/补采|核真实是否零交易/零交易/零数据/筛选;标记核查结果/记录/失败/重导
+026|保留原始出处/原件/原文/页码;转换统一口径/标准值/币种/字段/精度|总额或重复校验/总额/去重/校验;异常流转复核/复核/抽查/异常清单|确认负号定义/负号/退款/括号;重跑验证和留痕/重跑/总额/原值
+027|交易层核对/订单/退款/交易层;结算层核款/到账/结算编号/银行|按差异类型分类/时间差/手续费/缺单/汇率;采用责任与证据/责任人/证据/编号|追查交易缺单/订单同步/缺单/时间范围;复核后补录或挂起/补录/复核/待处理
+028|解释核销用途/结清/应收/欠款余额;绑定款项和单据/分配/对应/匹配|按证据分配/分摊/匹配/证据;记录部分和剩余/剩余/未核销/待确认|检查付款证据/付款方/参考号/确认;分配并留记录/核销/分摊/凭证
+029|列主要成本/退款/佣金/广告/采购;按 SKU 统一结算维度/sku/账期/币种|说明来源与规则/分摊/来源/汇率;与总量及差异勾稽/差异/总账/结算|对齐核算期间与口径/期间/退货/汇率;逐层对比科目/收入/费用/成本/差额
+030|凭证要素及平衡/科目/借贷/平衡;附原始证据与业务编号/底稿/编号/单据|校验导入结果/失败行/凭证号/状态;查总账或重复/总账/重复/账期|判定已入账/凭证号/已成功/批次;只重跑失败项/失败项/单独/重试
+031|明确适用主体与市场/主体/市场/税号;归档证据/原件/退税/物流/版本|核申报基础字段/账期/币种/金额/税号;把缺口交给责任人/缺失/税务/专业/截止|排查税价退款口径/税含价/退款/账期/日期;差异补证并复核/补证/税务/差额
+032|分开参考与授权素材/参考/授权/来源;用可关联的文件名/版本/命名/sku|查字幕内容准确性/误读/术语/品牌;时间戳和画面对齐/时间戳/同步/片段|唯一标识与版本/版本/不同标识/原版;字幕和来源按版本对应/关联/绑定/链接
+033|记录分段信息/时间/景别/镜头;说明每段卖点/卖点/动作/口播|形成拍摄清单/脚本/镜头清单/拍摄;以自家商品实测表达/原创/自家/实测/授权|改为可验证画面/实测/版型/试穿;核对商品与模特/模特/商品/字幕
+034|按款号与色号匹配/sku/色号/款号;设镜头规则/标签/时长/镜头|复核跨镜头一致性/特写/颜色/上下文;检查字幕与授权/字幕/音乐/授权|找到色号映射/色号/过滤/标签;替换并复核/替换/重新生成/复核
+035|准备类目与商品事实/类目/属性/规格;校验成本合规/成本/核价/合规|核价对利润/利润/成本/底线;下架有审批和状态/审批/状态/观察|测算履约及处置/重算/物流/成本;确认调整路径/改包装/暂缓/清货/负责人
+036|筛订单状态与时效/状态/时效/托管;核对备货能力/库存/sku/异常|核对实际发货/包裹/运单/实物;跟踪回传和异常/回传/失败/记录|隔离缺货项/隔离/缺货单/异常单;按实发处理其余/其余/实发/补货
+037|统一报价条款/规格/起订量/币种/含税;评估质量和稳定性/样品/交期/质量|明确书面条款/书面/有效期/报价;关联合同采购/采购单/协同记录/责任|缺证先不定/未核实/待确认/拒绝;选择证据齐全供应商/样品/规格/交期
+038|先核仓和模式/仓别/货权/托管;判断处置费用和支持/费用/平台/退回/调拨|保留数量和单据/数/单号/sku;按真实状态更新/实际收货/在途/可售|分别记录95与差异/95/差异/短少;查证后再调整/签收/箱单/调查
+039|检查活动准入与优惠/活动资格/折扣/售价;核库存利润/库存/履约/利润|对齐时间和状态/上线/活动前/期间;评估销量之外结果/利润/退货/缺货/增量|测算增量和利润/增量/利润/库存;例外需确认范围/审批/预算/停止/负责人
+040|区分活动用途/自动/手动/定位;定义预算与范围/预算/出价/目标商品|草稿经运营审核/审核/确认/草稿;追踪实际执行/活动编号/回写/日志|核已创建活动/日志/查询/已有;重试确认缺失/缺失/幂等/防重复
+041|维持商品事实一致/商品事实/统一规格/实测;按站点适配/单位/本地化/搜索词/合规|任务与结果留痕/登记/任务表/运营确认;关联版本和站点/站点/版本/sku/状态|回源核规格/原始规格/换算/单位;跨素材修订再复核/文案/图片/属性/复核
+042|识别三类标识/sku/asin/fnsku;说明库存与目录关联/对应/绑定/标签|验证实际流程/标签/入仓/收货;再确认扩大发货/正式货量/合规/试发|按目标市场补证/合规/证据/站点;暂停需放行活动/暂停/暂缓/不发/待放行
+043|提供可靠来源/前台/竞品/评论/报表;校验词相关/相关/真实需求/词义|词按作用分层/品类/属性/场景/长尾;带上用途与优先级/标题/广告/优先级/五点|核真实搜索意图/意图/相关/搜索结果;降级探索或排除/排除/降级/观察
+044|核竞争和前台状态/价格/竞品/库存;看流量承接/相关/页面/买家|区分漏斗问题/曝光/点击/转化;明确调整和观察/观察期/证据/回退|先核相关性和价格承接/意图/价格/报价;小步验证动作/验证/调整/复评
+045|提取实际货源/1688/规格/采购;比目标站证据/竞品/评论/美国站/费用|给出决策建议/进入/观察/放弃;列证据与假设/ASIN/假设/证据/日期|核类目或词维度/类目/关键词/站点;记录差异和补证/补证/分歧/假设
+046|确认各变体可售/库存/价格/可售/变体;巡查抑制和广告资质/抑制/广告/推广|将反馈归属到动作/词库/包装/补货;记录行动和复盘/负责人/复盘/行动|先排可售和流量/可售/相关性/库存;看样本及归因/样本/归因/观察
+047|核行业与地区/国家/地区/公司角色;验证商务入口/官网/商务/官方|交接企业和来源/企业/线索表/来源;守联系规则/拒收/联系依据/平台规则|继续核验归属/官网/企业/验证;使用正式公开入口/官方/业务联系/暂停
+048|核公司和岗位匹配/职位/岗位/采购;确认信息有效期/任职/现任/官方|合规跟进记录/状态/负责人/业务相关;记录拒收/拒收/停止/不再联系|更新失效数据/离职/失效/更新;从官方入口找新联系人/官方/现任/重新核验
+049|理解购买前疑虑/痛点/顾虑/替代;记录社区及上下文/社区/场景/来源|记录可验证洞察/原话/证据/场景;与其他信号核验/交叉/评论/搜索词/规格|避免以单样本代整体/社区/样本/代表性;交叉核验/其他社区/评论/核验
+050|盘点内部能力/资金/现金/人力/履约;评估市场条件/需求/竞争/市场/支付|验证并分期/软启动/阶段/验证;定义资源和判断/指标/负责人/预算/暂停|补试当地真实返退成本/退货/成本/履约;少量试跑再扩/小批/少量/试点/先测
+051|确认漏斗和事件/埋点/漏斗/支付;定位差异证据/流失/设备/转化|按影响和证据排序/影响/证据/成本;写验证指标/验证/观察期/目标事件|核支付和配送体验/支付失败/配送费用/支付方式;重现实测并验埋点/埋点/重现/测试订单
+052|找买家实际查询/搜索词/真实搜索;确认转化证据再迁移/出单/转化/手动|确认手动能承接/承接/预算/手动;控制重叠且观察/否定/重叠/归因|先记候选和检查样本/候选/样本/观察;确认相关和边界再迁移/相关/库存/证据
+053|识别三份口径/采购单/箱单/实收;逐行核对/sku/数量/规格|记录异常证据/照片/证据/签收;触发隔离和部门交接/隔离/补发/应付|区分实收与可用/实收100/100/95;隔离并追责留证/隔离/证据/通知
+054|识别营收与转化/客单/转化/每访客;利润及退货边界/利润/退货/限制|预设实验设计/样本/分流/观察期;验证与落地规则/停/利润/组别|防止过早判胜/样本/观察期/停止;看完整指标/利润/显著/波动
+055|验证异常并分维度/延迟/渠道/站点;收入组成拆解/订单量/客单价/转化|解释贡献与根因证据/证据/贡献/假设;指定动作与复验/动作/负责人/回归|优先看客单价及结构/客单价/商品组合/促销;按 SKU 可追溯/sku/分解/退款
+056|确认转化数据准确/追踪/回传/币种;结合有效样本和利润/数据量/样本/利润|记录分步调整/记录/幅度/理由;留足归因观察/学习/归因/观察|核信号与目标约束/追踪/信号/目标过紧;对照并考虑放宽回退/放宽/回退/利润/订单
+057|确保发信和授权/域名/订阅/授权;按群体与活动排期/VIP/名单/受众/落地页|确认订单实况/已购/订单/取消;按购买和授权分流/未购/分群/服务|暂停信息不实的邮件/暂停/替换/撤回;同步库存落地页/落地页/库存/受众
+058|约束合法演进/状态/合法/迁移;避免错误副作用/库存/审计/时间/提醒|先防重复/幂等/唯一键/事件ID;再校验当前状态/当前状态/校验/库存|维护当前合法状态/保持/不改回/不回退;核回调和历史/历史/延迟/重复/识别
+059|核真实授权和范围/授权/许可/权利人;留证据与限制条件/证据/期限/用途/地域|查释放内容真实性/sku/误导/商品一致;记录上线与撤回/撤回/上线/授权范围|查付费广告权限/投放/广告/渠道;另获许可再用/另行/取得/补充授权
+060|用少量 SKU 验证/少量/试销/小批;看经营闭环指标/履约/转化/毛利/支付|按门槛成熟再扩大/达标/验证/周期;确定供应和服务承载/库存/售后/客服/履约|定位退货和利润/退货原因/利润/成本;修复复验再放量/修复/暂停/复验/重新决定
+061|多源核实市场/官方/竞品/估算;同时看利益和准入/利润/合规/交期|输出证据与结论/证据表/进入/观察/放弃;标记待验证和边界/补证/停止/测算|按新售价重算利润/重算/价格/利润;按底线做决策/底线/差异化/观察/放弃
+062|类目模板定义规格/类目模板/规格/认证;统一询价成本项/起订量/单价/体积/交期|比较供应可靠度/质量/交期/合规;三种情景测算/三情景/保守/乐观/基准|拿到实测装箱和报价/体积/装箱/运费;重算再放行/重算/改包装/重新议价
+063|逐部分检索取证/商标/外观/版权/专利;保留证据和分级/证据/分级/命中|边界是风险和证据/不完整/高风险/不明确/相似;提交复核和暂停/复核/上报/暂停|暂停并要求书面材料/暂停/暂缓/不放行;验证权属和授权/授权/权属/复核
+</script>
+<script type="text/plain" id="quiz-data">
+S0|黑色款与白色款共用父级，哪个编号用于分别跟踪库存？|各自的卖家 SKU|父级 ASIN|两个变体共用的报价编号|可售子款需要独立追踪库存、报价和出错记录。
+S0|还没确认目标类目支持按颜色变体，应先做什么？|检查类目模板和允许的变体主题|先建父级，审核失败再拆|把颜色写在标题中并共用一个 SKU|变体关系由类目决定，先核规则可避免错误合并。
+S0|页面写 12 件装，工厂表写 10 件装，建档时怎么处理？|核实实际装箱规格后同步商品主数据与待发布素材|按页面写 12 件，售后再补差|两个数据都保留，上传时由运营任选|包装数量是商品事实，文案、图片、库存单位都应引用同一确认值。
+S0|该站点已有完全相同的品牌、型号和包装商品，接下来先做什么？|核实是否应匹配现有 ASIN 并添加自己的报价|用新内部 SKU 强制创建一个新 ASIN|选择同类畅销 ASIN 来复用详情页|内部 SKU 与平台目录是两套标识。商品确实一致时按平台路径匹配现有目录。
+S1|供应商口头说材质已通过检测，能否据此写性能声称？|索要可核验报告并确认它覆盖当前型号和声称|只要是同一家工厂就能沿用|把声称放在副图即可|同供应商的其他型号报告不自动覆盖本品，图片中的声称也需有证据。
+S1|美国站有放行记录，准备在英国站刊登，如何复用？|复用已核实的产品事实，再按英国站核对应要求和证据|直接复制美国站的全部审批字段|先上传英国站，缺证时用美国截图解释|各站点有自己的要求，资料复用时要重新核对适用范围。
+S1|竞品图片版权归属不明，设计能做什么？|分析其信息表达，改用自家实拍或有授权的素材|把图片裁掉水印后继续使用|在图片边角写“参考”后继续使用|参考表达方式与复用素材的权利是两个问题。上线素材须有可用依据。
+S1|类目审批未完成，哪些工作可继续推进？|补资质与证据，准备可复核草稿并阻止正式发布|先用不相符的类目开售|把认证字段留空直接提交正式上架|可以并行做准备，正式发布按准入结论放行。
+S2|要比较理线夹的定价，哪个样本最合适？|目标站点同用途、同类规格和类似件数的商品|全球站点评价数最高的桌面配件|同一品牌的所有产品均价|同用途、站点和装量让价格与规格可比较。
+S2|差评里多次提到粗线无法卡入，下一步怎么验证？|查看具体线径和场景，并实测本品适配范围|把“适用所有线材”设为差异化卖点|按差评数量推算本站月销量|用户声音帮助形成可验证假设，结论需要实际规格和实测。
+S2|一款竞品当前价 9.99 美元并标有临时促销，怎么记？|标注日期、活动状态、件数和观察价|记录为类目新的长期最低价|购买一件就把实付当全站价格基准|价格快照带时间和优惠条件，便于后续按可比口径复核。
+S2|产品改用更贵材料，供应链还未确认交期，调研报告怎么办？|把成本和交期列为待验证，给出试销或暂停的条件|把成本填为竞品售价的固定比例|只写市场有需求并承诺上线日期|可行性包括成本、供货和需求。未确认的输入应显式留待验证。
+S3|一个热搜词流量很高，但查询结果几乎都是理线盒，理线夹要用吗？|先验证购买意图，相关性低则排除或单独观察|直接放在标题首位|在标题、五点和后台全重复一遍|理线盒与理线夹可能解决不同需求，相关性影响转化质量。
+S3|关键词表交给文案时，哪些列最有用？|词、来源、目标站点、相关性和建议使用位置|词、字数、颜色和创建人|词、竞争对手和统一出价|下游需要知道证据、意图和配置位置，出价可在投放计划另管。
+S3|从广告报告找到一个新搜索词，要立刻写入标题吗？|先核真实意图、商品匹配度和数据成熟度|只要出过一单就写到标题开头|等转化率超过竞品评价率就写入|广告搜索词是新增证据，是否影响页面主定位仍需判断。
+S3|德语站本地化时，英语核心词应该怎么处理？|查目标站买家实际表达，重新判断相关性和归类|用统一术语表直译后沿用原优先级|把原词和所有译词都塞进后台词|同一商品在不同站点可能有不同搜索表达和使用习惯。
+S4|五点写“支持直径 8 mm”，规格表上限是 6 mm，谁的数据优先？|回查实测及主数据，确认后统一页面字段|采用文字更能吸引点击的版本|保留两种数据用于不同市场|规格冲突要回到可追溯事实，文案和图同步更新。
+S4|将页面交付给设计，哪份内容更可用？|按 SKU 列卖点、实测规格、视觉证明和使用限制|只提供一段通用标题|仅发竞品链接和畅销截图|设计需要知道每张图回答什么、可以引用什么事实。
+S4|已有美国站文案，要发布新站点时先做什么？|检查单位、搜索语境、站点政策和本地证据|沿用同一字数和限制清单|先发布通用版，后续仅翻译标题|本地化包括单位、政策和实际使用表达，不止语言转换。
+S4|上架排期紧，A+ 资格未就绪，怎么决定上线？|确认常规 Listing 是否已满足放行要求，A+ 独立排期|随意借用其他品牌申请资格|先把全部 A+ 文案复制到后台搜索词|核心商品信息与可选内容有各自的资格和排期。
+S5|场景图里的手机和桌子只是道具，买家可能当成赠品，怎么办？|明确实物随货范围，核对画面和说明是否会误导|在客服 FAQ 补充即可|为了突出用途继续增加无标签配件|视觉需要说明使用场景，也要让真实包装内容清楚。
+S5|两种颜色共用尺寸图，可以怎么复用？|共用验证后的尺寸信息，并检查图中的颜色和 SKU 绑定|把黑色图直接绑定全部颜色|按不同颜色重新估算尺寸|信息可复用，画面仍需真实对应可售变体。
+S5|图片看着没问题，移动端缩略图文字完全看不清。怎么验收？|检查实际端上可读性并调整信息密度|只验原图分辨率|分页增加同样字号的文字|分辨率合规不等于页面可读。重要信息应在常见展示尺寸下可读。
+S5|设计平台生成理线夹新图，轮廓多出两个孔，该怎样处理？|用实拍或校正稿重做并对照实物验收|作为副图使用，主图正常就行|把产品名称写完整以避免误解|副图也会影响购买判断，不能展示不存在的结构。
+S6|计划售价 20 美元，采购 7、佣金 3、履约 4、预计退货分摊 1，广告前单件余量是多少？|5 美元|9 美元|6 美元|20 减 7、3、4、1 等于 5。广告等其他费用还需要额外测算。
+S6|货件显示承运商签收，平台可售数仍为 0，能启动推广吗？|先核平台接收与可售时间，待确认供给后排推广|签收即等于库存可售，按计划放量|把在途库存手动计入前台可售量|承运签收、仓内接收和可售状态是不同节点。
+S6|准备 FBM 自发货，除了库存还要核实什么？|发货时效、运费模板、覆盖地区和配送承诺|只核对 FBA 仓的入仓标签|只需要核产品质检文件|FBM 的履约和时效由卖家负责，商业设置与实际发货能力要一致。
+S6|售价与库存已经审批，上传包还缺新版子 SKU 图片，怎么处理？|补齐匹配素材后复核，或明确隔离欠缺的子款|用另一个子款的照片临时替代|整批提交后立即开启广告|可辨识的 SKU 与正确素材是前台验收的前提。
+S7|模板返回已接收，下一步优先确认什么？|检查处理结果和异常，再逐 SKU 做前台购买验收|先投广告来验证上传成功|重复提交，直到出现可售量|后台接收只表示请求进入处理，业务完成要看处理报告和前台表现。
+S7|部分子款因缺属性失败，其余子款已通过，怎么重传？|按错误原因补全受影响子款，核对编号和当前状态后重提|所有行原样重传一次|给失败子款换一个 SKU 规避报错|定向重试能避免重复提交和父子关系变化。
+S7|正式上线后第一批异常先看什么？|按站点与子款检查可售、价格、履约与抑制状态|先计算整店一整月利润|先把所有标题换一遍|新品先验收能否正确购买，排除阻止流量转化的基础问题。
+S7|上线一周后出现“线夹太小”的反馈，怎样闭环？|对照实测和页面表达，明确产品或文案动作并安排复验|只降低广告出价|立即删除所有尺寸主图|评价要回到商品事实和承诺，区分产品改进和表达问题。
+001|三款竞品都出现相同卡扣断裂，什么证据最值得写入机会表？|商品版本、具体使用条件与原始差评|三款商品星级的平均数|评论者昵称及关注人数|跨版本、跨商品的同类实物故障可作为机会线索。
+001|两个产品方案都能解决痛点，下一步优先比较什么？|样品达标率、成本和供应可行性|用的关键词数量|竞品评论总量|选品机会最终需要满足可执行的产品和成本约束。
+002|两边都是收纳盒，一边 2 件装一边 6 件装，先怎么算？|统一到单件并注明规格与促销|只比页面总价|用评价数折算单价|统一件数后再考虑材质、尺寸与营销条件。
+002|哪条竞品结论可以直接转成行动？|多款竞品未清楚表达尺寸，自家加实测尺寸图并跟踪误购退货|销量高的竞品都用了白色背景，照搬整套图|竞品均价降低，当日永久降价|可执行建议应含证据、动作和验收指标。
+003|标题用了精准词，五点没写适用尺寸，最先补什么？|按实测规格回答尺寸问题|加更多泛类目关键词|删掉五点让标题更突出|用户买前需要适配信息，补上缺口比增加泛词有效。
+003|多站点文案同时审过，哪个文件应该上传？|与目标站点和 SKU 绑定的已审批版本|最后被打开的草稿|综合评分最高的任意站点稿|执行资料需核审批状态、站点和规格版本。
+004|48 条差评中有 15 条提到安装难，能说 31% 买家安装难吗？|只能说这批差评约 31% 提到，需更多样本估计全体|可以说 31% 购买者安装失败|按评分分布把 31% 折算为平台退货率|差评样本与全体买家分母不同。
+004|近一个月破损仅集中在一个物流批次，先交给谁？|仓储物流核包装、运输和该批证据|广告运营排除品牌词|设计改整套规格图|批次集中是履约或包装的排查线索。
+005|场景图比例失真，验收哪份证据最靠谱？|实物多角度照片和测量尺寸|竞品图透视|AI 提示词上的单位|图像要以产品实际尺寸、结构为基准。
+005|同一个产品要投多个站点，图片怎样复用？|共享实拍底图，逐站校核单位、文字和规范|同一套图直接覆盖所有语言|为每个站点虚拟新产品外观|复用事实层，按站点适配展示层。
+006|拆解参考图最适合记录什么？|构图作用和信息顺序|竞品水印的位置|竞品源文件的复制路径|可借鉴通用表达，素材复用需有授权。
+006|新图亮点是竞品插画，哪种交付最稳？|替换成已获权利或原创的元素并存来源|修改色相后交付|放到背景里减小可见度|改颜色和位置不能替代使用权。
+007|广告图写“充电 65 W”，同系列仅高配支持，怎么发布？|只给已证实支持 65 W 的 SKU 且注明适用条件|广告通用图没必要区分型号|把两个 SKU 都标为最高能力|参数需绑定型号与测试条件。
+007|接口参数表供应商更新了，先刷新什么？|确认新版规格并同步页面属性、参数图和适配说明|只换更美观的场景图|广告报告中替换名称即可|参数变更要同步全部消费者接触点。
+008|两条视频曝光量天差地别，比较开场应该看什么？|相近流量来源下的早段留存或有效点击|只看总播放量|只看视频总时长|留存和点击更贴近开场假设，需控制流量差异。
+008|爆款用了真人口播与高额投放，应该沉淀什么？|明确可复用镜头结构和待验证假设|规定所有视频的预算等于爆款|复制演员的口播原句|把内容特征与投放、账号因素区分开。
+009|给批处理一组原素材，先定什么？|素材 ID、用途、时间段与目标画幅|只选一张封面|每个视频用同一文件名|可追溯的输入和时长限制减少错剪。
+009|生成草稿后字幕有错、镜头无错，如何返修？|修正字幕文本和时间轴，重新复核预览|重新生成所有素材和脚本|导出成片后在标题说明|局部错误要回到可编辑草稿修改。
+010|报价 A 不含运、B 含运，怎么做同口径比较？|把运费按相同数量与目的地纳入到货成本|比较两家报价中的税率|选择账面单价最低的|采购决策看相同条件下的到货成本。
+010|OCR 将 MOQ 的 500 识别为 50，哪个控制点最容易拦截？|回链原件并在低置信或异常数量时人工核验|只检查文件能否打开|给同类采购单统一默认 MOQ|关键字段识别错会影响报价阶梯和备货。
+011|一个货件被拆成两个运单，应该怎样入账？|保留货件和两个运单的一对多关联|只保存最后上传的运单|复制货件总箱数到两个运单|保留包裹粒度才能追踪签收与差异。
+011|运单上毛重 18 lb，系统标准要 kg，怎么存？|保存原值与单位并按确认口径另存换算值|直接填 18 kg|统一用供应商的净重|重量类型与单位均会影响物流结算。
+012|商品收入下滑，要分清流量和转化，哪组数据直接支持？|同站点商品访客数、订单数及可售状态|所有站点合并后的广告账单|全年平台服务费和汇率|同粒度的访客和订单帮助分解，并检查库存干扰。
+012|业务报告与广告报告的订单数不相同，先检查什么？|全量与广告归因口径、时间窗和去重规则|用较大的数覆盖较小的数|按店铺同比涨幅统一比例|报表服务不同目的，需先对齐归因与统计口径。
+013|改页面想看标题效果，哪种安排更容易解释结果？|保留其他主要因素并记录标题版本和可比窗口|同时换全套图、标题和售价|只比较修改当天累计销量|减少并发变更有助于归因。
+013|转化没问题但点击持续偏低，最先复核哪部分？|搜索展示中的主图、标题及价格竞争力|先修改售后话术|把描述段落翻倍|用户在点击前看到的信息是直接排查范围。
+014|尺寸误购的退货升高，图片优化应先补哪类信息？|实测尺寸和适配条件|公司发展史|泛化生活场景数量|纠正买前理解可减少不匹配的订单。
+014|同一 ASIN 图片替换后表现变好，哪项记录最有用？|旧新图、具体槽位、时间与同期活动变更|只留新图|按所有 SKU 的年度销量比较|可复核版本与观察口径才能复盘效果。
+015|可售 120 件，最近日销 10 件，不考虑补货，约够几天？|12 天|10 天|120 天|库存覆盖天数是可售量除以预计日销。
+015|仓内还有 60 件不可售，运营应怎样规划？|先排查不可售原因，独立估算可售和补货|把 60 件加到可售库存后不补货|先在前台手动增加数量|不可售库存须按状态处理，不能用于承诺配送。
+016|准备 FBA 创建货件，哪个数据必须与实物一致？|SKU、装箱数量、标签、箱规和重量|商品推荐语和目标广告词|对手的发货平台|仓储和承运交接依赖准确的货件数据。
+016|平台已收 95 件而实发 100 件，先做什么？|对箱单、平台收货进度和签收记录|立刻把实际发出改成 95 件|把 5 件补到系统可售数|保留实发和实收差异，确认收货进度后再处置。
+017|库存报表一条少货，平台已自动处理，首次动作是什么？|查是否已有赔付、补收或冲回记录|用同一证据重复提交新工单|只检查近一年的店铺评分|先核原事件状态以免重复申诉和入账。
+017|平台同意部分赔付，如何完成财务交接？|记录工单号、数量及实际到账并核差异|用商家申请金额全额入账|等年度审计才核对|平台处理结果与实际资金记录都要匹配。
+018|监控关键词排名，哪些采样条件要固定？|站点、地区、时段和位置类型|只固定浏览器窗口大小|只固定运营人员|采样条件影响位置，控制口径才可比较。
+018|广告显示有预算但展示骤降，报告该加什么？|实际投放状态、曝光时段以及变更记录|所有 ASIN 建议涨价|只报告自然搜索排名|预算存在不代表投放正常，先查实际运行状态。
+019|一个词花费 30 美元，归因销售 100 美元，ACOS 是多少？|30%|约 3.3%|70%|ACOS 是广告花费除以广告归因销售额。
+019|跨店铺比较广告效率最先统一什么？|币种、时间区间、站点与归因口径|店铺名称的首字母|全部活动的预算绝对值|数据窗口和货币不同会造成错误排序。
+020|规则写“ACOS 过高就降价”，缺哪个关键信息？|数值阈值、窗口、最小样本和动作幅度|活动名字是否用英文|运营周报发布日期|可重复规则需定义触发和动作边界。
+020|新规则准备接真实账户，第一轮如何运行？|只输出建议并审核误报|立即全自动改单日预算|仅在最大店铺直接执行|提示模式可验证规则，并减少误操作。
+021|一笔打款覆盖多笔销售和退款，优先用什么关联？|结算或转账编号及账期|广告活动编号|商品标题|结算层通常是多交易对单笔打款。
+021|平台报表 1000，银行到账 990，先做什么？|核同一笔结算并查手续费或汇兑|直接把平台账单改成 990|把差额统一算作退款|资金差额要用真实凭证解释并留原始数据。
+022|哪一步会把已收款分配到具体应收？|核销|资料采集|利润分摊|核销通过匹配收款和单据更新欠款余额。
+022|想自动制证，但上游字段频繁缺失，应先做什么？|修采集与标准化，并让差异可复核|为缺失字段写固定默认金额|跳过对账直接导入凭证|凭证质量依赖可追溯的上游数据。
+023|平台出现履约超时预警，哪条通知便于处理？|订单 ID、站点、证据、截止时间与负责人|整店销售额同比下降|提醒所有同事关注平台|具体对象、行动时限和责任是巡店闭环的前提。
+023|同一个异常每天重复出现，状态怎样管理？|按店铺与原因关联旧记录，更新最后发现和处理进度|每次作为全新事件关闭|删除过去全部异常再巡检|去重并留时间线，才能看清未解决问题。
+024|某查询曝光高、点击低，先看什么？|搜索展示和查询意图匹配程度|第一批货件有多少箱|该品牌有几次结算|问题位于点击前，需看搜索流量和页面展示。
+024|购物篮里两件商品频繁搭配购买，哪个下步合理？|算组合毛利和履约再做小规模测试|直接生成全目录组合包|用搭配比例推导单品库存量|购物篮给机会线索，真实成本和转化要验证。
+025|关账时某平台账号报表没取到，怎么标记？|按账期记录缺失原因和补取负责人|手动补一份零交易文件|从其他账号复制同月报表|把零交易与采集失败区分开才能控制关账质量。
+025|同账期平台重新导出一版结算明细，文件怎么管理？|保留两版，标识使用版本与变更|以新文件覆盖全部旧证据|把两份数据直接相加|不同导出版本需有可追溯依据并避免重复计算。
+026|退款原文是 (20.00)，标准表应怎样转换？|先按来源定义确认符号，再保存原值和标准金额|去掉括号后统一记正|金额留空以避免错账|明确来源规则并用账单总额交叉校验。
+026|两份格式不同的结算资料如何校验清洗结果？|按报表及币种核总额并追溯抽样行|按文件行数是否相同|以文件名一致作为成功|行数可不同，核算口径需要金额与字段证据。
+027|订单和平台明细吻合，可银行没有对应到账，问题在哪层？|结算到资金到账层|商品主数据层|订单物流状态层|已匹配交易不代表资金到账，需查结算周期和状态。
+027|同一订单有两次部分退款，应该如何匹配？|保留两笔退款事件并按交易编号和金额对账|用最后的退款覆盖前一笔|把两笔当重复删除一笔|一次销售可以有多笔不重复的退款。
+028|应收 1000 元，银行实收 600 且已确认对应这笔，核销后剩多少？|400 元|0 元|600 元|已证实的 600 计入核销，余款仍为未结清。
+028|一笔款与三张账单金额相同，付款方却不一致，怎么处理？|保留待确认，补查付款关联与授权证据|按金额相同立即批量核销|按最早账期自动冲销|金额相同只是线索，核销要确认款项归属。
+029|销量增长、SKU 利润下降，最合适的第一步？|拆单件收入、广告、采购、履约和退货成本|把全店销量分给每个商品|直接用营业额替代利润|利润由收入及成本共同决定。
+029|不同站点收入用不同币种，汇总怎样可复核？|保留原币并说明汇率时点和折算依据|看当天截图统一换算|直接相加币种数值|利润汇总应可还原原币和汇率口径。
+030|凭证模板生成后，应先验什么？|科目映射、借贷平衡与账期|每页预览颜色一致|业务系统登录时间|凭证具备会计要素和勾稽校验才能导入。
+030|失败行再次提交前，为什么要查询已入账行？|防止相同业务凭证被重复导入|确认所有行仍用相同格式|让历史报表自动改名|重试要按业务唯一编号区分成功与失败。
+031|欧盟不同主体的申报材料怎么组织？|按经营主体、市场、税号、账期归档|按下载人员姓名归档|只留欧盟合并总额|税务与审计要追溯到适用主体和期间。
+031|发现申报底稿数据和结算报告不一致，哪个结果先交税务？|带原文件、差异金额与口径说明的清单|把结算报告手工改同一数字|仅交截图不标账期|保留真实差异供有权人员确认。
+032|想以后查到某句话出现在原视频第几秒，应保存什么？|与视频版本绑定的带时间码字幕|只保存转写纯文本|只存视频标题|时间轴和视频版本一一对应才能定位。
+032|外部样片已经能下载，能否直接用于成片？|核可使用权，未获得的仅用于参考分析|只要不加水印就可使用|拍摄人不知道即可使用|可访问不等于拥有商业使用权。
+033|分析服装试穿视频，怎样拆成可拍的脚本？|记录景别、时间、动作与对应买家疑问|复制总时长和原口播|只记录模特面部镜头|脚本需要解释每段要拍什么与为什么。
+033|参照视频面料光泽很好，自家材质哑光，怎么表达？|用自家实拍展示实际面料质感|对自家画面强行增强光泽|用竞品近景替代自家特写|画面卖点要能由真实商品验证。
+034|自动剪片要避免蓝款混入黑款，哪个字段必要？|款号、色号及镜头标签|文件修改日期|上传时的用户名|业务字段控制正确的素材筛选。
+034|成片使用一段版权不明的音乐，交付前怎么办？|更换可商用音乐并记录授权|把音量降为原来一半|移到片尾并缩短几秒|变更音量或时长不能替代授权。
+035|平台商品批量上传有部分失败，如何核对？|以 SKU 对处理结果逐行回写并隔离失败项|将整批一律标已上线|将所有失败改成新款号|逐 SKU 才能定位状态并定向返工。
+035|某货品 30 天没销售，但中间不可售 25 天，能据此判滞销吗？|先计算真实可售观察期再判断|按整月无销量直接下架|根据竞品星级定为滞销|可售期只有短时间，结果可能反映供给缺失。
+036|备货表发现 8 单中 1 单地址异常，怎么推进？|隔离异常单，其余按真实发货情况处理|先确认整批发货再改异常|把地址异常单当已妥投|单笔异常应有单独处理路径。
+036|什么时候可以确认发货？|核对包裹、运单和实际发货依据后|仓库收到备货任务时|运单打印出来即确认无论是否交运|备货、打单和实际发货是不同状态。
+037|同样单价，两家起订量不同，该怎么比？|按计划采购量和实际到货成本比较|一律选高 MOQ 店铺|只看页面最低阶梯价格|阶梯单价只有满足起订或数量条件才成立。
+037|议价完成后怎样让下游按相同条件执行？|书面确认价格、规格、交期和有效期并关联采购单|转发一张截断聊天图|口头告知仓库预计到货|关键承诺要留可追溯记录。
+038|全托调拨已发出，目的仓尚未收货，库存记在哪？|单列在途，目的仓待实际收货更新|两仓同时记可售|直接记目的仓已售|库存状态要与物理流转和实际收货匹配。
+038|退回商品检测有破损，哪个处理路径合理？|隔离并留证，按平台和仓库流程处置|恢复可售并继续打折|标记录完成但不更新库存|不可安全销售的货须从可售状态移出。
+039|报名活动前，折扣后售价 12 元，履约与成本合计 13 元，怎么做？|提交负毛利和清货理由给负责人判断是否破例|直接按预估销量自动报名|把亏损算到下一期消掉|活动报名要在约定利润和库存约束内。
+039|活动销量增加但店铺总体利润下滑，怎么复盘？|分开看活动增量、折扣费用、退货和缺货|以销量涨幅为唯一成功标准|用曝光量替代财务数据|活动价值要同时看增长质量与成本。
+040|新品广告自动创建前，审批人最该看什么？|ASIN、站点、活动目标、预算和出价|脚本文件大小|报表下载账号的昵称|批准活动范围和成本后才能执行。
+040|同日有两项自动规则改单组出价，应如何处理？|冲突检测并合并为一次经审核的变更|按发现顺序全部执行|一律取调整幅度之和|同一目标的重复动作可能叠加失控。
+041|英国页面图片单位和详情属性不一致，谁做第一次核对？|本地化运营回查主规格并统一各处表达|广告同事调低竞价|仓库以页面图片为准改实物|源商品事实用统一记录，各站页面需保持一致。
+041|同一 SKU 两个市场审批进度不同，任务表怎样写？|分别记录站点、版本、审核状态和提交结果|一个状态覆盖所有站点|按最早通过站点统一发布|站点审批与上传独立管理。
+042|哪一步最能验证首批发货链路？|按少量实际货件跟踪标签、收货和可售结果|只打开刊登页面检查标题|等正式放量后再查错|小批量实跑能在扩大前发现节点失配。
+042|物流信息延迟，系统怎么回写？|标记最后确认状态、更新时间和待核实异常|提前写已入仓|仅在站点资料备注“已完成”|状态应由可信证据驱动，延迟另行标记。
+043|词表里哪些词可优先进入 Listing 核心字段？|明确描述商品且符合真实搜索意图的词|搜索量最高的所有词|所有竞品品牌名|匹配购买意图和商品事实比流量绝对值重要。
+043|词库扩词发现新叫法，怎样让结论长期可追溯？|记录来源、站点、日期和搜索结果样本|只记录月搜索量|用一个全站词频覆盖所有市场|词的意义与可信度依赖来源和时点。
+044|有展示、点击率低，广告诊断应先看什么？|词意图、搜索页面素材和价格竞争力|银行到账差异|看广告曝光越多越好|低点击主要发生在用户打开详情之前。
+044|点击和转化正常，但每单广告成本偏高，优先查什么？|流量成本、出价和利润目标|把每个 SKU 标题同时重写|立即增加所有活动预算|定位问题是在竞价与获客成本，避免无关变更。
+045|前台竞品比 1688 货源贵很多，能直接算高利润吗？|先扣目标市场的佣金、包装、物流、退货及其他适用费用|用前台价减采购价作为最终毛利|按货源评论数估算成本|采购与零售价之间还要覆盖履约和平台等成本。
+045|报告快结束，竞品价格样本带旧促销，如何结论？|补当前可比快照，明确促销与常规价格|把样本最低价当现行市场价|删掉所有价格信息只写需求|记录和标注条件比未经验证的定性更可用。
+046|上架后的早期检查，哪一项最先排除？|商品不可购买、缺库存或受抑制|首月账单是否已经归档|今年广告毛利是否超过全年预算|开售初期先验证流量能否转化为正常订单。
+046|一款商品频繁退货，原因主要是规格误解，反馈给谁？|产品和内容运营确认规格表达，并复验退货变化|仅交财务延后结算|只凭评论删除该商品|退货原因要按归属路由到真正可改的上游。
+047|什么样的线索适合进入商务联系待办？|官网可验证、业务匹配且有适用的公开商务入口|来源不明的私人手机号|靠算法猜出的邮箱和联系方式|线索质量取决于业务匹配、来源与联系方式的适用性。
+047|客户明确拒绝后，团队需要更新什么？|记录拒收，让后续成员停止联系|换一个渠道继续发送同一内容|把记录移出可见范围后重试|拒收应全队可见，避免重复打扰。
+048|搜索结果的人看起来负责采购，选择下一步？|核对企业、现任岗位和公开商务联系入口|全量发送统一模板|把职位称谓当作已授权|决策者角色与联系渠道都要核实。
+048|联系数据两年前采集，首次触达之前怎样处理？|更新岗位和公司信息，核验渠道是否仍适用|默认名单永远不变|跨多个账号重复触达验证|降低过期与重复线索，提高联系质量。
+049|哪条帖子信号更值得进入洞察表？|多个相关讨论出现同一购买前顾虑且有使用背景|点赞最多的无关段子|任意一条被删除的评论|相关、可复核的语境决定证据实用性。
+049|如何验证论坛表达能不能用作商品卖点？|与本品规格、实际用户反馈和站点数据交叉核对|直接把帖子原句复制为标题|只看发帖人活跃度|讨论提供候选语言，商品声称和市场实际还需确认。
+050|评估新市场，哪个组合更能形成进入决策？|需求、竞争、单位经济、合规、履约和资金投入|人口和国土面积两个指标|只考虑平台年度广告增长|市场吸引力与公司执行能力都影响是否进入。
+050|软启动暂停条件应该什么时候定？|试跑前定指标、观察期和暂停条件|只在失败后追认|等第一笔退款后再看|先定义条件可减少事后为结果找理由。
+051|加购事件突然少一半，第一步是什么？|核对埋点发布变更和实际加购流程|马上换首页色调|将订单金额除以两倍|先确定测量无误，再定位实际业务流失。
+051|选择先修哪个问题时，优先怎样判断？|影响用户范围、证据强度和可执行成本|页面是否由同一设计师负责|任何最显眼的样式问题|高影响且有证据的问题应优先处理。
+052|搜索词关联度高，转化与成本证据已具备，下一步？|把它加入受控的手动精确活动并记录迁移|删掉原自动活动的全部关键词|增加全部广告活动预算|合适词进入可控流量单元后再核重叠。
+052|手动精准组还未开始投放时，原自动组怎么办？|先确认承接状态再决定否定|立即把全部获客词否定|清空自动报告以避免重复|承接未就绪不宜把正常流量提前切断。
+053|PO 订了红款，实收相同数量蓝款，应如何分类？|错发并隔离待处置|数量正确所以正常可售|作为短装直接关单|收货核对需要匹配规格和 SKU，不只看数量。
+053|仓库报实收 98，供应商请按箱单 100 更新库存，应该？|保留实收 98 与差异 2，留证待复核|系统录 100，现场另做口头记录|改采购单为 98 后删除差异|实收、订货和箱单值是不同可追溯记录。
+054|高价组客单上涨但转化下降，怎样综合衡量？|比较每访客收入和利润，同时检查预设限制指标|只看客单价|只看转化率|价格实验的两个方向可能相反，需要统一口径。
+054|实验中途网站全站大促，与分组效应混在一起怎么办？|记录干扰，按预设条件判断能否继续或重做|假定两组都一样并忽略|按优惠较大的组直接判胜|外部变更可能冲击有效性，需要检验分组受到的影响。
+055|渠道 A 下滑 50%，但是体量极小，渠道 B 下滑 5% 但体量巨大，先看哪条？|比较两者对总下滑的绝对贡献|必然先看百分比最大的 A|只看订单利润最高的渠道|业务排查应按总体影响排序，再追原因。
+055|发现数据入仓晚了两小时，应把告警认为什么？|先标为数据完整性待核，复算后再下业务结论|已经证明购买转化下降|立即安排全站降价|延迟能让当天看起来异常，先确认完整性。
+056|智能出价把退货订单仍按原金额计入，先处理什么？|校正转化价值和退款口径|先提高目标 ROAS|减半所有关键词预算|信号错误会影响自动出价优化方向。
+056|多次连续改 ROAS 目标后波动加剧，怎样处理？|恢复可比较基线并给学习和归因留时间|持续每日大幅反调|只用最后一个小时的数据判断|调整与观测窗口要足以区分学习波动和真实效果。
+057|黑五提醒邮件准备发送，哪些人应先核查？|有有效订阅、符合促销条件且尚未购买的人|名单中所有地址包括已退订|所有点击过客服链接的人|活动提醒应基于授权与最新分群。
+057|VIP 提前场优惠码误设为全人群，发出前应怎样处理？|核对优惠资格、有效期和落地页后重新测试|发送后再通过邮件解释|直接清空所有折扣|事前校验可阻止错误优惠扩散。
+058|支付网关同一支付事件重发，做什么才幂等？|识别已处理事件并只确认收到，不重复扣库存|每次都重建订单|先将状态设回待支付|重复事件只能产生一次业务副作用。
+058|轨迹没有到妥投，但客服收到退回单，应该怎么写状态？|按合法逆向流程和可信证据处理，并保留状态日志|跳过全部检查直接标已签收|删除轨迹再写退回|逆向流程要依照真实事件和允许的状态变化。
+059|买家照片授权商品页 90 天，什么时候要撤下或续授权？|达到许可期限时，按记录处理|到新商品页面上线再说|图片被投诉才处理|授权期限要和展示计划一起管理。
+059|授权已取得，但画面出现不适用的竞品配件，怎么办？|先确认能否调整到真实准确，并核第三方权益|有授权就直接展示|贴上品牌角标让买家自行判断|创作者许可不能解决第三方权益和页面准确性。
+060|新市场软启动第一批商品怎样选？|少量代表主要需求、合规和履约风险的 SKU|全目录一次铺开|只选当前站点销量第一且不看适用性|试跑需要验证关键约束并限制投入。
+060|新市场试跑应拿什么证据决定扩目录？|可复核的单位经济、履约稳定性及用户反馈|一个活动当天最高销售额|竞品页面素材风格|规模化判断应基于稳定表现与承接能力。
+061|第三方销量估算和平台趋势冲突，怎么处理？|记录方法差异并补采同口径证据|平均后当作平台实测销量|只留更大的那个值|不同数据源应注明来源和不确定性。
+061|市场候选利润可行，但当地产地要求和交期缺证，决策应是什么？|暂列待验证并明确补证与交期开关|正式立项并立刻放量|改变标注国以通过|利润只是进入条件之一，合规和交期须核实。
+062|两款很像的货询价前，为什么先看目标类目模板？|尽早明确规格、包装和认证字段，避免无法刊登|让供应商随意填价格|模板主要用于改用户评论|上架属性约束应提前反向进入寻源表。
+062|保守情景下物流每件多 2 元导致亏损，如何交接？|明确亏损和原因，验证改包装或议价再定品|把保守情景删除|按乐观情景立即排产|用压力情景看方案在不利条件下是否可执行。
+063|产品本身无标识，但外包装近似第三方品牌，应该怎么评？|包装单独取证和分类，交复核后决定是否放行|因实物没标直接过审|仅修改商品标题|权属风险可能来自实物、包装、图文等不同材料。
+063|供应商更换后产品外观没变，之前筛查能直接复用吗？|复核新供应商的权属和授权链，补齐后重新放行|照旧使用旧供应商授权|产品照片一致就无需记录|授权与主体、时间及范围有关，供应商变更要复核。
+</script>
+<script>
+"use strict";
+const byId = id => document.getElementById(id);
+function dataRows(id) {
+  return byId(id).textContent.trim().split(/\r?\n/).map(line => line.split("|").map(field => field.trim()));
+}
+const rubricByCourse = new Map(dataRows("rubric-data").map(([id,...rubrics]) => [
+  id, rubrics.map(rubric => rubric.split(";").map(group => group.split("/")))
+]));
+const choicesByGroup = new Map();
+dataRows("quiz-data").forEach(([group,q,correct,distractor1,distractor2,explanation]) => {
+  const groupQuestions = choicesByGroup.get(group) || [];
+  if (![q,correct,distractor1,distractor2,explanation].every(Boolean) ||
+      new Set([correct,distractor1,distractor2]).size !== 3) throw new Error("选择题数据有误 " + group);
+  const answers = [correct,distractor1,distractor2];
+  const seed = [...q].reduce((acc,char) => (acc*31+char.codePointAt(0))%997,0);
+  const shift = seed % answers.length;
+  groupQuestions.push({
+    q,a:explanation,key:"choice-" + group + "-" + groupQuestions.length,
+    options:answers.slice(shift).concat(answers.slice(0,shift)),correct:(answers.length-shift)%answers.length
+  });
+  choicesByGroup.set(group,groupQuestions);
+});
+const themes = [
+  {name:"新品上架与选品", ids:"START 001 002 003 004 013 041 042 043 045 046 049"},
+  {name:"商品图片与短视频", ids:"005 006 007 008 009 014 032 033 034 059"},
+  {name:"亚马逊广告与店铺经营", ids:"012 018 019 020 023 024 040 044 052 055"},
+  {name:"采购、履约与库存", ids:"010 011 015 016 017 053 058"},
+  {name:"跨境财务与结算", ids:"021 022 025 026 027 028 029 030 031"},
+  {name:"TEMU 商品与运营", ids:"035 036 037 038 039 061 062 063"},
+  {name:"独立站、外贸拓客与市场扩张", ids:"047 048 050 051 054 056 057 060"}
+];
+const lookup = new Map();
+themes.forEach(({name, ids}) => ids.split(" ").forEach(id => lookup.set(id,name)));
+const courses = dataRows("course-data").map(([id,title,flow,...pairs]) => {
+  if (!lookup.has(id) || !title || !flow || pairs.length < 6 || pairs.length % 2 || pairs.some(part => !part)) throw new Error("课程数据有误 " + id);
+  const rubrics = rubricByCourse.get(id);
+  if (rubrics?.length !== pairs.length/2 || rubrics.some(groups => groups.length < 2 || groups.some(group => !group.every(Boolean)))) throw new Error("简答题要点不全 " + id);
+  const base = rubrics.map((rubric,i) => ({q:pairs[i*2],a:pairs[i*2+1],key:String(i),rubric,practice:i === rubrics.length-1}));
+  let cards;
+  if (id === "START") {
+    cards = base.slice(0,-1).flatMap((card,phase) => {
+      const choices = choicesByGroup.get("S" + phase);
+      if (choices?.length !== 4) throw new Error("入门环节选择题数量有误 " + phase);
+      return [choices[0],choices[1],card,choices[2],choices[3]].map(question => ({...question,phase}));
+    });
+    cards.push({...base.at(-1),phase:8});
+  } else {
+    const choices = choicesByGroup.get(id);
+    if (choices?.length !== 2) throw new Error("课程选择题数量有误 " + id);
+    cards = [choices[0],base[0],base[1],choices[1],base[2]];
+  }
+  return {id,title,steps:flow.split("→"),cards,theme:lookup.get(id)};
+});
+const catalog = new Map(courses.map(course => [course.id,course]));
+if (catalog.size !== courses.length || lookup.size !== catalog.size) throw new Error("课程编号不全或重复");
+const ordered = themes.flatMap(({ids}) => ids.split(" ").map(id => catalog.get(id)));
+const totalCards = courses.reduce((sum, course) => sum + course.cards.length,0);
+// The map assigns one primary stage per course. A course may also supply other stages.
+const mapStages = [
+  {
+    id:"research", title:"市场与选品", handoff:"选品清单", ids:"001 002 004 024 043 045 049 061",
+    input:"目标站点、竞品和评论。已有店铺可再看搜索、退货与利润数据。",
+    output:"选品证据表和目标价格带，交给采购判断能否做、按什么成本做。"
+  },
+  {
+    id:"sourcing", title:"寻源与定品", handoff:"商品资料", ids:"010 037 062",
+    input:"候选规格、目标采购价、包装、合规与交期要求。",
+    output:"确认的供应商、报价、样品和产品资料包，交给上市运营与供应链。"
+  },
+  {
+    id:"listing", title:"刊登与内容", handoff:"可售页面", ids:"START 003 005 006 007 008 009 013 014 032 033 034 035 041 042 059 063",
+    input:"商品和变体资料、合规证据、市场卖点与关键词。",
+    output:"经复核的商品页面和可售商品编号，交给推广与履约。"
+  },
+  {
+    id:"growth", title:"获客与转化", handoff:"订单与转化数据", ids:"012 018 019 020 023 039 040 044 046 051 052 054 055 056 057",
+    input:"可售商品、价格与库存计划，以及词库、内容和推广预算。",
+    output:"订单进入履约，搜索词、转化和异常数据交给运营复盘。",
+    feedback:{id:"listing", label:"用搜索词和转化数据优化刊登内容"}
+  },
+  {
+    id:"stock", title:"备货与库存", handoff:"可售库存", ids:"015 016 053",
+    input:"确认的 SKU、供应商和首批数量。开售前准备仓配，开售后根据需求和交期调整补货。FBA 货件按实际刊登标识和标签要求推进。",
+    output:"可售库存、预计到货时间和物流单据，交给运营确认开售或补货计划。"
+  },
+  {
+    id:"fulfillment", title:"订单履约与售后", handoff:"发货与退货记录", ids:"011 017 036 038 058",
+    input:"商品运营线的成交订单、可用库存、配送承诺和售后请求。",
+    output:"发货、签收、退货和索赔记录，交给财务核对。",
+    feedback:{id:"listing", label:"用退货原因修正页面、包装或规格表达"}
+  },
+  {
+    id:"finance", title:"结算与财务", handoff:"对账与利润", ids:"021 022 025 026 027 028 029 030 031",
+    input:"销售与退款、平台费用、履约成本、结算账单和实际到账。",
+    output:"对账差异、凭证、合规资料和 SKU 利润，交给经营负责人复盘。",
+    feedback:{id:"research", label:"用实际利润和成本复盘下一轮选品"}
+  },
+  {
+    id:"expansion", title:"拓展新市场", mapLabel:"拓展支线 · 拓展新市场", ids:"047 048 050 060",
+    input:"现有市场的经营结果，或企业明确的新市场与 B2B 拓客目标。",
+    output:"优先市场、可核验的商务线索或试跑计划，交给当地业务负责人验证。",
+    feedback:{id:"research", label:"在新站点重新验证市场需求与选品"}
+  }
+];
+const complianceStage = {
+  id:"compliance", title:"贯穿环节 · 合规与风控", mapLabel:"贯穿全程 · 合规与风控", buttonLabel:"合规与风控", courseIds:["063","059","031"],
+  input:"定品核验知识产权与资质，刊登核验素材授权和商品声称，经营中留存税务与申报证据。",
+  output:"放行结论、待补材料和证据记录，分别交给采购、内容运营与财税负责人。"
+};
+const mapNodes = new Map([...mapStages,complianceStage].map(stage => [stage.id,stage]));
+const mapStageByCourse = new Map();
+mapStages.forEach(stage => {
+  stage.courseIds = stage.ids.split(" ");
+  stage.courseIds.forEach(id => {
+    if (!catalog.has(id) || mapStageByCourse.has(id)) throw new Error("全景链路课程编号有误 " + id);
+    mapStageByCourse.set(id,stage);
+  });
+});
+if (mapStageByCourse.size !== catalog.size) throw new Error("存在未归入全景链路的课程");
+const learningOrder = [catalog.get("START"), ...mapStages.flatMap(stage =>
+  stage.courseIds.filter(id => id !== "START").map(id => catalog.get(id))
+)];
+const key = "cb-training-camp-v1";
+let storageAvailable = true;
+let marks = {};
+let lastId = "START";
+let indexes = {};
+let positions = {};
+let attempts = {};
+try {
+  const saved = JSON.parse(localStorage.getItem(key) || "{}");
+  marks = saved.marks || {};
+  lastId = saved.lastId || "START";
+  indexes = saved.indexes || {};
+  positions = saved.positions || {};
+  attempts = saved.attempts || {};
+} catch {
+  storageAvailable = false;
+}
+const cardKey = (id,index) => id + ":" + catalog.get(id).cards[index].key;
+const statusFor = (id,index) => marks[cardKey(id,index)];
+function phaseBounds(course,cardIndex) {
+  if (course.id !== "START") return {start:0,end:course.cards.length};
+  const phase = course.cards[cardIndex].phase;
+  return {start:phase*5,end:Math.min((phase+1)*5,course.cards.length)};
+}
+function batchInfo(course,cardIndex) {
+  const phase = phaseBounds(course,cardIndex);
+  const split = Math.min(phase.start+3,phase.end);
+  const second = cardIndex >= split;
+  const start = second ? split : phase.start;
+  const end = second ? phase.end : split;
+  const unanswered = [];
+  for (let i=start;i<end;i++) if (!attempts[cardKey(course.id,i)]) unanswered.push(i);
+  return {phase,start,end,second,unanswered,more:end<phase.end,total:split<phase.end?2:1};
+}
+function unlockedIndex(course,cardIndex) {
+  const phase = phaseBounds(course,cardIndex);
+  if (cardIndex < phase.start+3) return cardIndex;
+  const pending = batchInfo(course,phase.start).unanswered;
+  return pending[0] ?? cardIndex;
+}
+const countKnown = course => course.cards.filter((_,i) => statusFor(course.id,i) === "known").length;
+const hashId = location.hash.slice(1);
+let current = catalog.get(hashId) || catalog.get(lastId) || catalog.get("START");
+function startIndex(course) {
+  const saved = positions[course.id] ?? String(indexes[course.id]);
+  const matching = course.cards.findIndex(card => card.key === saved);
+  return matching < 0 ? 0 : unlockedIndex(course,matching);
+}
+let index = startIndex(current);
+const introLocations = ["listing","compliance","research","research","listing","listing","stock","listing","fulfillment"];
+function learningLocation() {
+  if (current.id === "START") return mapNodes.get(introLocations[current.cards[index].phase]);
+  if (current.id === "063") return complianceStage;
+  return mapStageByCourse.get(current.id);
+}
+let viewedStage = learningLocation();
+let retrying = false;
+const original = "file:///C:/kb_all/" + encodeURIComponent("01_离线浏览") + "/cards/";
+const introSources = ["AGT-CB-001","SKL-CB-010","CHAIN-CB-041","CHAIN-CB-046"];
+
+function persist() {
+  if (!storageAvailable) return;
+  try {
+    positions[current.id] = current.cards[index].key;
+    localStorage.setItem(key,JSON.stringify({marks,lastId:current.id,positions,indexes,attempts}));
+  } catch {
+    storageAvailable = false;
+    byId("storage-note").textContent = "这个浏览器当前无法保存学习记录，本次打开期间仍可标记卡片。";
+  }
+}
+function make(tag,text) {
+  const el = document.createElement(tag);
+  el.textContent = text;
+  return el;
+}
+function makeMapButton(stage) {
+  const button = make("button",stage.mapLabel || stage.title);
+  button.type = "button";
+  button.className = "map-stage";
+  button.dataset.mapStage = stage.id;
+  if (stage.handoff) {
+    const handoff = make("span",stage.handoff);
+    handoff.className = "map-deliverable";
+    button.append(handoff);
+  }
+  button.setAttribute("aria-controls","map-context");
+  button.addEventListener("click",() => inspectStage(stage));
+  return button;
+}
+const mapButtons = new Map();
+const mapLanes = [
+  {element:"map-prepare", stages:["research","sourcing"], sequential:true},
+  {element:"map-operate", stages:["listing","growth"], sequential:true},
+  {element:"map-supply", stages:["stock","fulfillment"], sequential:true},
+  {element:"map-settle", stages:["finance"]},
+  {element:"map-relationships", stages:["compliance","expansion"]}
+];
+mapLanes.forEach(({element,stages,sequential}) => {
+  const lane = byId(element);
+  stages.forEach((id,i) => {
+    if (sequential && i > 0) {
+      const arrow = make("span","→");
+      arrow.className = "map-arrow";
+      arrow.setAttribute("aria-hidden","true");
+      lane.append(arrow);
+    }
+    const button = makeMapButton(mapNodes.get(id));
+    mapButtons.set(id,button);
+    lane.append(button);
+  });
+});
+function inspectStage(stage) {
+  viewedStage = stage;
+  renderMap();
+  byId("map-courses").open = true;
+}
+function renderMapCourses() {
+  const container = byId("map-course-list");
+  const scroll = container.scrollTop;
+  container.replaceChildren(...viewedStage.courseIds.map(id => {
+    const course = catalog.get(id);
+    const button = make("button","");
+    button.type = "button";
+    button.className = "btn";
+    button.dataset.mapCourse = id;
+    button.setAttribute("aria-current",String(current.id === id));
+    const count = make("span",countKnown(course) + "/" + course.cards.length);
+    count.className = "course-count";
+    button.append(make("span",course.title),count);
+    button.addEventListener("click",() => {
+      setCourse(course);
+      byId("course-title").focus();
+    });
+    return button;
+  }));
+  container.scrollTop = scroll;
+}
+function renderMap() {
+  const learningStage = learningLocation();
+  byId("map-current").textContent = (current.id === "START" ? "当前问答 · " : "当前课程 · ") + (learningStage.buttonLabel || learningStage.title);
+  mapButtons.forEach((button,id) => {
+    button.setAttribute("aria-current",id === learningStage.id ? "step" : "false");
+    button.setAttribute("aria-pressed",String(id === viewedStage.id));
+  });
+  byId("map-stage-title").textContent = viewedStage.title;
+  byId("map-input").textContent = viewedStage.input;
+  byId("map-output").textContent = viewedStage.output;
+  byId("map-courses-label").textContent = "相关问答 · " + viewedStage.courseIds.length + " 门";
+  const back = byId("map-return");
+  back.replaceChildren();
+  back.hidden = !viewedStage.feedback;
+  if (viewedStage.feedback) {
+    const feedback = viewedStage.feedback;
+    const link = make("button",feedback.label);
+    link.type = "button";
+    link.addEventListener("click",() => {
+      const target = mapNodes.get(feedback.id);
+      inspectStage(target);
+      mapButtons.get(target.id).focus();
+    });
+    back.append(make("span","反馈回路 · "),link);
+  }
+  renderMapCourses();
+}
+themes.forEach(({name}) => {
+  const option = make("option",name);
+  option.value = name;
+  byId("theme").append(option);
+});
+function renderDirectory() {
+  const term = byId("search").value.trim().toLowerCase();
+  const theme = byId("theme").value;
+  const onlyReview = byId("review-only").checked;
+  const shown = ordered.filter(course => {
+    const matchesTheme = !theme || course.theme === theme;
+    const matchesText = !term || [course.title,course.theme,"CHAIN-CB-" + course.id,...course.steps].join(" ").toLowerCase().includes(term);
+    const matchesStatus = !onlyReview || course.cards.some((_,i) => statusFor(course.id,i) === "review");
+    return matchesTheme && matchesText && matchesStatus;
+  });
+  const nav = byId("course-list");
+  const scroll = nav.scrollTop;
+  nav.replaceChildren();
+  shown.forEach(course => {
+    const button = make("button","");
+    button.type = "button";
+    button.dataset.course = course.id;
+    button.setAttribute("aria-current",String(current.id === course.id));
+    const count = make("span",countKnown(course) + "/" + course.cards.length);
+    count.className = "course-count";
+    button.append(make("span",course.title),count);
+    button.addEventListener("click",() => {
+      const reviewIndex = onlyReview ? course.cards.findIndex((_,i) => statusFor(course.id,i) === "review") : -1;
+      setCourse(course,reviewIndex < 0 ? startIndex(course) : reviewIndex);
+      if (matchMedia("(max-width:640px)").matches) byId("directory").open = false;
+      byId("course-title").focus();
+    });
+    nav.append(button);
+  });
+  nav.scrollTop = scroll;
+  byId("results").textContent = shown.length ? shown.length + " 门课程" : "没有匹配的课程";
+}
+function renderProgress(){
+  const known = courses.reduce((sum,course) => sum + countKnown(course),0);
+  byId("progress").max = totalCards;
+  byId("progress").value = known;
+  byId("progress-label").textContent = "已掌握 " + known + " / " + totalCards + " 张";
+}
+function normalizeAnswer(value) {
+  return value.normalize("NFKC").toLowerCase().replace(/\s+/gu,"");
+}
+function mentionsPoint(text,aliases) {
+  const negated = /(?:不需要|无需|不用|不必|不要|不查|别查|不做|忽略|跳过|不必核对|不检查|不核对|无需检查|不用管)$/u;
+  return aliases.some(alias => {
+    const needle = normalizeAnswer(alias);
+    let from = 0;
+    while (from < text.length) {
+      const at = text.indexOf(needle,from);
+      if (at < 0) return false;
+      if (!negated.test(text.slice(Math.max(0,at-8),at))) return true;
+      from = at+needle.length;
+    }
+    return false;
+  });
+}
+function gradeAnswer(card,response) {
+  if (card.options) {
+    const correct = response === card.correct;
+    return {
+      title:correct ? "回答正确" : "这题答错了", review:!correct,
+      submitted:card.options[response], points:[],
+      reference:card.options[card.correct] + "\n" + card.a
+    };
+  }
+  const input = normalizeAnswer(response);
+  const points = card.rubric.map(([label,...aliases]) => ({label,hit:mentionsPoint(input,[label,...aliases])}));
+  const hits = points.filter(point => point.hit).length;
+  return {
+    title:"简答初评 · 检测到 " + hits + " / " + points.length + " 个要点线索",
+    review:hits < points.length, submitted:response, points, reference:card.a
+  };
+}
+function renderAnswer(card) {
+  const response = attempts[cardKey(current.id,index)]?.response;
+  const showResult = response !== undefined && !retrying;
+  byId("quiz-form").hidden = showResult;
+  byId("answer").hidden = !showResult;
+  byId("quiz-error").hidden = true;
+  byId("quiz-choices").hidden = !card.options;
+  byId("quiz-text").hidden = Boolean(card.options);
+  byId("answer-input").value = "";
+  byId("quiz-options").replaceChildren();
+  if (!showResult) {
+    byId("grade-title").textContent = "";
+    byId("submitted").textContent = "";
+    byId("grade-points").replaceChildren();
+    byId("answer-text").textContent = "";
+    if (card.options) {
+      card.options.forEach((option,i) => {
+        const label = make("label","");
+        label.className = "quiz-option";
+        const input = make("input","");
+        input.type = "radio";
+        input.name = "quiz-option";
+        input.value = String(i);
+        label.append(input,make("span",String.fromCharCode(65+i) + "．" + option));
+        byId("quiz-options").append(label);
+      });
+    }
+    return;
+  }
+  const result = gradeAnswer(card,response);
+  byId("grade-title").textContent = result.title;
+  byId("grade-title").dataset.grade = result.review ? "review" : "good";
+  byId("submitted").textContent = "你的答案\n" + result.submitted;
+  byId("grade-points").hidden = result.points.length === 0;
+  byId("grade-points").replaceChildren(...result.points.map(({label,hit}) => {
+    const item = make("li",(hit ? "已提及 · " : "可补充 · ") + label);
+    item.dataset.hit = String(hit);
+    return item;
+  }));
+  byId("answer-label").textContent = card.options ? "正确答案与解析" : "参考答案";
+  byId("answer-text").textContent = result.reference;
+}
+function renderBatch(){
+  const batch = batchInfo(current,index);
+  const pending = batch.unanswered.length;
+  const size = batch.end-batch.start;
+  const lastCard = index === current.cards.length-1;
+  const lastCourse = learningOrder.at(-1) === current;
+  const complete = pending === 0;
+  const nextBatch = byId("next-batch");
+  nextBatch.disabled = !batch.more || !complete;
+  nextBatch.textContent = !batch.more && complete ? "本环节题库已答完" : "换一批";
+  byId("batch-progress").textContent = "第 " + (batch.second?2:1) + " / " + batch.total +
+    " 批 · 已提交 " + (size-pending) + " / " + size +
+    (batch.more && !complete ? " · 本批答完后解锁" : "");
+  byId("previous").textContent = index === 0 && learningOrder[0] !== current ? "上一课" : "上一题";
+  const atEnd = index === batch.end-1;
+  let nextLabel = "下一题";
+  if (atEnd && pending) nextLabel = "回到未答题";
+  else if (atEnd && batch.more) nextLabel = "换一批";
+  else if (atEnd && lastCard && !lastCourse) nextLabel = "下一课";
+  else if (atEnd && current.id === "START" && !lastCard) nextLabel = index === 39 ? "综合实战" : "下一环节";
+  const next = byId("next");
+  next.textContent = nextLabel;
+  next.disabled = complete && lastCard && lastCourse;
+  byId("previous").disabled = index === 0 && current === learningOrder[0];
+  byId("position").textContent = "本批 " + (index-batch.start+1) + " / " + size + " 题 · 全课 " +
+    (index+1) + " / " + current.cards.length;
+}
+function renderCard(){
+  const card = current.cards[index];
+  const practice = card.practice;
+  const status = statusFor(current.id,index);
+  byId("card-kind").textContent = card.options ? "单选题" : practice ? "情景简答" : "简答题";
+  byId("card-kind").classList.toggle("practice",Boolean(practice));
+  byId("card-status").textContent = ({known:"已掌握",review:"待复习"})[status] || "未标记";
+  const stage = learningLocation();
+  byId("card-location").textContent = stage.buttonLabel || stage.title;
+  if (current.id === "START") {
+    Array.from(byId("flow").children).forEach((step,stepIndex) => {
+      step.setAttribute("aria-current",stepIndex === card.phase ? "step" : "false");
+    });
+  }
+  byId("question").textContent = card.q;
+  renderAnswer(card);
+  byId("mark-known").setAttribute("aria-pressed",String(status === "known"));
+  byId("mark-review").setAttribute("aria-pressed",String(status === "review"));
+  renderBatch();
+}
+function renderCourse(){
+  byId("course-meta").textContent = current.id === "START" ? "入门综合课" : current.theme + " · CHAIN-CB-" + current.id;
+  byId("course-title").textContent = current.title;
+  const steps = current.id === "START" ? [...current.steps,"综合实战"] : current.steps;
+  byId("flow").replaceChildren(...steps.map((step,i) => {
+    const item = make("li","");
+    if (i) {
+      const arrow = make("b","›");
+      arrow.setAttribute("aria-hidden","true");
+      item.append(arrow);
+    }
+    if (current.id === "START") {
+      const button = make("button",step);
+      button.type = "button";
+      button.className = "flow-button";
+      button.addEventListener("click",() => {
+        const start = i*5;
+        const end = Math.min(start+5,current.cards.length);
+        const pending = current.cards.slice(start,end).findIndex((_,offset) => !attempts[cardKey(current.id,start+offset)]);
+        showQuestion(pending === -1 ? start : start+pending);
+      });
+      item.append(button);
+    } else item.append(make("span",step));
+    return item;
+  }));
+  const ids = current.id === "START" ? introSources : ["CHAIN-CB-" + current.id];
+  byId("sources").replaceChildren(make("span","知识库原卡 · 草稿"),...ids.map(id => {
+    const link = make("a",id);
+    link.href = original + id + ".html";
+    link.target = "_blank";
+    link.rel = "noopener noreferrer";
+    link.setAttribute("aria-label","打开本地知识库原卡 " + id);
+    return link;
+  }));
+  renderMap();
+  renderCard();
+  renderDirectory();
+}
+function setCourse(course,cardNumber = startIndex(course)) {
+  current = course;
+  index = unlockedIndex(course,cardNumber);
+  viewedStage = learningLocation();
+  byId("map-courses").open = false;
+  retrying = false;
+  try { history.replaceState(null,"","#" + course.id); } catch { /* local file URL can be restricted */ }
+  persist();
+  renderCourse();
+}
+function showQuestion(cardNumber) {
+  index = unlockedIndex(current,cardNumber);
+  if (current.id === "START" && viewedStage !== learningLocation()) {
+    viewedStage = learningLocation();
+    byId("map-courses").open = false;
+    renderMap();
+  }
+  retrying = false;
+  persist();
+  renderCard();
+  byId("question").focus();
+}
+function swapBatch(){
+  const batch = batchInfo(current,index);
+  if (batch.more && batch.unanswered.length === 0) showQuestion(batch.end);
+}
+function move(direction) {
+  const batch = batchInfo(current,index);
+  if (direction > 0 && index === batch.end-1 && batch.unanswered.length) {
+    showQuestion(batch.unanswered[0]);
+    return;
+  }
+  const next = index + direction;
+  if (next >= 0 && next < current.cards.length) {
+    showQuestion(next);
+  } else {
+    const nextCourse = learningOrder[learningOrder.indexOf(current) + direction];
+    if (nextCourse) setCourse(nextCourse,direction > 0 ? 0 : nextCourse.cards.length-1);
+  }
+  byId("question").focus();
+}
+function submitAnswer(event) {
+  event.preventDefault();
+  const card = current.cards[index];
+  const input = card.options ? byId("quiz-options").querySelector("input:checked") : byId("answer-input");
+  if (!input || !/[\p{L}\p{N}]/u.test(input.value.trim())) {
+    byId("quiz-error").textContent = card.options ? "请先选择一个答案。" : "请先写下你的判断，再提交。";
+    byId("quiz-error").hidden = false;
+    if (!card.options) input.focus();
+    return;
+  }
+  const response = card.options ? Number(input.value) : input.value.trim();
+  const identifier = cardKey(current.id,index);
+  const grade = gradeAnswer(card,response);
+  attempts[identifier] = {response};
+  if (card.options) marks[identifier] = grade.review ? "review" : "known";
+  else if (grade.review) marks[identifier] = "review";
+  retrying = false;
+  refreshStudy();
+  byId("grade-title").focus();
+}
+function refreshStudy(){
+  persist();
+  renderCard();
+  renderDirectory();
+  renderMapCourses();
+  renderProgress();
+}
+function mark(value) {
+  const markKey = cardKey(current.id,index);
+  if (!attempts[markKey] || retrying) return;
+  if (marks[markKey] === value) delete marks[markKey];
+  else marks[markKey] = value;
+  refreshStudy();
+}
+
+byId("course-title").tabIndex = -1;
+byId("question").tabIndex = -1;
+byId("search").addEventListener("input",renderDirectory);
+byId("theme").addEventListener("change",renderDirectory);
+byId("review-only").addEventListener("change",renderDirectory);
+byId("quiz-form").addEventListener("submit",submitAnswer);
+byId("retry").addEventListener("click",() => {
+  retrying = true;
+  renderCard();
+  const first = current.cards[index].options ? byId("quiz-options").querySelector("input") : byId("answer-input");
+  first?.focus();
+});
+byId("next-batch").addEventListener("click",swapBatch);
+byId("card-location").addEventListener("click",() => {
+  const stage = learningLocation();
+  viewedStage = stage;
+  renderMap();
+  mapButtons.get(stage.id).focus();
+});
+byId("mark-review").addEventListener("click",() => mark("review"));
+byId("mark-known").addEventListener("click",() => mark("known"));
+byId("previous").addEventListener("click",() => move(-1));
+byId("next").addEventListener("click",() => move(1));
+window.addEventListener("hashchange",() => {
+  const requested = catalog.get(location.hash.slice(1));
+  if (requested && requested !== current) setCourse(requested);
+});
+if (matchMedia("(max-width:640px)").matches) byId("directory").open = false;
+if (!storageAvailable) byId("storage-note").textContent = "这个浏览器当前无法加载学习记录，本次打开期间仍可标记卡片。";
+byId("catalog-summary").textContent = (courses.length - 1) + " 条业务链路 · " + totalCards + " 道练习题";
+renderCourse();
+renderProgress();
+</script>
+</body>
+</html>

@@ -1,0 +1,637 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="按模块查看领星亚马逊的数据采集接口、业务动作及 RPA 需求。">
+<title>领星亚马逊接口与 RPA 模块盘点</title>
+<style>
+:root{color-scheme:light;--paper:#f4f6f8;--white:#fff;--ink:#142433;--muted:#4b5d6c;--line:#dce4e8;--navy:#102739;--teal:#007266;--full:#00796f;--part:#477da9;--rpa:#bd630e;--none:#a34535;--radius:18px}
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);font:15px/1.65 system-ui,"Microsoft YaHei",sans-serif}
+a{color:var(--teal);text-underline-offset:.25em}
+a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,summary:focus-visible{outline:3px solid #008985;outline-offset:3px}
+button,input,select{font:inherit}
+.wrap{width:min(1200px,calc(100% - 48px));margin-inline:auto}
+.hero{background:var(--navy);color:white;padding:44px 0 38px}
+.eyebrow{margin:0 0 10px;color:#8de1d5;font-weight:700;letter-spacing:.09em;font-size:.85rem}
+h1,h2,h3,p{margin:0}
+h1{font-size:clamp(1.85rem,4.5vw,3rem);line-height:1.22;letter-spacing:-.035em}
+.lead{max-width:52rem;color:#d4e2e9;margin-top:13px}
+.hero nav{display:flex;flex-wrap:wrap;gap:10px 22px;margin-top:20px}
+.hero a{color:#a6eee4}
+main{padding:24px 0 42px}
+section{margin:0 0 28px;scroll-margin-top:16px}
+.facts{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+.fact,.panel{background:var(--white);border:1px solid var(--line);border-radius:var(--radius)}
+.fact{padding:17px 19px}
+.fact dt{font-weight:650;color:var(--muted)}
+.fact dd{margin:2px 0 0;font-size:1.95rem;line-height:1.16;font-weight:780;font-variant-numeric:tabular-nums}
+.fact small{display:block;margin-top:7px;color:var(--muted);font-size:.82rem;font-weight:500}
+.panel{padding:22px 24px}
+.section-top{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:5px 16px;margin:0 0 14px}
+h2{font-size:1.45rem;letter-spacing:-.02em}
+h3{font-size:1.02rem}
+.muted,.hint{color:var(--muted)}
+.hint{font-size:.88rem}
+.insights{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.insight{padding:13px 15px;background:#f3f7f8;border-radius:12px;border-left:3px solid #58a99f}
+.insight p{margin-top:5px;color:var(--muted);font-size:.92rem}
+.legend{display:flex;flex-wrap:wrap;gap:6px 17px;margin:0 0 14px;font-size:.84rem;color:var(--muted)}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.dot{width:10px;height:10px;border-radius:3px;display:inline-block}
+.full{--tone:var(--full)} .part{--tone:var(--part)} .rp{--tone:var(--rpa)} .none{--tone:var(--none)}
+.dot,.bar span{background:var(--tone)}
+.table-scroll{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums}
+.matrix{min-width:855px}
+th,td{padding:9px 11px;text-align:left;border-bottom:1px solid var(--line);vertical-align:top}
+thead th{background:#edf3f5;color:#304453;font-size:.82rem;white-space:nowrap}
+.matrix th:first-child,.matrix td:first-child{padding-left:12px}
+.matrix td:not(:first-child),.matrix thead th:not(:first-child),.matrix tfoot td{text-align:right;white-space:nowrap}
+.matrix tr.domain th{text-align:left;background:#f4f7f8;color:#3b5362;font-size:.81rem;padding-block:6px}
+.matrix tbody tr:not(.domain):hover{background:#f5faf9}
+.matrix tfoot{font-weight:750;background:#edf3f5}
+.module-link{color:#00675c;font-weight:720}
+.bar{display:flex;min-width:85px;height:8px;margin-top:7px;overflow:hidden;border-radius:12px;background:#edf3f5}
+.bar span{height:100%}
+.rate{color:#953f17;font-weight:700}
+.toolbar{display:grid;grid-template-columns:minmax(180px,1.6fr) repeat(3,minmax(125px,1fr)) auto;align-items:end;gap:10px;margin-bottom:13px}
+.toolbar label{display:grid;gap:3px;font-size:.84rem;font-weight:650}
+.module-brief{background:#f3f7f8;border-left:3px solid #58a99f;border-radius:10px;padding:11px 14px;margin-bottom:13px}
+.module-brief p{margin-top:3px;color:var(--muted);font-size:.89rem}
+input,select,button{border:1px solid #aebfc9;border-radius:8px;background:white;color:var(--ink);padding:8px 10px;min-height:42px;min-width:0}
+button{cursor:pointer}
+button:hover{background:#e9f4f2}
+.result-head{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:8px;margin:0 0 8px}
+.shortcuts{display:flex;gap:7px;flex-wrap:wrap}
+.shortcuts button{min-height:33px;padding:3px 8px;font-size:.83rem}
+.details-table{min-width:840px}
+.details-table th:nth-child(1){width:104px}
+.details-table th:nth-child(2){width:86px}
+.details-table th:nth-child(3){width:30%}
+.details-table th:nth-child(4),.details-table th:nth-child(5){width:116px}
+.details-table tbody tr:hover{background:#f5faf9}
+.details-table td{font-size:.88rem}
+.details-table td:last-child{overflow-wrap:anywhere}
+.badge{display:inline-block;border:1px solid currentColor;border-radius:999px;padding:1px 7px;white-space:nowrap;font-size:.79rem}
+.badge.full{color:#006b60}.badge.part{color:#285f8b}.badge.rp{color:#93500c}.badge.none{color:#9a3e30}
+.path-list{display:grid;gap:3px}
+code{font: .77rem/1.5 ui-monospace,Consolas,monospace;color:#38556e;overflow-wrap:anywhere}
+.note{display:block;margin-top:4px;color:var(--muted);font-size:.82rem}
+.source-links{display:flex;gap:8px 20px;flex-wrap:wrap;margin:8px 0}
+.scope p+p{margin-top:7px}
+@media(max-width:900px){.facts{grid-template-columns:repeat(2,minmax(0,1fr))}.toolbar{grid-template-columns:repeat(2,minmax(0,1fr))}.toolbar label:first-child{grid-column:1/-1}.insights{grid-template-columns:1fr}}
+@media(max-width:560px){.wrap{width:calc(100% - 24px)}.hero{padding:28px 0 23px}.fact{padding:12px}.panel{padding:15px 13px}.fact dd{font-size:1.6rem}.facts{gap:7px}.fact dt{font-size:.84rem}.fact small{font-size:.75rem}}
+@media print{.hero{color:#142433;background:#fff;padding:15px 0}.hero .lead,.hero .eyebrow{color:#4b5d6c}.hero nav,.toolbar,.shortcuts{display:none}.wrap{width:100%}.panel,.fact{border-color:#b4c0c8}.table-scroll{overflow:visible}.matrix,.details-table{min-width:0}.bar,.dot{print-color-adjust:exact}tr{break-inside:avoid}}
+</style>
+</head>
+<body>
+<header class="hero">
+  <div class="wrap">
+    <p class="eyebrow">亚马逊 · 领星 ERP</p>
+    <h1>领星接口与 RPA 模块盘点</h1>
+    <p class="lead">从订单、供应链到广告、财务和售后，查看每个模块中已有接口的场景、接口能覆盖到什么程度，以及仍由 RPA 采集或执行的环节。</p>
+    <nav aria-label="报告章节"><a href="#matrix">模块总览</a><a href="#details">场景清单</a><a href="#sources">口径与来源</a></nav>
+  </div>
+</header>
+<main class="wrap">
+  <section aria-label="整体统计"><dl class="facts" id="facts"></dl></section>
+  <section class="panel" aria-labelledby="highlights-title">
+    <div class="section-top"><h2 id="highlights-title">各模块最明显的差异</h2></div>
+    <div class="insights">
+      <div class="insight"><h3>仓配动作的接口覆盖较高</h3><p>采购 4/4、订单动作 5/5、仓库 9/10、FBA 动作 9/12 有完整接口。仓库盘点发起、FBA 扩容等环节仍在 RPA 清单里。</p></div>
+      <div class="insight"><h3>广告接口多，报表字段仍有缺口</h3><p>32 条广告采集场景中，25 条标为接口不完整，涉及 SP、SB、SD 和 DSP 报表。18 条广告动作里有 13 条走 RPA，包括促销、优惠券和排名监控。</p></div>
+      <div class="insight"><h3>客服、绩效和财务更依赖 RPA</h3><p>客服 6/6、绩效 11/14、财务 11/19 走 RPA，覆盖站内信、账号健康申诉、月结、对账和核销等环节。</p></div>
+    </div>
+  </section>
+  <section class="panel" id="matrix" aria-labelledby="matrix-title">
+    <div class="section-top"><h2 id="matrix-title">模块总览</h2><p class="hint">点击模块名查看接口与 RPA 明细</p></div>
+    <div class="legend" id="legend" aria-label="覆盖图图例"></div>
+    <div class="table-scroll" role="region" aria-label="模块接口覆盖统计" tabindex="0">
+      <table class="matrix">
+        <thead><tr><th scope="col">模块与覆盖构成</th><th scope="col">采集 / 动作</th><th scope="col">完整 · 接口</th><th scope="col">不完整 · 接口</th><th scope="col">不完整 · RPA</th><th scope="col">无接口 · RPA</th><th scope="col">RPA 占比</th></tr></thead>
+        <tbody id="matrix-body"></tbody><tfoot id="matrix-foot"></tfoot>
+      </table>
+    </div>
+  </section>
+  <section class="panel" id="details" aria-labelledby="details-title">
+    <div class="section-top"><h2 id="details-title">接口与 RPA 场景清单</h2><p class="hint">可按模块、记录类型、覆盖状态定位，也可搜索名称或路径</p></div>
+    <div class="toolbar" role="search" aria-label="筛选场景">
+      <label>关键词<input id="keyword" type="search" placeholder="例如 盘点、SP、对账、reportExportTask"></label>
+      <label>模块<select id="module"><option value="">全部模块</option></select></label>
+      <label>记录类型<select id="kind"><option value="">采集及动作</option><option value="C">数据采集</option><option value="A">业务动作</option></select></label>
+      <label>覆盖状态<select id="state"><option value="">全部状态</option><option value="R">全部 RPA</option><option value="I">全部接口实现</option><option value="F">完整 · 接口</option><option value="P">不完整 · 接口</option><option value="Q">不完整 · RPA</option><option value="N">无接口 · RPA</option></select></label>
+      <button id="reset" type="button">清空</button>
+    </div>
+    <div id="module-brief" class="module-brief" hidden></div>
+    <div class="result-head">
+      <p id="result-count" class="hint" role="status"></p>
+      <div class="shortcuts"><button type="button" data-state="R">只看 RPA</button><button type="button" data-state="I">只看接口实现</button><button type="button" data-state="">查看全部状态</button></div>
+    </div>
+    <div class="table-scroll" role="region" aria-label="场景查询结果" tabindex="0">
+      <table class="details-table">
+        <thead><tr><th scope="col">模块</th><th scope="col">记录类型</th><th scope="col">场景</th><th scope="col">接口完整度</th><th scope="col">表内实现</th><th scope="col">源表列出的路径</th></tr></thead>
+        <tbody id="detail-body"></tbody>
+      </table>
+    </div>
+    <noscript><p>此文件需要启用 JavaScript 才能显示模块统计和清单。</p></noscript>
+  </section>
+  <section class="panel scope" id="sources" aria-labelledby="sources-title">
+    <h2 id="sources-title">口径与来源</h2>
+    <div class="source-links">
+      <a href="https://ying-dao.feishu.cn/base/IyDYb5yxcaX4Vpsd8jbc4wX8n2c?table=tblIFJ3TJDvfqpAU&amp;view=vewT6iMBF6" target="_blank" rel="noopener noreferrer">飞书 · 数据采集</a>
+      <a href="https://ying-dao.feishu.cn/base/IyDYb5yxcaX4Vpsd8jbc4wX8n2c?table=tblc0ql8ssCvHBJD&amp;view=vewxE9Lp66" target="_blank" rel="noopener noreferrer">飞书 · 业务动作</a>
+    </div>
+    <p class="hint">按 2026 年 11 月 27 日读取的两个「表格」视图统计。源文档标题写有「87个业务动作」，业务动作视图当前为 101 条。业务分类沿用源表的 16 个模块，上层领域为本报告的归并。库存、仓库与 FBA 保留为独立模块。</p>
+    <p class="hint">四种覆盖状态由源表的「采集方式」或「实现方式」与「接口说明」交叉得出。RPA 占比按源表标为 RPA 的场景数除以模块场景数计算。每行对应一个场景，同一接口路径可服务多个场景，部分场景列出多个路径。</p>
+    <p class="hint">路径来自飞书表内的采集来源或动作路径说明。接口标注、路径、开放权限、字段和可执行性均未实测。RPA 表示源表标注的实现方式，具体自动化范围仍取决于目标平台、权限和流程条件。</p>
+  </section>
+</main>
+<script id="inventory" type="text/plain">
+@订单
+CP|订单_AllOrders订单全量报表|/basicOpen/report/create/reportExportTask /erp/sc/data/mws_report/allOrders
+CN|订单_ArchivedOrders归档订单报表
+CP|订单_FBMOrders自发货订单报表|/erp/sc/data/mws_report/allOrders
+CQ|订单_UnshippedOrders未发货订单报表
+CQ|订单_PendingOrders待处理订单报表
+CN|订单_OrdersPII受限XML订单报表
+CN|订单_XMLAllOrdersXML订单全量报表
+AF|创建多渠道订单_亚马逊|/order/amzod/api/createOrder
+AF|提交标发_自发货订单|/pb/mp/order/submitFulfillment
+AF|导入面单_自发货订单|/basicOpen/selfShipmentOrder/importLabel
+AF|更新订单备注_平台订单|/basicOpen/platformOrder/scOrder/setRemark
+AF|确认发货_VC订单|/basicOpen/platformOrder/vcOrderDf/confirmShipment
+@库存
+CP|库存_FBA库存状况报告|/erp/sc/routing/fba/fbaStock/getFbaAgeList
+CP|库存_ManageFBA库存报告|/erp/sc/data/mws_report/manageInventory
+CP|库存_库存分类账明细视图|/cost/center/ods/detail/query /basicOpen/openapi/mwsReport/adjustmentList
+CF|库存_库存分类账汇总视图|/cost/center/ods/summary/query
+CN|库存_补货建议报告Restock
+CP|库存_滞留库存报告Stranded|/basicOpen/report/create/reportExportTask
+CN|库存_BulkFix滞留库存加载器
+CP|库存_移除订单详情RemovalOrderDetail|/erp/sc/routing/data/order/removalOrderListNew
+CF|库存_移除货件详情RemovalShipmentDetail|/erp/sc/statistic/removalShipment/list
+CP|库存_月度仓储费报告|/erp/sc/data/fba_report/storageFeeMonth
+CP|库存_长期仓储费报告|/erp/sc/data/fba_report/storageFeeLongTerm
+CF|库存_预留库存报告Reserved|/erp/sc/data/mws_report/reservedInventory
+CP|库存_建议移除报告RecommendedRemoval|/basicOpen/report/create/reportExportTask
+CP|库存_多国库存报告MultiCountry|/erp/sc/data/mws_report/getAfnFulfillableQuantity
+CP|库存_AFN亚马逊库存报告|/basicOpen/report/create/reportExportTask
+CF|库存_每日库存历史DailyInventory|/erp/sc/data/mws_report/dailyInventory
+CF|库存_AWD库存|/basicOpen/openapi/storage/awdWarehouseDetail
+CF|库存_FBA实时库存API|/erp/sc/routing/fba/fbaStock/fbaList /basicOpen/openapi/storage/fbaWarehouseDetail
+CQ|库存_FBA容量限制CapacityMonitor
+CQ|库存_CapacityManager容量管理器
+CQ|库存_IPI库存绩效指数
+CN|库存_需求预测下载DemandForecast
+@仓库
+AF|添加入库单_本地仓|/erp/sc/routing/storage/storage/orderAdd
+AF|添加出库单_本地仓|/erp/sc/routing/storage/storage/orderAddOut
+AF|创建调拨单_本地仓|/erp/sc/routing/inventoryReceipt/StorageAllocation/addAllocationOrder
+AQ|创建盘点单_本地仓|/erp/sc/routing/inventoryReceipt/InventoryCheck/addOrder
+AF|创建调整单_数量调整|/erp/sc/routing/inventoryReceipt/StorageAdjustment/addAdjustmentOrder
+AF|创建收货单_采购收货|/erp/sc/routing/deliveryReceipt/PurchaseReceiptOrder/createReceiptOrder
+AF|创建备货单_海外仓|/erp/sc/routing/owms/inbound/createInbound
+AF|备货单发货_海外仓|/erp/sc/routing/owms/inbound/sendInbound
+AF|配对库存_海外仓SKU|/basicOpen/overseaWarehouseSetting/productMatch
+AF|生成装箱任务_装箱管理|/basicOpen/packingTask/addTask
+@FBA
+AF|创建发货计划_FBA仓|/erp/sc/routing/storage/shipment/createShipmentPlan
+AF|创建备货计划_海外仓|/erp/sc/routing/owms/overseaStockPlan/createOverseaStockPlan
+AF|创建发货单_FBA|/erp/sc/routing/storage/shipment/createReadySendOrder
+AF|发货单发货_FBA|/erp/sc/storage/shipment/sendGoods
+AF|创建STA任务_FBA货件|/amzStaServer/openapi/inbound-plan/createInboundPlan
+AF|提交装箱信息_FBA货件|/amzStaServer/openapi/inbound-packing/setPackingInformation
+AF|提交配送服务_FBA货件|/amzStaServer/openapi/inbound-shipment/setDeliveryService
+AF|上传货件跟踪号_FBA货件|/amzStaServer/openapi/inbound-shipment/updateShipmentTrack
+AF|创建AWD入库任务_AWD仓|/amzStaServer/openapi/awd/inbound-plan/createInboundPlan
+AQ|创建移除订单_FBA库存|/erp/sc/statistic/removalOrder/createAndCommit
+AN|申请扩容_FBA库容
+AN|匹配_发货贴标
+@发货
+CP|发货_FulfilledShipmentsFBA发货明细报表|/erp/sc/data/mws_report/fbaOrders /erp/sc/data/mws_report/getAmazonFulfilledShipmentsList /erp/sc/data/mws_report_v1/getAmazonFulfilledShipmentsList
+CN|发货_EasyShipEasyShip配送单据报表
+CN|发货_EasyShip揽收状态报表
+CF|发货_MCF多渠道配送订单报表|/order/amzod/api/orderList /order/amzod/api/orderDetails/productInformation
+CN|发货_FBACostReport海关申报PDF
+AF|截单_销售出库单|/basicOpen/wmsOrder/cancel
+@物流
+CF|物流_物流追踪看板追踪记录|/basicOpen/logistics/trackRecord/list /basicOpen/logistics/trackRecord/status/total
+CF|物流_自发货订单管理列表|/erp/sc/routing/order/Order/getOrderList /pb/mp/order/submitFulfillment
+CN|物流_EndOfDayForms发货尾单报表
+AF|回填运单号_物流下单|/basicOpen/logisticsOrdering/setTrackingNo
+AF|维护头程物流_物流商渠道|/erp/sc/routing/tms/FirstVessel/addChannels
+AF|确认对账_FBM物流账单|/basicOpen/logistics/logisticsBill/confirm
+AN|处理_POD回传
+@采购
+AF|创建采购计划_标准|/erp/sc/routing/data/local_inventory/createPurchasePlan
+AF|创建采购单_标准|/erp/sc/routing/purchase/purchase/createPurchaseOrder
+AF|创建采购退货单_标准|/erp/sc/routing/purchase/purchase_return_order/createPurchaseReturnOrder
+AF|维护供应商_采购|/erp/sc/routing/storage/supplier/edit
+@多平台
+AF|创建订单_多平台直挂|/pb/mp/order/v2/create
+AF|快速出库_多平台订单|/pb/mp/order/v2/fastOutbound
+AF|审核发货_多平台订单|/basicOpen/openapi/multiplatform/order/review
+AF|配对商品_多平台|/pb/mp/listing/v2/pairMultiPlatform
+AF|发货单发货_多平台平台仓|/basicOpen/multiplatform/shippingList/delivery
+AQ|修改库存_多平台Listing|/basicOpen/multiplatform/temu/createPublishQueue
+AF|解密地址_Temu订单|/basicOpen/temu/temuAddressDecrypt
+@产品Listing
+CP|产品Listing_AllListings全量Listing报表|/erp/sc/data/mws/listing
+CP|产品Listing_ActiveInactiveListings报表|/erp/sc/data/mws/listing
+CQ|产品Listing_SuppressedListings压制报表
+CN|产品Listing_Listing质量报表
+CF|产品Listing_Listing问题Issues查询|/listing/publish/openapi/amazon/product/search
+CN|产品Listing_商品目录Catalogue
+CN|产品Listing_品牌APlus与图片
+CP|产品Listing_BrowseTreeGuide类目树|/basicOpen/openapi/publish/manage/categoryRoot /basicOpen/openapi/publish/manage/categoryChildren
+CN|产品Listing_仅肉眼选品机会页
+CN|产品Listing_仅肉眼自动定价页
+CN|产品Listing_类目受限与销售申请
+AF|上传Listing_商品刊登|/listing/publish/openapi/amazon/product/publish
+AF|批量改价_Listing售价|/erp/sc/listing/ProductPricing/pricingSubmit
+AF|修改FBM库存_自发货Listing|/basicOpen/FbmManagement/modifyFbmInventory
+AF|新增产品_本地产品|/erp/sc/routing/storage/product/set
+AF|配对产品_Listing配对|/erp/sc/storage/product/link
+AN|申请解限_类目Gating
+AN|设置规则_自动调价
+AN|监控_竞对链接与价格
+AN|匹配_竞品商品
+AN|质检_Listing合规
+AN|导入_多站点价格扩展
+AN|提交_GPSR合规
+@广告
+CP|广告_SP广告活动报表|/pb/openapi/newad/spCampaignReports
+CP|广告_SP广告位报表|/pb/openapi/newad/campaignPlacementReports
+CP|广告_SP广告组报表|/pb/openapi/newad/spAdGroupReports
+CP|广告_SP关键词与商品定向报表|/pb/openapi/newad/spKeywordReports /pb/openapi/newad/spTargetReports
+CP|广告_SP广告商品报表|/pb/openapi/newad/spProductAdReports
+CP|广告_SP已购买商品报表|/pb/openapi/newad/asinReports
+CP|广告_SP用户搜索词报表|/pb/openapi/newad/queryWordReports
+CN|广告_SP总流量与无效流量报表
+CP|广告_SB广告活动报表|/pb/openapi/newad/hsaCampaignReports
+CP|广告_SB广告位报表|/pb/openapi/newad/hsaCampaignPlacementReports
+CP|广告_SB广告组报表|/pb/openapi/newad/hsaAdGroupReports
+CP|广告_SB广告创意报表|/pb/openapi/newad/listHsaProductAdReport
+CP|广告_SB关键词与定向报表|/pb/openapi/newad/listHsaTargetingReport /pb/openapi/newad/listHsaKeywordPlacementReport
+CP|广告_SB用户搜索词报表|/pb/openapi/newad/hsaQueryWordReports
+CP|广告_SB已购买商品报表|/pb/openapi/newad/hsaPurchasedAsinReports
+CN|广告_SB总流量与无效流量报表
+CP|广告_SD广告活动报表|/pb/openapi/newad/sdCampaignReports
+CP|广告_SD广告组报表|/pb/openapi/newad/sdAdGroupReports
+CP|广告_SD广告商品报表|/pb/openapi/newad/sdProductAdReports
+CP|广告_SD商品定位报表|/pb/openapi/newad/sdTargetReports
+CP|广告_SD已购买商品报表|/pb/openapi/newad/sdAsinReports
+CP|广告_SD匹配的目标报表|/pb/openapi/newad/sdMatchTargetReports
+CN|广告_SD总流量与无效流量报表
+CP|广告_SP小时数据报表|/pb/openapi/newad/spCampaignHourData
+CP|广告_SB小时数据报表|/pb/openapi/newad/sbCampaignHourData
+CP|广告_SD小时数据报表|/pb/openapi/newad/sdCampaignHourData
+CP|广告_DSP订单层级报表|/pb/openapi/newad/dspAdvertiserList /basicOpen/dspReport/order/list
+CN|广告_Attribution归因报表
+CN|广告_广告发票与税费文档
+CQ|广告_Bulksheets批量操作表
+CF|广告_广告活动与报告API数据|/pb/openapi/newad/spCampaigns
+CN|广告_仅肉眼品牌工具页
+AF|创建广告活动_SP|/basicOpen/adReport/manage/postSpCampaign
+AF|创建广告_SP|/basicOpen/adReport/manage/postSpAds
+AF|修改广告活动_SP|/basicOpen/adReport/manage/putSpCampaign
+AF|添加关键词_SP|/basicOpen/adReport/spTarget/addKeywords
+AF|归档否定投放_SP|/basicOpen/adReport/spTarget/archiveNegatives
+AN|报名_Vine计划
+AN|创建实验_AB测试
+AN|创建优惠券_Coupon
+AN|创建促销_ManagePromotions
+AN|报名秒杀_Deals
+AN|建设页面_品牌旗舰店
+AN|监控_广告投放异常
+AN|抓取_关键词广告位置
+AN|监控_关键词搜索排名
+AN|生成_广告周报
+AN|加入_新品捡漏广告
+AN|管理_广告规则自动化
+AN|执行_广告否定暂停
+@业务报告
+CF|业务报告_SalesAndTrafficByDate销售流量日报|/basicOpen/report/create/reportExportTask /bd/productPerformance/openApi/asinList
+CF|业务报告_DetailPageSalesByASIN详情页销售流量|/basicOpen/report/create/reportExportTask /bd/productPerformance/openApi/asinList
+CP|业务报告_SQP搜索词表现报告|/pb/openapi/newad/abaReport
+CN|业务报告_CustomAnalytics自定义分析导出
+CP|业务报告_SKUEconomics经济核算报表|/bd/profit/statistics/open/msku/list
+CP|业务报告_逐ASIN页面浏览量|/bd/productPerformance/openApi/asinList
+AQ|创建导出报告_业务报告|/basicOpen/report/create/reportExportTask
+@财务
+CF|财务_结算FlatFileV2|/bd/sp/api/open/settlement/export/url/get /bd/sp/api/open/settlement/summary/list /bd/sp/api/open/settlement/transaction/detail/list
+CP|财务_TransactionView交易视图|/bd/sp/api/open/settlement/transaction/detail/list /basicOpen/finance/profitReport/order/transcation/list
+CP|财务_日期区间交易报表|/bd/sp/api/open/settlement/transaction/detail/list /basicOpen/report/create/reportExportTask
+CQ|财务_日期区间汇总报表PDF
+CQ|财务_延期交易报表
+CN|财务_卖家费用发票CSV
+CP|财务_余额与准备金|/bd/sp/api/open/settlement/summary/list
+CP|财务_打款与预期打款|/bd/sp/api/open/settlement/summary/list
+CF|财务_逐SKU佣金预估|/basicOpen/report/create/reportExportTask
+CQ|财务_仅肉眼旧结算重取
+CQ|财务_仅肉眼放款Lending
+AF|创建费用单_其他费用|/bd/fee/management/open/feeManagement/otherFee/create
+AF|重算利润报表_财务|/bd/profit/report/open/report/settle/compute/manual
+AN|采集_多账号月结资料
+AN|对账_平台ERP资金流水
+AN|核销_应收应付
+AN|导入_财务凭证
+AN|处理_多来源财务报表
+AN|截图_结算一览存证
+@税务
+CF|税务_VAT交易报表AVTR|/basicOpen/report/create/reportExportTask
+CF|税务_VAT计算报表|/basicOpen/report/create/reportExportTask
+CN|税务_VAT发票数据报表
+CN|税务_AmazonVAT发票PDF
+CN|税务_仅肉眼税务文件库
+AN|配置税务_TaxSettings
+AN|整理_VAT申报资料
+@绩效
+CP|绩效_Feedback评价报告负面中性|/erp/sc/cs/feedback/listMws
+CP|绩效_买家之声VoC下载|/basicOpen/customerService/voiceOfBuyer/list /basicOpen/salesAnalysis/returnOrder/analysisLists
+CQ|绩效_仅肉眼账户健康逐条违规
+CN|绩效_仅肉眼监管合规页
+CF|绩效_绩效通知收件箱|/basicOpen/customerService/performanceNotice/list
+CQ|绩效_逐ASIN评论主题
+CN|绩效_仅肉眼后台设置页
+AN|申诉_账号健康
+AN|上传合规文件_法规合规
+AN|配置权限_子账号
+AN|设置通知_偏好路由
+AN|授权应用_第三方应用
+AN|删除_Feedback差评
+AN|巡检_店铺绩效
+@退货赔偿
+CF|退货赔偿_FBA客户退货报表|/erp/sc/data/mws_report/refundOrders
+CP|退货赔偿_FBM自发货退货报表|/erp/sc/routing/data/order/fbmReturnOrderList
+CF|退货赔偿_FBA赔偿报表|/basicOpen/openapi/mwsReport/reimbursementList
+CF|退货赔偿_FBA换货订单报表|/erp/sc/routing/data/order/fbaExchangeOrderList
+CQ|退货赔偿_仅肉眼AtoZ索赔管理页
+CQ|退货赔偿_仅肉眼信用卡拒付管理页
+CQ|退货赔偿_仅肉眼SAFET索赔管理页
+AF|创建退款_销售订单|/basicOpen/openapi/salesOrder/refundOrder
+AN|提交索赔回诉_SAFE-T
+AN|申诉索赔_AtoZ
+AN|申诉拒付_信用卡拒付
+AN|索赔_FBA丢货
+AN|申诉_SKU重测赔偿
+@客服
+CQ|客服_仅肉眼买家消息页
+CN|客服_卖家支持工单
+AQ|创建售后工单_客服|/basicOpen/customerService/workOrder/add
+AN|回复买家消息_站内信
+AN|创建工单_卖家支持
+AN|邀评_售后评论请求
+</script>
+<script>
+'use strict';
+const byId = id => document.getElementById(id);
+const domains = [
+  ['订单与供应链', ['订单', '库存', '仓库', 'FBA', '发货', '物流', '采购', '多平台']],
+  ['商品与增长', ['产品Listing', '广告', '业务报告']],
+  ['财务与合规', ['财务', '税务', '绩效']],
+  ['售后与客户', ['退货赔偿', '客服']]
+];
+const status = {
+  F: {tone:'full', label:'完整', legend:'完整 · 接口'},
+  P: {tone:'part', label:'不完整', legend:'不完整 · 接口'},
+  Q: {tone:'rp', label:'不完整', legend:'不完整 · RPA'},
+  N: {tone:'none', label:'无接口', legend:'无接口 · RPA'}
+};
+const kindLabels = {C:'数据采集', A:'业务动作'};
+const moduleBriefs = new Map([
+  ['订单', ['完整动作覆盖多渠道建单、提交标发、导入面单、更新备注和 VC 确认发货。全量与自发货订单报表有部分接口。', '归档订单、待处理与未发货订单报表、受限或全量 XML 报表。']],
+  ['库存', ['FBA 实时库存、AWD 库存、预留库存和库存分类账汇总有完整接口。仓储费、多国库存及库存分类账明细有部分接口。', '补货建议、滞留库存批处理、FBA 容量限制与容量管理、库存绩效指数及需求预测。']],
+  ['仓库', ['完整覆盖本地仓出入库、调拨、数量调整、采购收货，以及海外仓备货发货、SKU 配对和装箱任务。', '本地仓盘点。现有接口可录入盘点结果，发起在途盘点流程仍有缺口。']],
+  ['FBA', ['完整覆盖发货计划和发货单、STA 建单、装箱、配送服务、上传跟踪号和 AWD 入库。', '创建 FBA 移除订单的超出接口范围部分、库容扩容和发货贴标匹配。']],
+  ['发货', ['MCF 多渠道配送查询、销售出库单截单有完整接口。FBA 发货明细有部分接口。', 'EasyShip 配送单据、揽收状态和 FBA 海关申报 PDF。']],
+  ['物流', ['物流追踪、自发货订单列表、运单号回填、头程物流渠道维护和 FBM 物流账单确认有完整接口。', '发货尾单报表和 POD 回传。']],
+  ['采购', ['采购计划、采购单、采购退货单、供应商维护均标为完整接口。', '源表收录的 4 条采购动作均以接口实现。']],
+  ['多平台', ['多平台直挂建单、快速出库、审核发货、商品配对、平台仓发货与 Temu 地址解密有完整接口。', '多平台 Listing 改库存标为 RPA 执行，现有接口覆盖部分平台，具体人工环节见明细。']],
+  ['产品Listing', ['商品刊登上传、批量改价、FBM 库存修改、本地产品新增及配对有完整接口。全量 Listing、在售与停售报表及类目树有部分接口。', 'Listing 压制与质量报表、竞品监控、类目解限、自动调价、合规质检和 GPSR 提交等。']],
+  ['广告', ['SP 创建与修改广告活动、创建广告、添加关键词和归档否定投放有完整接口。SP、SB、SD 和 DSP 多数采集报表标为部分接口。', '无效流量、归因和发票报表，Bulksheets 批量操作表，以及促销、优惠券、A/B 测试、监控和周报等动作。']],
+  ['业务报告', ['销售流量日报与详情页流量有完整接口；SQP、SKU 经济核算和逐 ASIN 页面浏览量有部分接口。', '自定义分析导出，以及领星导出任务未覆盖的报表类型。']],
+  ['财务', ['结算 FlatFile、逐 SKU 佣金预估、创建费用单和重算利润有完整接口。交易、余额和打款查询有部分接口。', '日期区间汇总 PDF、延期交易和费用发票采集，以及多账号月结、对账、核销、凭证、报表处理和存证。']],
+  ['税务', ['VAT 交易报表与 VAT 计算报表有完整接口。', 'VAT 发票数据及 PDF、税务文件库、税务设置和 VAT 申报资料整理。']],
+  ['绩效', ['绩效通知收件箱有完整接口，Feedback 评价和买家之声有部分接口。', '账户健康与监管合规采集，以及健康申诉、文件提交、子账号配置、应用授权、差评处理和巡检。']],
+  ['退货赔偿', ['FBA 退货、赔偿和换货报表，以及销售订单退款有完整接口。FBM 自发货退货报表有部分接口。', 'SAFE-T、A-to-Z 和信用卡拒付的后台采集及申诉，另有 FBA 丢货索赔、SKU 重测申诉。']],
+  ['客服', ['创建售后工单与买家消息页有部分接口，源表未列出完整接口场景。', '买家消息采集和回复、卖家支持工单采集和创建、邀评及超出接口范围的售后工单。']]
+]);
+const notes = new Map(Object.entries({
+  '订单_UnshippedOrders未发货订单报表':'领星订单列表可按未发货状态部分替代，缺买家联系方式与完整地址。',
+  '广告_SP广告活动报表':'可按日拉取投放数据，缺预算规则、Kindle 阅读等少数列。',
+  '创建移除订单_FBA库存':'接口覆盖退回和弃置，清算变现需要另走流程。',
+  '创建盘点单_本地仓':'接口可录入已盘完的结果，发起在途盘点流程仍有缺口。',
+  '创建导出报告_业务报告':'接口仅支持清单内报表，品牌分析、待处理订单等不在清单内。',
+  '修改库存_多平台Listing':'说明列出的支持范围为 Temu、TikTok、Shein、沃尔玛，其他平台仍需人工处理。',
+  '创建售后工单_客服':'接口仅支持仅退货类型，换货、维修等类型仍需线下处理。'
+}));
+
+function parseInventory(raw) {
+  const modules = new Map();
+  let current;
+  for (const line of raw.trim().split(/\r?\n/)) {
+    if (line.startsWith('@')) {
+      current = line.slice(1);
+      modules.set(current, []);
+      continue;
+    }
+    const [code, title, paths = ''] = line.split('|');
+    modules.get(current).push({
+      module: current, kind: code[0], state: code[1], title,
+      paths: paths ? paths.split(' ') : [],
+      note: notes.get(title) || ''
+    });
+  }
+  return modules;
+}
+const modules = parseInventory(byId('inventory').textContent);
+const records = [...modules.values()].flat();
+const states = Object.keys(status);
+const usesRpa = record => record.state === 'Q' || record.state === 'N';
+const percentage = (part, total) => total ? (100 * part / total).toFixed(1) + '%' : '—';
+const displayModule = name => name === '产品Listing' ? '产品 Listing' : name;
+const ui = {module:byId('module'), kind:byId('kind'), state:byId('state'), keyword:byId('keyword')};
+
+function node(tag, className, content) {
+  const element = document.createElement(tag);
+  if (className) element.className = className;
+  if (content !== undefined) element.textContent = content;
+  return element;
+}
+
+function summary(rows) {
+  const totals = {F:0, P:0, Q:0, N:0, C:0, A:0};
+  for (const row of rows) {
+    totals[row.state]++;
+    totals[row.kind]++;
+  }
+  return totals;
+}
+
+function renderFacts() {
+  const s = summary(records);
+  const cards = [
+    ['业务模块', modules.size, records.length + ' 条场景 · ' + s.C + ' 采集 / ' + s.A + ' 动作'],
+    ['完整接口场景', s.F, '占全部场景 ' + percentage(s.F, records.length)],
+    ['部分接口场景', s.P + s.Q, s.P + ' 条走接口 · ' + s.Q + ' 条走 RPA'],
+    ['RPA 场景', s.Q + s.N, s.N + ' 条无接口 · 占全部 ' + percentage(s.Q + s.N, records.length)]
+  ];
+  for (const [title, count, detail] of cards) {
+    const card = node('div', 'fact');
+    const value = node('dd', '', count);
+    value.append(node('small', '', detail));
+    card.append(node('dt', '', title), value);
+    byId('facts').append(card);
+  }
+  for (const key of states) {
+    const entry = node('span');
+    entry.append(node('i', 'dot ' + status[key].tone), status[key].legend);
+    byId('legend').append(entry);
+  }
+}
+
+function matrixRow(title, rows, total = false) {
+  const s = summary(rows);
+  const tr = node('tr');
+  const heading = node('th', '', total ? title : undefined);
+  heading.scope = 'row';
+  if (!total) {
+    const link = node('a', 'module-link', displayModule(title));
+    link.href = '#details';
+    link.addEventListener('click', () => {
+      resetFilters();
+      ui.module.value = title;
+      renderRecords();
+    });
+    const segments = node('div', 'bar');
+    segments.setAttribute('aria-hidden', 'true');
+    for (const key of states) {
+      if (!s[key]) continue;
+      const segment = node('span', status[key].tone);
+      segment.style.flexGrow = String(s[key]);
+      segment.title = status[key].legend + ' ' + s[key] + ' 条';
+      segments.append(segment);
+    }
+    heading.append(link, segments);
+  }
+  tr.append(heading, node('td', '', s.C + ' / ' + s.A));
+  for (const key of states) tr.append(node('td', '', s[key]));
+  tr.append(node('td', 'rate', (s.Q + s.N) + ' / ' + rows.length + ' · ' + percentage(s.Q + s.N, rows.length)));
+  return tr;
+}
+
+function renderMatrix() {
+  for (const [domain, names] of domains) {
+    const row = node('tr', 'domain');
+    const cell = node('th', '', domain);
+    cell.colSpan = 7;
+    row.append(cell);
+    byId('matrix-body').append(row);
+    const options = node('optgroup');
+    options.label = domain;
+    for (const name of names) {
+      byId('matrix-body').append(matrixRow(name, modules.get(name)));
+      const option = node('option', '', displayModule(name));
+      option.value = name;
+      options.append(option);
+    }
+    ui.module.append(options);
+  }
+  byId('matrix-foot').append(matrixRow('合计', records, true));
+}
+
+function matchesState(record, selection) {
+  if (!selection) return true;
+  if (selection === 'R') return usesRpa(record);
+  if (selection === 'I') return !usesRpa(record);
+  return record.state === selection;
+}
+
+function detailRow(record) {
+  const tr = node('tr');
+  const title = node('td', '', record.title);
+  if (record.note) title.append(node('small', 'note', record.note));
+  const badge = node('td');
+  const state = status[record.state];
+  badge.append(node('span', 'badge ' + state.tone, state.label));
+  const implementation = usesRpa(record) ? (record.kind === 'C' ? 'RPA 采集' : 'RPA 执行') : '领星接口';
+  const paths = node('td');
+  if (record.paths.length) {
+    const list = node('div', 'path-list');
+    for (const path of record.paths) list.append(node('code', '', path));
+    paths.append(list);
+  } else {
+    paths.append(node('span', 'muted', '—'));
+  }
+  tr.append(node('td', '', displayModule(record.module)), node('td', '', kindLabels[record.kind]), title,
+    badge, node('td', '', implementation), paths);
+  return tr;
+}
+
+function renderRecords() {
+  renderModuleBrief();
+  const tokens = ui.keyword.value.toLowerCase().trim().split(/\s+/).filter(Boolean);
+  const rows = records.filter(record => {
+    if (ui.module.value && ui.module.value !== record.module) return false;
+    if (ui.kind.value && ui.kind.value !== record.kind) return false;
+    if (!matchesState(record, ui.state.value)) return false;
+    const searchable = [record.module, record.title, record.note, ...record.paths].join(' ').toLowerCase();
+    return tokens.every(token => searchable.includes(token));
+  });
+  const body = byId('detail-body');
+  const fragment = document.createDocumentFragment();
+  for (const row of rows) fragment.append(detailRow(row));
+  if (!rows.length) {
+    const tr = node('tr');
+    const td = node('td', 'muted', '没有符合当前筛选条件的场景。');
+    td.colSpan = 6;
+    tr.append(td);
+    fragment.append(tr);
+  }
+  body.replaceChildren(fragment);
+  const countRpa = rows.filter(usesRpa).length;
+  byId('result-count').textContent = '显示 ' + rows.length + ' / ' + records.length + ' 条 · 接口实现 ' +
+    (rows.length - countRpa) + ' 条 · RPA ' + countRpa + ' 条';
+}
+
+function renderModuleBrief() {
+  const brief = byId('module-brief');
+  const moduleName = ui.module.value;
+  brief.hidden = !moduleName;
+  if (!moduleName) {
+    brief.replaceChildren();
+    return;
+  }
+  const [api, rpa] = moduleBriefs.get(moduleName);
+  const {F, P, Q, N} = summary(modules.get(moduleName));
+  brief.replaceChildren(
+    node('h3', '', displayModule(moduleName) + ' · ' + (F + P + Q) + ' 条有接口（含部分） · ' + (Q + N) + ' 条标为 RPA'),
+    node('p', '', '接口覆盖　' + api),
+    node('p', '', 'RPA 环节　' + rpa)
+  );
+}
+
+function resetFilters() {
+  for (const input of Object.values(ui)) input.value = '';
+}
+
+for (const input of Object.values(ui)) input.addEventListener('input', renderRecords);
+byId('reset').addEventListener('click', () => {
+  resetFilters();
+  renderRecords();
+});
+for (const shortcut of document.querySelectorAll('[data-state]')) {
+  shortcut.addEventListener('click', () => {
+    ui.state.value = shortcut.dataset.state;
+    renderRecords();
+  });
+}
+renderFacts();
+renderMatrix();
+renderRecords();
+</script>
+</body>
+</html>

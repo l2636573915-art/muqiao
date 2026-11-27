@@ -1,0 +1,752 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>亚马逊跨境入门练习</title>
+<style>
+:root{color-scheme:light;--ink:#142c34;--muted:#4c626a;--line:#ccdadd;--paper:#fff;--bg:#eff5f5;--accent:#006452;--deep:#102f36;--wash:#e1f3ec;--warn:#852c18;--warm:#fff0e8}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{margin:0;background:var(--bg);color:var(--ink);font:1rem/1.65 system-ui,"Microsoft YaHei",sans-serif}
+button,textarea{font:inherit}
+button,a,textarea,input{touch-action:manipulation}
+a{color:#005b55;text-underline-offset:.2em}
+:focus-visible{outline:3px solid #006bb3;outline-offset:3px}
+button{cursor:pointer;color:var(--ink);border:1px solid var(--line);background:var(--paper);border-radius:8px;padding:.55rem .85rem;min-height:44px}
+button:hover:enabled{border-color:var(--accent);background:var(--wash)}
+button:disabled{opacity:.55;cursor:default}
+button.primary{background:var(--accent);color:#fff;border-color:var(--accent);font-weight:700}
+button.primary:hover:enabled{background:#004d40;color:#fff}
+h1,h2,h3,p{margin:0}
+header{background:var(--deep);color:white;padding:2rem max(1rem,calc((100vw - 1160px)/2))}
+header h1{font-size:clamp(1.55rem,4vw,2.35rem);line-height:1.3;margin-bottom:.45rem}
+header p{color:#d5eeea}
+.shell{display:grid;grid-template-columns:252px minmax(0,1fr);gap:1.25rem;max-width:1192px;margin:0 auto;padding:1.25rem 1rem 2rem;align-items:start}
+.rail,.panel{background:var(--paper);border:1px solid var(--line);border-radius:14px}
+.rail{padding:1rem}
+.rail summary{cursor:pointer;font-weight:750;min-height:38px}
+nav{display:grid;gap:5px}
+nav button{display:grid;grid-template-columns:1.65rem 1fr auto;gap:.35rem;text-align:left;align-items:center;padding:.4rem .48rem;border-color:transparent}
+nav button[aria-current=true]{background:var(--wash);border-color:#94c7b7;color:#00493c;font-weight:750}
+.count,.muted{color:var(--muted);font-size:.9rem}
+main{display:grid;gap:.85rem;min-width:0}
+.view{display:grid;gap:.85rem;min-width:0}
+.mode-switch{display:flex;gap:.45rem;flex-wrap:wrap;margin-top:1rem}
+.mode-switch button{background:#203f46;color:#fff;border-color:#668087}
+.mode-switch button[aria-pressed=true],.mode-switch button:hover{background:#e1f3ec;color:#00493c;border-color:#e1f3ec}
+.lesson-rail p,.rail-note{margin-top:.6rem}
+#lesson-menu button{grid-template-columns:1.65rem 1fr}
+.lesson{display:grid;gap:.95rem}
+.lesson h2{font-size:clamp(1.35rem,3vw,1.85rem);line-height:1.35}
+.lesson h3{font-size:1.11rem;margin-bottom:.35rem}
+.lesson ul,.lesson ol{margin:.25rem 0 0;padding-left:1.4rem}
+.lesson li+li{margin-top:.32rem}
+.lesson .scenario{background:#eaf5f1;border:1px solid #bfddd2;border-radius:10px;padding:clamp(.8rem,2vw,1.15rem)}
+.scenario p+p{margin-top:.6rem}
+.lesson .takeaway{border-left:3px solid var(--accent);padding-left:.8rem}
+.lesson .reading{padding-top:.8rem;border-top:1px solid var(--line)}
+.lesson .reading a{display:inline-block;margin-right:.75rem}
+.lesson-actions{border-top:1px solid var(--line);padding-top:.85rem}
+.lesson-actions .toolbar{margin-top:.45rem}
+.lesson-pages{margin-top:0}
+.learning-check{background:#f5f8fb;border-radius:8px;padding:.65rem .8rem}
+.learning-check summary{cursor:pointer;font-weight:650}
+.learning-check p{margin-top:.4rem}
+.panel{padding:clamp(1rem,3vw,1.55rem)}
+.top,.toolbar,.controls,.questions{display:flex;align-items:center;flex-wrap:wrap;gap:.5rem .75rem}
+.top,.controls{justify-content:space-between}
+.module-title{font-size:1.5rem;line-height:1.3;margin:.2rem 0 .45rem}
+.module-description{margin:.45rem 0 .25rem}
+.questions{margin:1rem 0 0;gap:.35rem}
+.questions button{padding:.2rem .25rem;min-width:44px;font-variant-numeric:tabular-nums}
+.questions [aria-current=true]{border:2px solid var(--accent);font-weight:750}
+.questions [data-mark=correct]{background:var(--wash)}
+.questions [data-mark=incorrect]{background:var(--warm)}
+.questions [data-mark=written]{background:#e4edf8}
+.progress-box{margin-top:1rem}
+progress{width:100%;height:.65rem;accent-color:var(--accent);display:block;margin-top:.4rem}
+.question-title{font-size:clamp(1.16rem,2.4vw,1.46rem);line-height:1.5;margin:.35rem 0 .85rem;overflow-wrap:anywhere}
+fieldset{margin:0;padding:0;border:0;display:grid;gap:.55rem}
+#options{display:grid;gap:.55rem}
+legend{padding:0;margin:0 0 .4rem;color:var(--muted)}
+.option{padding:.65rem .8rem;border:1px solid var(--line);border-radius:8px;display:flex;align-items:flex-start;gap:.55rem;cursor:pointer}
+.option:has(input:checked){border-color:#399881;background:var(--wash)}
+.option input{accent-color:var(--accent);flex:none;margin:.34rem 0 0;width:1rem;height:1rem}
+textarea{width:100%;min-height:128px;border:1px solid #8fa8ae;border-radius:8px;padding:.65rem .75rem;margin-top:.4rem;resize:vertical;color:var(--ink)}
+.submit{margin-top:.8rem}
+.feedback{margin-top:.8rem;border-radius:8px;background:var(--wash);padding:.8rem .95rem;overflow-wrap:anywhere}
+.feedback[data-state=incorrect]{background:var(--warm);color:var(--warn)}
+.feedback[data-state=written]{background:#e9f0f9}
+.feedback p+p{margin-top:.3rem}
+.controls{margin-top:1.1rem;border-top:1px solid var(--line);padding-top:.85rem}
+.export h2{font-size:1.16rem;margin-bottom:.35rem}
+.export .toolbar,.export .muted{margin-top:.45rem}
+.error{color:var(--warn);margin-top:.4rem}
+details.reference{margin-top:.5rem}
+details.reference summary{cursor:pointer}
+footer{padding:.35rem .2rem}
+@media(max-width:690px){header{padding:1.25rem 1rem}.shell{grid-template-columns:1fr;gap:.75rem;padding-top:.75rem}.rail{padding:.65rem .85rem}nav{grid-template-columns:repeat(auto-fit,minmax(155px,1fr))}}
+</style>
+</head>
+<body>
+<header>
+  <h1>亚马逊跨境入门练习</h1>
+  <p>跟着一款桌面理线夹，从理解卖家的日常决策到完成业务练习。</p>
+  <div class="mode-switch" role="group" aria-label="学习与练习">
+    <button type="button" id="show-learning" aria-controls="learning-view" aria-pressed="true">学习板块 · 7 课</button>
+    <button type="button" id="show-practice" aria-controls="practice-view" aria-pressed="false">业务练习 · 110 题</button>
+  </div>
+</header>
+<div class="shell">
+  <aside class="rail lesson-rail" id="learning-rail">
+    <details open id="lesson-directory"><summary>学习目录</summary><nav id="lesson-menu" aria-label="选择学习板块"></nav></details>
+    <p class="muted">第一次学可以按顺序看。每课末尾都有一个自测和对应练习。</p>
+  </aside>
+  <aside class="rail" id="practice-rail" hidden>
+    <details open id="directory"><summary>业务路线</summary><nav id="modules" aria-label="选择练习模块"></nav></details>
+    <p class="muted rail-note">实际开售前，FBA 商品通常要先备货入仓并确认可售。</p>
+  </aside>
+  <main>
+    <noscript>请使用启用了 JavaScript 的浏览器打开本文件。</noscript>
+    <div class="view" id="learning-view">
+      <article class="panel lesson" aria-labelledby="lesson-1" data-lesson>
+        <h2 id="lesson-1" tabindex="-1">1. 快速上手领星</h2>
+        <p>ERP 是帮卖家集中处理经营数据的管理系统。你可以把亚马逊卖家后台理解为平台上的业务记录，把 ERP 理解为一个能把多个记录放在一起看、还能结合采购和物流成本的工作台。</p>
+        <section class="scenario">
+          <h3>业务场景 · 为什么店铺授权后，利润仍然不完整？</h3>
+          <p>你卖黑色 10 件装理线夹。授权店铺后，销售订单已同步，但广告花费还没出现，采购和头程成本也没录入。此时团队打开利润报表，发现利润看起来比预期高。</p>
+          <ol>
+            <li>先核对店铺、站点、日期范围和同步进度，抽查一笔订单是否与卖家后台一致。</li>
+            <li>按业务需要核对广告授权和可用的广告数据。邮箱授权通常用于同步相关邮箱数据，按客服流程决定是否需要。</li>
+            <li>按 SKU 补齐采购和头程等成本，再检查利润表纳入了哪些费用。遇到空白字段时，要分清数据没接入还是实际为零。</li>
+          </ol>
+        </section>
+        <p class="takeaway"><strong>读报表前先确认：</strong>数据从哪里来、同步到什么时间、有没有加入卖家自己的成本。</p>
+        <details class="learning-check"><summary>自测 · 今天刚授权，订单列表为空，先查什么？</summary><p>先查店铺授权、同步状态、筛选范围和权限，再到卖家后台用一笔订单交叉核验。</p></details>
+        <p class="reading muted">领星参考 <a href="https://www.lingxing.com/help/article/1minuseLX" target="_blank" rel="noopener noreferrer">3 步快速上手领星</a></p>
+        <div class="lesson-actions"><h3>对应练习</h3><div class="toolbar"><button type="button" data-practice="2">获得订单</button><button type="button" data-practice="9">利润核算</button></div></div>
+      </article>
+      <article class="panel lesson" aria-labelledby="lesson-2" data-lesson hidden>
+        <h2 id="lesson-2" tabindex="-1">2. 产品与销售</h2>
+        <p>选品要先验证谁会买、需要解决什么、愿意付多少钱。产品定下来后，商品资料、买家看到的页面和订单里记录的规格才能对得上。</p>
+        <section class="scenario">
+          <h3>业务场景 · 同款理线夹有黑白两个颜色，怎么上架和处理订单？</h3>
+          <p>竞品评论反复提到“线太粗放不进去”。你实测后确认理线夹适合 3–5 毫米线材，决定推出黑色和白色两个 10 件装，并在页面注明适用线径。</p>
+          <ul>
+            <li><strong>SKU</strong> 是卖家自己的商品编码，可用 CLIP-BK-10 和 CLIP-WH-10 分开管库存。订单也用对应编码识别卖出了哪款。</li>
+            <li><strong>ASIN</strong> 是亚马逊目录编号。若类目允许颜色变体，黑白两款可组成同一变体系列，各自对应可购买的子款。</li>
+            <li><strong>Listing</strong> 是商品刊登。买家会在详情页看图、选颜色和下单。后台提交成功后，切换黑白两款，逐一检查图片、价格、库存及购买入口。</li>
+          </ul>
+        </section>
+        <p class="takeaway"><strong>交接给运营：</strong>每款的 SKU、颜色、件数、准确规格、实物图和可用范围。订单产生后可按 SKU 追溯页面与实物。</p>
+        <details class="learning-check"><summary>自测 · 白色款页面能看到，买家却下不了单，你先看哪三样？</summary><p>检查白色款报价是否生效、是否有可售库存、是否有配送或刊登限制。</p></details>
+        <p class="reading muted">领星参考 <a href="https://www.lingxing.com/help/article/productManage" target="_blank" rel="noopener noreferrer">产品管理</a><a href="https://www.lingxing.com/help/article/listing1" target="_blank" rel="noopener noreferrer">Listing</a><a href="https://www.lingxing.com/help/article/OrderMmanagement" target="_blank" rel="noopener noreferrer">订单管理</a></p>
+        <div class="lesson-actions"><h3>对应练习</h3><div class="toolbar"><button type="button" data-practice="0">选品与产品</button><button type="button" data-practice="1">创建 Listing</button><button type="button" data-practice="2">获得订单</button></div></div>
+      </article>
+      <article class="panel lesson" aria-labelledby="lesson-3" data-lesson hidden>
+        <h2 id="lesson-3" tabindex="-1">3. 采购、仓库与物流</h2>
+        <p>采购单记录你向工厂订了什么。仓库收货记录实物到了多少、多少合格。头程物流记录整批货如何运到海外仓或亚马逊仓。走 FBA 时，亚马逊会再根据买家订单拣货和派送。</p>
+        <section class="scenario">
+          <h3>业务场景 · 订了 300 套，为什么暂时只有 270 套可卖？</h3>
+          <ol>
+            <li>采购单是 300 套。国内仓实际收了 300 套，其中 10 套包装破损被隔离，290 套验收合格并发运。</li>
+            <li>货代显示已签收，亚马逊接收了 290 套，其中 270 套当前可售，另 20 套仍在处理中。</li>
+            <li>这时候用 270 套安排销售。对国内仓的 10 套跟进返工，对亚马逊待处理的 20 套查库存状态和预计转可售日期。</li>
+          </ol>
+        </section>
+        <p class="takeaway"><strong>定位差异要用对应的单据：</strong>采购单看订购，收货单看验收，运单看物流，货件和库存报告看入仓及可售。SKU、批次和货件编号帮助你串起来。</p>
+        <details class="learning-check"><summary>自测 · 物流已签收，能按发出数量直接开广告吗？</summary><p>先以目标 SKU 当下可售量和预计销量评估能承接多少订单，再核对还有多少正在接收或处理。</p></details>
+        <p class="reading muted">领星参考 <a href="https://www.lingxing.com/help/article/gongyinglianguanli" target="_blank" rel="noopener noreferrer">供应链管理</a><a href="https://www.lingxing.com/help/article/Firstleglogistics" target="_blank" rel="noopener noreferrer">头程物流单</a><a href="https://www.lingxing.com/help/article/fbaShippingProcess" target="_blank" rel="noopener noreferrer">FBA 发货流程</a></p>
+        <div class="lesson-actions"><h3>对应练习</h3><div class="toolbar"><button type="button" data-practice="3">采购备货</button><button type="button" data-practice="4">头程运输</button><button type="button" data-practice="5">FBA 入仓</button></div></div>
+      </article>
+      <article class="panel lesson" aria-labelledby="lesson-4" data-lesson hidden>
+        <h2 id="lesson-4" tabindex="-1">4. 补货策略</h2>
+        <p>补货要同时回答两个问题：现在的货能卖到哪天？新货在什么时候能卖？采购、运输、清关和入仓都会占用时间，促销和断货也会影响历史销量。</p>
+        <section class="scenario">
+          <h3>业务场景 · 每天卖 8 套，眼下库存只有 80 套</h3>
+          <p>80 套能覆盖约 10 天。有一批 60 套在途，预计第 14 天才可售。所以第 11 到 13 天预计有约 3 天缺口，即约 24 套需求。就算把这批货计入后续补货计划，当下的断货风险仍要单独看。</p>
+          <p>假设从下采购单到可售要 20 天，希望额外留 5 天缓冲，按日销 8 套估算，本轮目标覆盖量是 8 ×（20＋5）＝200 套。扣去当前可售 80 套、有效在途 60 套，粗算还差 60 套。你可以另外评估能否把一小批提前送到，覆盖第 14 天之前的空档。</p>
+        </section>
+        <p class="takeaway"><strong>补货表至少要有：</strong>预计日销、当前可售、在途数量、预计可售日期、供货周期、安全库存与起订量。同一批货在多个列表出现时按货件去重。</p>
+        <details class="learning-check"><summary>自测 · 大促期间日销翻倍，平时备货要按哪个数字估？</summary><p>用正常有货时的日销作为基线，给确认会发生的促销单独设预计增量和备货窗口。</p></details>
+        <p class="reading muted">领星参考 <a href="https://www.lingxing.com/help/article/buhuocelue" target="_blank" rel="noopener noreferrer">如何制定科学的补货策略</a><a href="https://www.lingxing.com/help/article/replenishmentAadvice" target="_blank" rel="noopener noreferrer">补货建议详解</a></p>
+        <div class="lesson-actions"><h3>对应练习</h3><div class="toolbar"><button type="button" data-practice="10">根据销量再次补货</button><button type="button" data-practice="5">FBA 入仓</button></div></div>
+      </article>
+      <article class="panel lesson" aria-labelledby="lesson-5" data-lesson hidden>
+        <h2 id="lesson-5" tabindex="-1">5. 广告与运营</h2>
+        <p>广告帮买家发现商品。SP 是商品推广，常用来为具体商品获取流量。SB 是品牌推广，SD 是展示型推广。广告类型的适用条件和展示位置按目标站点核对。</p>
+        <section class="scenario">
+          <h3>业务场景 · 广告有人点，为什么没赚到钱？</h3>
+          <p>理线夹一周获得 2,000 次曝光、40 次点击、4 笔广告归因订单，总广告花费 $24。假设每单都卖一套，价格 $16，广告归因销售额是 $64。</p>
+          <ul>
+            <li>点击率是 40 ÷ 2,000＝2%，反映看到广告后有多少次点击。</li>
+            <li>按本例简化，广告订单转化率是 4 ÷ 40＝10%，用来看点击后有多少归因订单。</li>
+            <li>ACOS 是广告花费 ÷ 广告归因销售额，本例为 $24 ÷ $64＝37.5%。如果每套在计广告前只剩 $5，四套贡献 $20，覆盖不了 $24 的广告花费。</li>
+          </ul>
+        </section>
+        <p class="takeaway"><strong>先定位漏斗在哪一步变差：</strong>很少点击时看流量相关性与主图、标题。有人点却很少买时，看价格、可售、配送、页面和搜索意图，再选择一项调整并复查。</p>
+        <details class="learning-check"><summary>自测 · 广告无归因销售，有 $10 花费，ACOS 填多少？</summary><p>分母为零，记为无法计算。结合搜索词、点击和归因数据是否已经齐全，决定下一步。</p></details>
+        <p class="reading muted">领星参考 <a href="https://www.lingxing.com/help/article/guanggao" target="_blank" rel="noopener noreferrer">如何快速高效地投放广告</a><a href="https://www.lingxing.com/help/article/Dashboard" target="_blank" rel="noopener noreferrer">广告仪表盘</a></p>
+        <div class="lesson-actions"><h3>对应练习</h3><div class="toolbar"><button type="button" data-practice="6">销售与广告</button><button type="button" data-practice="1">创建 Listing</button></div></div>
+      </article>
+      <article class="panel lesson" aria-labelledby="lesson-6" data-lesson hidden>
+        <h2 id="lesson-6" tabindex="-1">6. 亚马逊回款与对账</h2>
+        <p>买家付款后，卖家还要跟踪履约、平台结算、平台转账和收款账户入账。一笔转账可汇集多笔订单，期间也可能有费用、退款、暂留和调整。</p>
+        <section class="scenario">
+          <h3>业务场景 · 本期卖了 $800，为什么收款账户只有 $527 入账？</h3>
+          <ol>
+            <li>在交易明细确认本期销售 $800，平台及履约费用 $200，客户退款 $40，简化交易净额为 $560。</li>
+            <li>在结算汇总确认本期暂留 $30。假设没有期初余额及其他调整，平台转出 $530。</li>
+            <li>在收款账户以转账标识匹配 $527 入账。如果流水显示收款服务费 $3，三段数字就对上了。</li>
+          </ol>
+        </section>
+        <p class="takeaway"><strong>查一笔订单看交易明细，查整期看结算汇总，查到账看收款流水。</strong>先统一店铺、币种和时间范围，再解释差额。</p>
+        <details class="learning-check"><summary>自测 · 平台显示已转账，账户还没有到账，下一步是什么？</summary><p>记录转账标识、账户、金额、币种与日期，对照收款工具的处理时间和入账状态。超过正常处理时效再按渠道追踪。</p></details>
+        <p class="reading muted">领星参考 <a href="https://www.lingxing.com/help/article/jiesuanzhongxin" target="_blank" rel="noopener noreferrer">如何算清亚马逊回款</a><a href="https://www.lingxing.com/help/article/SettlementCenter" target="_blank" rel="noopener noreferrer">亚马逊结算中心</a></p>
+        <div class="lesson-actions"><h3>对应练习</h3><div class="toolbar"><button type="button" data-practice="8">亚马逊结算</button><button type="button" data-practice="7">客服与退货</button></div></div>
+      </article>
+      <article class="panel lesson" aria-labelledby="lesson-7" data-lesson hidden>
+        <h2 id="lesson-7" tabindex="-1">7. 财务、统计与 BI</h2>
+        <p>财务回答卖一件能剩多少钱、钱何时回来。统计让你看每天卖了多少、哪些规格变化最大。BI（商业智能）把销量、广告、库存和利润放在一起看，帮你决定是否调整价格、补货或投放。</p>
+        <section class="scenario">
+          <h3>业务场景 · 销量从 40 套涨到 50 套，为什么利润少了？</h3>
+          <p>两周售价都为 $16，假设每套采购、头程、平台及履约费用合计 $10，忽略其他费用。第一周卖 40 套，广告花 $60，商品贡献为 40 ×（$16－$10）－$60＝$180。第二周卖 50 套，广告花 $160，贡献变成 50 ×（$16－$10）－$160＝$140。</p>
+          <p>第二周多卖 10 套，广告前多出 $60，但广告多花 $100，所以贡献少了 $40。此时可以按 SKU 和活动看广告流量是否相关、获客成本是否变高，再决定怎么调预算。</p>
+        </section>
+        <p class="takeaway"><strong>每周看板可以先放五项：</strong>销量、每套扣广告后的贡献、退款率、预计库存覆盖天数、实际回款。比较数据时保持店铺、币种、周期和费用口径一致。</p>
+        <details class="learning-check"><summary>自测 · 本月商品贡献为正，现金账户为什么可能减少？</summary><p>可能预付了下一批采购款，也可能已有销售还在待结算。对照未售库存和采购流水，以及结算、暂留和到账记录。</p></details>
+        <p class="reading muted">领星参考 <a href="https://www.lingxing.com/help/article/ProfitStatementnew" target="_blank" rel="noopener noreferrer">利润核算详解</a><a href="https://www.lingxing.com/help/article/manageBoard" target="_blank" rel="noopener noreferrer">销售看板</a><a href="https://www.lingxing.com/help/article/Dataanalysisd" target="_blank" rel="noopener noreferrer">数据分析</a></p>
+        <div class="lesson-actions"><h3>对应练习</h3><div class="toolbar"><button type="button" data-practice="9">利润核算</button><button type="button" data-practice="10">根据销量再次补货</button></div></div>
+      </article>
+      <div class="controls lesson-pages" aria-label="学习板块翻页">
+        <button type="button" id="previous-lesson">上一课</button>
+        <span class="muted" id="lesson-position"></span>
+        <button type="button" id="next-lesson">下一课</button>
+      </div>
+      <footer class="muted">案例金额、时效和数据为教学设定。经营时请核对目标站点现行规则。</footer>
+    </div>
+    <div class="view" id="practice-view" hidden>
+    <section class="panel" aria-labelledby="module-title">
+      <div class="top"><p class="muted" id="module-index"></p><p class="muted" id="overall"></p></div>
+      <h2 class="module-title" id="module-title"></h2>
+      <p class="module-description" id="module-description"></p>
+      <p class="muted">领星参考阅读 <a id="source" target="_blank" rel="noopener noreferrer"></a></p>
+      <div class="progress-box"><label class="muted" id="progress-label" for="progress"></label><progress id="progress" max="10" value="0"></progress></div>
+      <div class="questions" id="questions" role="group" aria-label="题号"></div>
+    </section>
+    <section class="panel" aria-labelledby="question">
+      <p class="muted" id="question-meta"></p>
+      <h3 class="question-title" id="question" tabindex="-1"></h3>
+      <form id="quiz" novalidate>
+        <fieldset id="choice" hidden><legend>请选择一个答案</legend><div id="options"></div></fieldset>
+        <div id="writing" hidden><label for="response">写下你的判断和理由</label><textarea id="response" maxlength="2500" placeholder="可以分点写，计算题请写出算式。"></textarea></div>
+        <p id="error" class="error" role="alert" hidden></p>
+        <button class="primary submit" type="submit" id="submit">提交答案</button>
+      </form>
+      <div id="feedback" class="feedback" tabindex="-1" role="status" hidden></div>
+      <div class="controls">
+        <button type="button" id="previous">上一题</button>
+        <button type="button" id="retry" hidden>修改答案</button>
+        <button type="button" id="next">下一题</button>
+      </div>
+    </section>
+    <section class="panel export" id="review" aria-labelledby="export-title">
+      <h2 id="export-title">提交简答题给 Codex 批改</h2>
+      <p id="export-count">已提交的简答题会连同原题一起导出。</p>
+      <div class="toolbar">
+        <button type="button" id="download-module">下载本模块答案</button>
+        <button type="button" id="download-all">下载全部答案</button>
+      </div>
+      <p class="muted" id="export-status" role="status">把下载的批改单上传到当前对话，我会按题号点评并给出修改稿。</p>
+    </section>
+    <footer class="muted" id="storage-note">练习数据保存在当前浏览器。题中金额、规则条件和商品情境为教学设定，经营时请核对目标站点现行规则。</footer>
+    </div>
+  </main>
+</div>
+<!-- 题库格式：模块 | 标题 | 阅读标题 | 领星文章地址末段 | 本模块目标
+     C | 题干 | 正确选项（从 1 起） | A | B | C | D | 解析
+     W | 题干 | 对照要点 -->
+<script id="bank" type="text/plain">
+M|选品与产品|新品开发|NewProducts|用需求、竞争、成本和供应能力筛选候选商品，形成可验证的产品定义。
+C|你要评估桌面理线夹的市场需求，哪组证据最适合作为起点？|2|只看一个畅销品的售价|比较目标站点多款同类商品的价格、评论和需求信号|询问一家供应商有多少现货|只看自己的社交媒体热度|同站点、同用途的多款可比商品能提供需求和竞争线索。第三方销量估算还要标清来源。
+C|几款理线夹都被反馈“粘不牢”。进入产品方案前，先做什么？|3|马上加大包装数量|根据星级最低的一条评论改产品|按桌面材质、安装方式和使用时长整理反馈，再做实测|直接在页面承诺适用所有表面|先找出问题出现的条件，才能区分材料缺陷、安装问题和商品描述不清。
+C|比较 10 件装和 20 件装的竞品时，怎样对比价格更合理？|1|同时记录套装售价和每件价格，并核对功能、材质及促销状态|只按套装标价从低到高排序|只比较历史最高标价|把配送费和促销差异都忽略|单件价格帮助统一包装规格，但比较时仍要记录商品和销售条件的差异。
+C|某供应商单价很低，但商标和外观权属存疑。定品前应怎么做？|4|先下大单锁价，再处理资料|改商品颜色后直接上架|只检查供应商营业执照|核查实物、包装及图文的知识产权风险和授权材料|供应商身份资料与具体商品的权属或授权是不同的证据。
+C|理线夹售价 $15，已估算的采购、头程和平台费用合计 $11。要判断能否挣钱，还该考虑什么？|2|只考虑竞争对手的销售排名|广告、退货、包装等尚未计入的成本，以及销量变化|只考虑包装颜色|只把售价再除以采购价|目前差额 $4 仍需覆盖未计入的成本，估算时还应统一币种和每件口径。
+C|黑色和白色理线夹需要分别追踪库存，产品主数据应怎么建？|3|两个颜色共用一个 SKU 和同一库存数|先只记颜色文字，出单后再补 SKU|每个可独立管理的规格分配独立 SKU，并记录颜色与包装规格|把收货仓名称作为 SKU|SKU 是卖家管理库存和报价的标识，独立库存需要可区分的编码。
+C|样品通过使用测试，但供应商无法确认稳定交期。哪项决策更合理？|1|记录交期风险，先验证小批量供货或备选供应商|按最大需求量立即排产|用历史最低价替代交期验证|用竞品有货证明自己的供应稳定|样品合格说明产品可行，量产交期仍需要独立验证。
+W|目标客户是居家办公用户。你准备怎样验证他们愿意买一套 10 件装理线夹？写出至少三种证据及一个判断标准。|可结合相关竞品的规格和价格带、评论中的真实场景与痛点、样品访谈或小规模测试。提前定义判断标准，例如足够多的目标用户能在真实桌面上安装成功，并接受预设价格。区分观察到的证据与推测。
+W|评论常说“尺寸不合适”。请写出两种可能原因，各给一种验证方法和对应动作。|可能是线径超出设计范围，测量不同线径并试卡，按结果调整规格。也可能是页面表达让人误解，观察用户如何选型并检查详情页，补适用线径和比例图。动作应跟验证结果对应。
+W|你要把黑色理线夹交给采购和运营。写出至少五项双方共用的主数据，并说明其中一项填错会造成什么后果。|可包括 SKU、颜色、材质、适用线径、套装件数、包装尺寸和重量、已验证使用条件、目标成本。例：套装件数录错会造成刊登与实物不符，影响价格核算并引发退货。
+M|创建 Listing|Listing|listing1|理解商品标识和报价，核对详情页准确性及买家可购买状态。
+C|哪一项正确描述 ASIN 与卖家 SKU？|4|两者都是运输追踪号|ASIN 由卖家自行编成内部采购单号|不同卖家销售同一目录商品时一定共享同一个卖家 SKU|ASIN 标识亚马逊目录商品，卖家 SKU 用于卖家管理商品或报价|同一目录商品可对应不同卖家的报价及各自的 SKU。
+C|页面写“适合所有线径”，实测只支持 3–5 毫米。应该如何发布？|2|只把表述藏在副图里|明确写出实测支持的 3–5 毫米，并统一文字和图片|先上线再看是否有人投诉|只保留“通用”，删掉所有规格|页面应准确反映已验证的兼容范围，包括标题、要点与配图。
+C|想把同款黑色与白色合并展示，先核对什么？|1|目标类目是否允许颜色变体及两款是否符合要求|两款的采购单位是否相同就足够|两款一定要使用同一 SKU|先复制其他卖家的变体关系|变体主题和商品关系受类目要求约束，子款仍需记录独立标识和报价。
+C|工厂改了包装，实发从 10 件变为 12 件，运营最先应该做什么？|3|只修改广告关键词|继续用旧图，因为功能一样|核对该变更对商品标识、库存及刊登资料的影响，再按平台要求处理|在客服回复中临时说明，页面照旧|套装件数影响买家预期和库存识别，应先确认商品与页面的对应关系。
+C|后台显示资料已处理，判断商品能否销售还需要什么证据？|2|后台已经出现 ASIN 就够了|用目标站点买家视角核对报价、可售库存、配送和购买入口|只检查标题读起来是否流畅|只等广告产生曝光|资料处理成功与买家能否下单是两个检查节点。
+C|你手上有多个热搜词，哪种用法更合理？|4|所有词都放进标题|优先加热门品牌词，即使与商品无关|把标题写成同义词列表|筛选与商品匹配的词，按标题、要点等字段用途自然表达|关键词要与真实商品及字段要求匹配，页面仍需要让买家看懂。
+C|发现商品前台默认展示的图片颜色与选中的子款不同，最先核查哪里？|1|核查子款 SKU 的图片绑定并对照实物|提高广告竞价|增加补货量|等待下一次财务结算|前台错误要核对到具体子款，修复后逐个切换变体验证。
+W|请为 10 件装黑色理线夹写两条商品要点。已知支持 3–5 毫米线径，适用于已测试的平整木质和金属桌面。|写清套装件数及线径，注明经过测试的桌面范围。示例：每包含 10 个黑色理线夹，适配直径 3–5 毫米的线材。适用于已测试的平整木质与金属桌面，安装前请清洁并擦干表面。避免引入无证据的性能承诺。
+W|白色款提交成功却不能购买。列出三项优先检查和最后怎么验收。|逐项检查子款报价是否有效、是否有可售库存及配送范围、是否存在刊登抑制或缺失属性。修复后以目标站点买家视角选中白色款，验证价格、配送提示与购买入口。
+W|主图准备外包给设计师。请写一段交接说明，让设计稿能与实际 SKU 对上。|写明目标站点、SKU、颜色、包装件数、准确规格、实物照片及素材授权。验收时对照商品和目标类目主图规则，核实图中件数、颜色以及是否加入未随货的道具。
+M|获得订单|订单管理|OrderMmanagement|从买家下单到发货追踪状态，并根据履约方式安排下一步。
+C|买家下单后，哪项信息能最直接区分这笔订单由谁履约？|3|卖家 SKU 字符串长度|下单时间|订单的 FBA 或 FBM 履约标记|商品的广告活动名称|FBA 通常由亚马逊履约，FBM 由卖家或受其委托的服务商履约。
+C|一笔 FBM 订单显示 Pending，尚未确认可履约。应该怎么做？|2|马上发货避免晚发|等待平台把订单更新为可处理状态，再按规定履约|先填写一个预计追踪号|发货后再决定订单是否有效|未确认订单应按平台状态处理，等待可履约再出库和确认发货。
+C|订单里有两个不同 SKU，打包前最重要的是哪一项？|4|只核对总件数|依据商品图片猜测拣货|把售价较高的商品先发|按订单行核对 SKU、规格和各自数量|订单行是拣货和验货的依据，总件数一致也可能装错规格。
+C|为什么用订单号关联订单、退款和结算明细？|1|便于追溯同一笔交易的状态、金额与异常|因为订单号包含广告点击数据|因为所有订单的结算金额相同|为了用订单号替代库存编码|同一订单可在多个报表和时点出现，匹配时还可能需要订单行标识或事件类型。
+C|后台出现“已发货”，哪个业务事实可以据此优先确认？|3|买家一定已签收|款项一定已经到账|订单已进入发货阶段，应另查物流及结算状态|买家无法再申请退货|发货、签收和回款是不同事件，各有对应记录。
+C|同一 FBA 订单行重复同步到 ERP，怎样避免被计作两笔销量？|2|按入库日期合并当天所有订单|按店铺、订单号和订单行等稳定键去重或更新|每次导入都生成新订单|把相同 SKU 的订单全部折叠为一笔|稳定的订单行标识能区分重复同步与真实的多笔订单。
+C|一笔 FBM 订单已打包，后台收到平台确认的取消状态，下一步是什么？|1|停止交运并核对取消状态，按流程恢复占用库存|继续发出等买家拒收|删除订单记录|先确认发货再恢复库存|出库前核对取消结果，停止配送并让库存记录反映实际货物状态。
+W|对比同款产品的一笔 FBA 与一笔 FBM 订单。分别写出谁负责发货，以及卖家在发货阶段应关注什么。|FBA 通常由亚马逊执行拣货和配送，卖家关注订单、库存及异常。FBM 由卖家安排拣货、包装与承运，关注发货承诺、追踪号及实际交运记录。
+W|买家报告收到白色款但下单的是黑色款。怎样查找错发环节？至少列三项证据。|对照订单行 SKU 和选购规格、拣货或扫码记录、包裹或标签记录，必要时核对仓内实物和买家提供的信息。确定错发范围和责任环节，按平台规则处理并复盘拣货校验。
+W|上午有 12 笔下单，其中 2 笔取消、3 笔待确认、其余均已发货。请给出已发货笔数并说明为什么还不能用这个数推算实收。|已发货 12－2－3＝7 笔。实收还受订单金额、费用、退款、结算和回款时间影响，应对照交易及到账记录。
+M|采购备货|采购管理|purchasingManagement|核对采购规格、报价、交期和收货验收，识别第一批货的资金风险。
+C|供应商报价 A 为每箱 $36，每箱 12 套。B 每套 $2.80，同口径。哪项正确？|1|B 每套便宜 $0.20|A 每套便宜 $0.20|两者单价相同|A 每套便宜 $33.20|A 每套 $36÷12＝$3.00，B 为 $2.80。实际比价还要核对运费与条款。
+C|询价文件里的 MOQ 指什么？|3|产品的最高售价|单箱最大重量|供应商要求的最低订购量|货件预计到仓日期|MOQ 影响首批投入和测试规模，询价时也要确认按规格还是合计计算。
+C|采购单最应包含哪组信息？|4|店铺照片、广告词、议价人爱好|只有商品简称和总价|品牌故事、仓库员工数、销售预测|供应商、SKU、规格、数量、单价、交期和交货条件|采购单是下单与收货核对的依据，需让双方理解一致。
+C|下单 300 套，工厂首批只交到 280 套。库存入账该怎么处理？|2|按采购单记满 300 套|记录实际收到并验收合格的数量，追踪剩余和差异|把 20 套直接计作销量|删除采购单，避免显示差异|订购量、实际收货量和合格量要分别保留。
+C|常规生产 14 天，质检 2 天，等提货 3 天，三段串行。从开工到提货至少预留几天？|3|14 天|16 天|19 天|21 天|14＋2＋3＝19 天。开工前排期和应急缓冲需另外考虑。
+C|样品合格后，首批收货仍应做什么？|1|按约定抽检实物规格、件数、包装和功能，留存批次结果|只比较发票总金额|把样品照片当成整批验收凭证|先全部上架，等退货再检查|量产可能有版本或工艺偏差，验收应能追溯到批次。
+C|预估只需 150 套，供应商要求最低 1000 套。哪项动作更适合测试阶段？|4|全订并假设都能卖掉|用高广告预算保证销量|先跳过报价阶段直接汇款|比较低起订量、试单或分批方案，并估算库存成本|交涉采购条件应结合验证规模、现金占用和库存风险。
+W|两家供应商报价口径不同。写一份用于比较的字段清单，至少包含六项。|可采用 SKU 和规格、报价单位及换算、币种、含税及运费条件、MOQ、阶梯单价、交期、质量标准、付款条件及有效期。把单价统一到相同数量和费用口径。
+W|仓库抽检发现 200 套里有 15 套包装破损。写出实物、系统和供应商三方面怎么处理。|隔离并标记破损实物，保留批次和照片。按实际验收区分合格、待处理和破损数量。联系供应商确认补发、返工或赔付，记录结果后再调整库存。
+W|准备采购 180 套，每套 $2.50，另付首批包装模具一次性 $90。计算本次投入及将模具全摊至首批后的每套金额。|商品价 180×$2.50＝$450，总投入 $540，首批合计 $540÷180＝$3.00 每套。经营核算还可按合理规则另行分摊一次性费用。
+M|头程运输|头程物流单|Firstleglogistics|比较跨境运输的到货时效和费用，追踪批次并验收物流证据。
+C|从国内备货仓运到亚马逊目的地仓库，这段运输通常叫什么？|2|末端消费者派送|头程运输|采购收货|平台资金结算|头程将卖家的备货运到海外履约节点，和买家订单的末端派送属于不同环节。
+C|比较两个运输报价，哪项做法最合理？|4|只比较每千克报价|只根据渠道名称判好坏|按运输时间最短直接选择|统一计费重量、包含费用、目的地和时效口径|报价可能包含不同清关、派送和附加费用，应按实际交付口径比较。
+C|某箱实重 8 kg，体积重 11 kg，渠道按两者较大者计费。计费重是多少？|3|8 kg|3 kg|11 kg|19 kg|按题设取实重与体积重的较大值，为 11 kg。
+C|一票两箱分批交运，仓库可能晚到一箱，哪个做法更容易定位？|1|保存物流单、各箱标识、物流追踪号与 FBA 货件编号的映射|只保留总运费|每箱手写同一号码且不记录箱数|只截取物流商聊天头像|货件与箱级物流证据可帮助定位哪箱漏收或晚到。
+C|承运商标注“已签收”。可以马上把全部货记成 FBA 可售吗？|2|可以，签收等于每件可售|先检查亚马逊接收和可售状态，再按已确认数量更新|可以，只要签收照片能找到|先把未上架库存全记为已售|运输签收只确认交付节点，平台仍可能需要接收和处理。
+C|同一批货海运预计 35 天，空运 12 天，手上可售库存只够 18 天。该先评估什么？|4|只选总报价最便宜的渠道|忽略缺货，因为货已经发出|把全批都设置为可售库存|评估空运到可售的实际用时，比较部分空运与断货成本|要把清关、派送和接收缓冲算进去，再决定是否分批。
+C|物流单上的箱数与实发不一致，交运前该怎么办？|1|暂停受影响箱件，按实发和箱标核对并修正关联单据|先走货，后续把差异当损耗|把异常交财务结算时再看|只调整仓库备注，不核对物流单|交运前修正箱级信息能减少追踪和接收差异。
+W|请列出你要向货代问的至少五个报价或交付问题，帮助判断理线夹能否按时可售。|可以问起运和目的地点、计费重量和附加费、清关与派送由谁负责、是否含税、提货到签收的时效范围、异常处理和追踪证据。另给 FBA 接收及上架留出缓冲。
+W|海运方案 $120、预计 35 天，空运 $260、预计 12 天，库存还有 20 天。写出你的初步方案和两个待验证条件。|海运单走存在时间缺口。可先评估一小批空运覆盖缺口，其余海运。验证时效是否计入收货转可售、未来日销量及紧急量，并比较断货代价与额外运输费用。
+W|物流状态 10 天未更新，你会找谁，提供哪些信息，怎样更新计划？|向承运商或货代查询，提供追踪号、箱数、交运日期、目的仓和关联货件。核实实际节点与新预计到达日期，更新在途计划并据可售覆盖天数判断是否需要应急补货。
+M|FBA 入仓|FBA 发货流程|fbaShippingProcess|从发货计划查到接收和可售库存，并定位收货数量差异。
+C|FBA 货件箱标和单件商品标签分别做什么？|3|两者都只用于算运费|箱标识别商品颜色，单件标签识别船期|箱标关联货件及箱，适用的单件标识用于识别商品库存|亚马逊要求两者必须写成同一号码|按计划和当期标签规则区分箱级标签与单件商品标识。
+C|货件要求用亚马逊条码。FNSKU 在这个场景下的用途是什么？|1|识别亚马逊履约体系中的卖家商品库存|记录买家收货地址|标注承运商的运输费|代替每位买家的订单号|FNSKU 用于识别卖家的 FBA 商品库存。具体条码要求按商品和平台规则核对。
+C|预计发 100 套，物流签收，系统接收 96 套。应先做什么？|4|立刻认定 4 套丢失|继续把 100 套都记为可售|立即新建一笔退款订单|检查货件接收进度与箱级记录，保留差异证据|接收过程可能分批更新。满足平台条件时可按流程核查差异。
+C|页面显示可售 55、预留 10、在途 25。现在直接用哪个数量判断当前可售？|2|90|55|80|65|在途和预留状态应分开管理，当前可售采用同口径的 55。
+C|贴标完成后发现黑白两款条码贴反了。怎么处理？|3|等亚马逊接收后再改|用采购合同证明颜色即可|隔离受影响商品，复核 SKU 与标签，返工并复验后交运|只修改商品标题|错标可能造成错误入库或错发，应在交运前纠正并复验。
+C|已有 120 套在途但预计 24 天后才可售，现有库存只能卖 10 天。应该如何看待在途？|1|记录潜在断货窗口，并评估可在 10 天内生效的方案|直接把在途视作可售，显示库存充足|只要运输单创建，就暂停检查销量|马上将所有在途单位登记为丢失|是否能覆盖需求取决于货物实际变为可售的时间。
+C|发货计划含多个箱。打包后改了某箱的数量，下一步是什么？|4|只改自己的手写备忘|再贴一张旧标签|运输中等平台发现差异|核对计划箱内明细、实际装箱和标签，按平台流程更新后交运|仓库按货件信息接收，变更应同步到实际箱件及相关记录。
+W|请写一份理线夹发 FBA 前的五项验收清单，至少涉及商品、外箱和系统记录。|可核对按 SKU 的实物规格与数量、适用的商品标签、单箱明细、箱标及箱规、货件编号及承运记录。保证各层记录能相互追溯。
+W|发出 100 套、接收 96 套、可售 86 套。写出两个数量差异，并说明各从哪里查。|发出与接收差 4 套，查装箱证据、物流追踪及货件接收进度。接收与可售差 10 套，查预留、处理中、不可售等库存状态及其时间口径。
+W|补货会上有人说“货已到了，就可以开大广告”。你要先查看什么，再给什么建议？|逐 SKU 查可售库存、前台购买状态、转可售速度与持续供应。确认能承接预期订单后再逐步放量，并限定预算与复查时间。
+M|销售与广告|如何快速高效地投放广告|guanggao|把曝光、点击、转化及广告成本联系起来，形成可验证的优化动作。
+C|广告有 2000 次曝光和 40 次点击，点击率是多少？|2|0.2%|2%|5%|20%|点击率＝40÷2000＝2%。
+C|广告花费 $24，归因销售额 $120，ACOS 是多少？|4|5%|12%|50%|20%|ACOS＝广告花费÷广告归因销售额＝20%。归因销售额采用报表口径。
+C|许多曝光却很少点击，同时搜索词与理线夹用途偏离。先做什么？|1|检查搜索词相关性和主图、标题，收紧不相关流量|立刻提高所有词的竞价|只等待平台下一次结算|按比例增加采购量|搜索相关性和展示内容都会影响买家是否点击，应先定位。
+C|有很多点击，几乎没有购买。优先检查哪组因素？|3|只查海外仓地址|只查搜索词的字符数|搜索意图、价格、可售状态、页面内容和配送|只查采购单的审批人|点击后的转化由流量质量和商品购买条件共同影响。
+C|广告花费 $20、广告归因订单 4 单。按这些数字，每笔归因订单广告成本是多少？|2|$4|$5|$16|$80|$20÷4＝$5。比较不同活动时采用可比的归因和时间范围。
+C|SP 在常见亚马逊广告类型里指什么？|1|Sponsored Products，商品推广|Sponsored Brands，品牌推广|Sponsored Display，展示型推广|Standard Payments，结算转账|SP、SB 和 SD 对应不同广告类型，资格和展示位置按站点规则核对。
+C|归因销售额为零。怎样记录 ACOS 更合适？|4|写 0%，因为没有销售|写成花费的金额|固定写 100%|标为无法计算，并查看花费、点击量和数据窗口|销售额为零时分母为零。仍可用花费和点击量描述活动表现。
+W|理线夹连续一周广告曝光很高，点击率正常，转化率却下降。写出三项要检查的指标或事实，并说明你打算先改什么。|用可比日期核对搜索词意图、价格或促销、可售和配送、详情页改动，以及不同流量的转化。先处理有证据的主要因素，设复查周期并避免同时改变多个变量。
+W|活动 A 花费 $30，归因销售 $150。B 花费 $24，归因销售 $80。算 ACOS，并说明为什么预算决策还要看其他数据。|A 为 20%，B 为 30%。进一步对照商品毛利、订单和点击样本、活动目标、归因窗口及库存，再判断是否调整。
+W|新品首周只能支出 $70 做广告。写出预算安排、你要看的指标，以及一条暂停或调整的条件。|可从 $10 每日的计划值做测试并追踪总支出。看搜索词、曝光、点击、归因订单和成本。例：某明显无关搜索词持续消耗，经复核后收紧投放。具体停止阈值应结合利润和样本。
+M|客服与退货|RMA 管理|RMA|用订单、退货和库存证据定位问题，给出服务动作和下游改进。
+C|买家说“夹不住线”，客服首先需要核对哪组信息？|2|卖家广告预算和结算周期|订单规格、线径、使用场景和具体问题|仓库租金和运输方式|供应商全部员工名单|问题可能来自规格不匹配、使用条件或质量，先收集最相关证据。
+C|RMA 在售后管理中通常指什么？|3|广告预算提醒|销售额增长率|退货授权或退货管理记录|清关费用项目|RMA 用于把退货申请与订单、原因及处理状态关联起来。
+C|同批理线夹集中出现断裂，客服怎样交接更有效？|1|整理订单、SKU、批次、原因及实物证据交给质检和采购|只给设计师发一条星级截图|只对全部投诉发送统一促销|先删掉批次记录再复盘|可追溯证据帮助质检定位材质或工艺问题。
+C|退回商品外包装已开，库存如何处理？|4|立即计入可售库存|只要订单退款就必然可售|按价格高低决定是否可售|按履约方提供的状态及验收流程处理，区分可售与不可售|退款、收回实物和库存可售状态应分别确认。
+C|某 SKU 发货 100 套，同一批销售中最终退回 8 套，按单位计算退货率是多少？|2|0.8%|8%|12.5%|80%|8÷100＝8%。实务分析还应确定对比窗口和退货观察期限。
+C|已核实页面尺寸图容易误读，最合适的下游改进是什么？|1|在尺寸图与文字里清晰标明适用线径，并复查该原因退货率|给买家提供更宽泛的保证|只更新运输标签|删除所有尺寸说明|通过页面改进明确购买预期，用后续数据验证效果。
+C|处理售后时哪种沟通更恰当？|3|请买家先删差评才处理|要求在公开评论区留下订单和地址|通过平台许可的渠道，围绕订单问题提供处理方案|绕过平台流程私下要求汇款|使用合规的订单沟通渠道，按规则处理问题和所需信息。
+W|买家收到套装后说少了两个。请拟一条客服回复，并列出你会在后台核对的两项信息。|示例：您好，收到数量不足给您带来了不便。我会核对您选购的套装规格和该笔订单的发货记录，并通过本渠道告知处理方案。后台核对订单行件数、SKU 版本和拣货或包装批次。
+W|退货原因中有“页面尺寸误解”“粘胶失效”“运输破损”。分别建议由谁先调查，以及看什么证据。|尺寸误解交运营核对详情和规格。粘胶失效交产品或质检检查批次、安装条件和测试。运输破损交仓库或物流检查外箱、运输记录与照片。
+W|一笔订单已退款，退回的货仍在路上。说明客服、仓库和财务各应记录什么。|客服记录退货原因与退款状态。仓库登记预期退回，收到并验收后才更新实际库存状态。财务按适用口径核对订单和退款明细，跟踪费用及后续调整。
+M|亚马逊结算|如何算清亚马逊回款|jiesuanzhongxin|区分成交、平台结算、发起转账和实际到账，能对照报表找差异。
+C|买家已付款后，哪一项最能直接证明收款账户里已经收到这笔平台打款？|4|商品获得了广告点击|订单状态为已发货|平台预计结算金额|收款账户的入账流水可与转账记录匹配|到账需核对收款渠道实收记录及转账标识。
+C|你想看本期结算金额，再追查某笔退款。应配合看哪两类数据？|1|结算汇总及交易明细|广告搜索词与客户留言|供应商报价与装箱清单|商品图片与订单总数|汇总提供整体金额和期别，明细可找订单费用和退款。
+C|本期收入 $1000，扣平台费用 $200、退款 $50，忽略其他调整。本期净额是多少？|3|$1250|$800|$750|$950|$1000－$200－$50＝$750。实际结算还可能有暂留、余额和其他调整。
+C|平台显示已转账，但收款工具未入账。下一步最合理的是？|2|把全额直接记为已到账|用转账标识、金额和币种核对；检查处理时间、状态及账户|把交易重录为新订单|先调整产品售价|先把平台转出和账户入账两段匹配，按正常处理时效跟进差异。
+C|同一店铺的结算周期跨月，月度经营核算怎样处理？|4|一律记在打款日，无需保留交易时点|忽略跨月的交易|把整期金额平均分给两个月|按所用会计口径匹配交易日期和明细，另记转账及到账日期|月度经营核算和结算周期是不同维度，明细可以帮助正确归集。
+C|退款发生在下一结算周期，如何追溯它归属于哪一笔原销售？|1|用订单号、相关交易标识和退款明细配对|用广告活动名称匹配|只按退款日期猜测原订单|统一匹配当日最大金额订单|保留标识、交易类型与时间便于跨期追溯。
+C|平台期末仍有一笔保留金。正确理解是什么？|3|它已经进了银行账户|它一定是产品采购成本|平台暂时保留的款项需跟踪释放和后续结算|它必然等于退款金额|暂留会影响可转出金额与到账时间，业务性质应以相关明细确认。
+W|请用自己的话解释一笔订单经过成交、发货、结算、平台转出、实际到账的过程。每一步举一个可查的记录。|可依次看订单与付款状态、发货或履约报告、结算汇总及订单交易明细、平台转账记录、收款工具或银行流水。同一笔转账可能汇集多笔订单。
+W|本期交易净额 $500，其中平台暂留 $40，假设无期初余额和其他调整，平台转出 $460，收款工具到账 $457。解释两段差额并说明证据。|$40 是题设暂留，查结算汇总和暂留明细。$3 需核对收款服务费、币种或其他调整，用转账编号关联收款流水，确认后记录实际原因。
+W|老板问为什么店铺卖了 $2000，银行只收到 $1100。写一个至少四步的核对办法。|先统一店铺、日期和币种，确认 $2000 的销售定义。按订单交易核对费用和退款，再区分已结算、待结算及暂留。用平台转账记录匹配实收流水，列明差异、证据和后续处理。
+M|利润核算|利润核算详解|ProfitStatementnew|用统一口径计算商品利润，理解销售额、利润和现金余额的不同含义。
+C|一套理线夹售价 $16，采购 $3、头程 $2、平台及配送 $5、广告 $2。忽略其他费用，单套剩余多少？|3|$2|$3|$4|$6|$16－$3－$2－$5－$2＝$4。题设只包含列出的费用。
+C|某 SKU 贡献利润 $200，计算口径下销售额 $1000。对应利润率是多少？|1|20%|80%|5%|200%|该口径利润率＝$200÷$1000＝20%。
+C|比较两个 SKU 的盈利情况，先核对什么？|4|只看谁的订单数更多|只看颜色哪个流行|只看收款工具的余额|统一期间、币种、成本归属及退款等口径|不同费用归集或币种会扭曲利润对比。
+C|货已买入且全额付款，目前只售出一部分。利润分析里通常怎样对待货品成本？|2|把所有存货成本都记到这几笔销售|按采用的库存计价口径，归集已售货品对应成本|采购款与利润无关所以永远不记|下次回款时才开始记录库存|销售成本通常与已售货品匹配，现金支出和未售库存另有记录。
+C|这周销售额上升，但利润下降。以下哪组是合理的检查方向？|1|广告、折扣、退款、履约成本及高低利润商品销售占比|只看仓库门牌号|只看标题字数|只看财务人员的登录次数|收入与成本结构共同决定利润，销量或销售额上涨可能伴随费用上涨。
+C|一个广告活动同时推广两个 SKU。算商品利润时怎样处理共享广告费？|3|两个 SKU 各记活动全额花费|因为无法完全精确就忽略全部|采用可解释、可复算的分摊规则并记录口径|只把费用分给较贵的 SKU|可根据归因数据或约定的依据分摊，并定期检查合理性。
+C|一套商品售价 $20，广告前单位贡献为 $5。假设每件贡献一致，无其他改变，广告归因订单的盈亏平衡 ACOS 是多少？|4|5%|15%|20%|25%|简化条件下允许的广告费用为 $5，$5÷$20＝25%。还应看归因范围和其他成本。
+W|卖出 50 套，每套 $16。每套采购 $3，头程 $2，平台与配送 $5，全月广告费 $110。忽略其他项目，算利润和利润率。|收入 $800。采购、头程、平台与配送合计 50×$10＝$500，另扣广告 $110，利润 $190。利润率 190÷800＝23.75%。
+W|如果理线夹销量增加、每套利润却下降，请列出三个可验证的原因和对应数据。|折扣加深查实际成交价；广告获客成本上升查广告花费和归因订单；退货或配送成本上升查退款及费用明细。也可查销量是否向低利润子款集中。
+W|同一个月利润报表为正，银行账户现金减少。给出两种解释，并说说用什么核实。|可能提前支付了下一批库存或物流，查采购付款和未售库存。也可能本期销售还未结算到账，查平台结算、暂留及收款流水。保持同一期间和币种。
+M|根据销量再次补货|如何制定科学的补货策略|buhuocelue|根据销量、库存和到货时间计算补货量，并识别预测与在途风险。
+C|可售库存 84 套，稳定日销 7 套，忽略其他变化。现有可售库存能覆盖几天？|2|7 天|12 天|14 天|21 天|84÷7＝12 天。实际覆盖时间会随销量变化。
+C|预计日销 5 套，采购至可售用时 18 天，另需 7 天安全库存。目标至少覆盖多少套？|1|125 套|90 套|35 套|100 套|5×（18＋7）＝125 套。时间口径包含从采购到最终可售所需环节。
+C|目标库存 125 套，当前可售 45 套，另有 30 套可在需要时变为可售且尚未计入。简化补货建议量是多少？|4|125 套|80 套|95 套|50 套|125－45－30＝50 套。要另看期间断货风险、起订量和箱规。
+C|上周促销把日均销量拉到 22 套，正常约 8 套，下月暂无类似活动。怎样做基础预测？|3|直接按 22 套长期放大备货|按零销量预测|以可比正常销量为基础，用促销情景单独估算|只照搬竞争对手库存|区分常态和事件造成的销量变化，明确活动假设。
+C|某款之前断货一周，那段时间销量为零。预测时怎么处理？|2|所有零销量日一律视为真实需求为零|标记断货日，参考有货期间销量并说明不确定性|把缺失销量统一填为同个大数|按售价高低决定断货销量|销量受是否有货限制，断货期观测值低估潜在需求。
+C|表里一批货同时出现在“已发货计划”和“运输在途”，如何计入补货判断？|1|按货件标识去重并核对预计可售数量和时间|两项相加，以免遗漏|仅按采购单原始数量计两遍|从所有库存中删除该 SKU|同一批货跨状态同步时应避免重复计入。
+C|销量波动不大，但物流交期经常超出计划。优先看什么？|3|继续沿用最快一次到货时间|只提高售价解决|复核历史到货时效和波动，评估安全库存或替代运输|将全部库存计作安全库存|时效的不确定性会增加断货风险，需要以实际数据调整策略。
+W|可售 100 套，日销 10 套，25 天后有一批 150 套变为可售。按简化条件估算到货前缺口，并提出一个动作。|现有货覆盖 10 天，预计缺货窗口约 15 天，按日销估算约 150 套需求缺口。可评估已有货的加速或分批空运，并把到可售的时间和成本纳入判断。
+W|设计一个每周补货检查表。写出至少六个字段，以及一条触发提醒的规则。|可用 SKU、预计日销、可售库存、已去重的有效在途、预计可售日、采购至可售周期、安全库存天数和 MOQ。例：预计可售覆盖天数低于供货周期加安全天数时提醒，随后查在途节点及时间缺口。
+W|供应商最低下单 200 套，但你算出的补货量只有 90 套。写出两种可执行方案，并说明如何选。|可谈判小批或分批交货，也可比较替代供应商、合并同规格采购或推迟到更合理的时间。选择时核对断货概率、交期、单位成本、库存持有成本和现金占用。
+</script>
+<script>
+"use strict";
+const byId = id => document.getElementById(id);
+const letters = "ABCD";
+const modules = [];
+for (const line of byId("bank").textContent.trim().split(/\r?\n/)) {
+  const [type, ...fields] = line.split("|").map(value => value.trim());
+  if (type === "M") {
+    const [title, reading, slug, description] = fields;
+    modules.push({title, reading, slug, description, questions: []});
+    continue;
+  }
+  const list = modules.at(-1).questions;
+  if (type === "C") {
+    const [prompt, correct, a, b, c, d, reference] = fields;
+    list.push({type, prompt, correct: Number(correct) - 1, options: [a, b, c, d], reference});
+  } else if (type === "W") {
+    const [prompt, reference] = fields;
+    list.push({type, prompt, reference});
+  }
+}
+
+const total = modules.reduce((sum, module) => sum + module.questions.length, 0);
+const lessons = Array.from(document.querySelectorAll("[data-lesson]"));
+const storageKey = "amazon-crossborder-practice-v1";
+let state = {moduleIndex: 0, questionIndex: 0, lessonIndex: 0, view: "learning", answers: {}, drafts: {}};
+let storageAvailable = true;
+try {
+  const saved = JSON.parse(localStorage.getItem(storageKey) || "null");
+  if (saved?.answers && saved?.drafts && modules[saved.moduleIndex]?.questions[saved.questionIndex]) {
+    state = {...state, ...saved};
+  }
+} catch {
+  storageAvailable = false;
+}
+if (!Number.isInteger(state.lessonIndex) || !lessons[state.lessonIndex]) state.lessonIndex = 0;
+if (state.view !== "practice") state.view = "learning";
+const own = (object, key) => Object.hasOwn(object, key);
+const keyFor = (moduleIndex, questionIndex) => (moduleIndex + 1) + "." + (questionIndex + 1);
+const activeKey = () => keyFor(state.moduleIndex, state.questionIndex);
+const activeQuestion = () => modules[state.moduleIndex].questions[state.questionIndex];
+
+function save() {
+  if (!storageAvailable) return;
+  try {
+    localStorage.setItem(storageKey, JSON.stringify(state));
+  } catch {
+    storageAvailable = false;
+    showStorageNotice();
+  }
+}
+
+function showStorageNotice() {
+  byId("storage-note").textContent = "当前浏览器无法保存到本地。请在关闭页面前下载批改单。题中金额和业务情境为教学设定。";
+}
+
+function element(tag, content, className) {
+  const node = document.createElement(tag);
+  node.textContent = content;
+  if (className) node.className = className;
+  return node;
+}
+
+function button(content, action) {
+  const node = element("button", content);
+  node.type = "button";
+  node.addEventListener("click", action);
+  return node;
+}
+
+const lessonButtons = lessons.map((lesson, index) => {
+  const title = lesson.querySelector("h2").textContent.replace(/^\d+\.\s*/, "");
+  const item = button("", () => {
+    if (compact.matches) byId("lesson-directory").open = false;
+    chooseLesson(index);
+  });
+  item.setAttribute("aria-controls", lesson.querySelector("h2").id);
+  item.append(element("span", String(index + 1).padStart(2, "0"), "count"), element("span", title));
+  return item;
+});
+
+function renderLesson() {
+  lessons.forEach((lesson, index) => {
+    const active = state.lessonIndex === index;
+    lesson.hidden = !active;
+    lessonButtons[index].setAttribute("aria-current", String(active));
+  });
+  byId("lesson-position").textContent = "第 " + (state.lessonIndex + 1) + " / " + lessons.length + " 课";
+  byId("previous-lesson").disabled = state.lessonIndex === 0;
+  byId("next-lesson").disabled = state.lessonIndex === lessons.length - 1;
+}
+
+function chooseLesson(index) {
+  if (!lessons[index]) return;
+  state.lessonIndex = index;
+  save();
+  renderLesson();
+  lessons[index].querySelector("h2").focus();
+}
+
+function showView(view, focusHeading = true) {
+  state.view = view;
+  const learning = view === "learning";
+  byId("learning-view").hidden = !learning;
+  byId("learning-rail").hidden = !learning;
+  byId("practice-view").hidden = learning;
+  byId("practice-rail").hidden = learning;
+  byId("show-learning").setAttribute("aria-pressed", String(learning));
+  byId("show-practice").setAttribute("aria-pressed", String(!learning));
+  save();
+  if (focusHeading) {
+    const heading = learning ? lessons[state.lessonIndex].querySelector("h2") : byId("question");
+    heading.focus();
+  }
+}
+
+function moduleAnswers(moduleIndex) {
+  return modules[moduleIndex].questions.flatMap((question, questionIndex) => {
+    const key = keyFor(moduleIndex, questionIndex);
+    return own(state.answers, key) ? [{question, key, response: state.answers[key]}] : [];
+  });
+}
+
+function renderNavigation() {
+  const module = modules[state.moduleIndex];
+  const answers = modules.map((_, moduleIndex) => moduleAnswers(moduleIndex));
+  const allAnswers = answers.flat();
+  const currentAnswers = answers[state.moduleIndex];
+  const correct = allAnswers.filter(({question, response}) => question.type === "C" && response === question.correct).length;
+  const checked = allAnswers.filter(({question}) => question.type === "C").length;
+  const written = allAnswers.length - checked;
+  const currentWritten = currentAnswers.filter(({question}) => question.type === "W").length;
+  byId("module-index").textContent = "模块 " + (state.moduleIndex + 1) + " / " + modules.length;
+  byId("overall").textContent = "总进度 " + allAnswers.length + " / " + total + " · 单选答对 " + correct + " / " + checked;
+  byId("module-title").textContent = module.title;
+  byId("module-description").textContent = module.description;
+  byId("source").textContent = module.reading;
+  byId("source").href = "https://www.lingxing.com/help/article/" + module.slug;
+  byId("progress").max = module.questions.length;
+  byId("progress").value = currentAnswers.length;
+  byId("progress-label").textContent = "本模块已提交 " + currentAnswers.length + " / " + module.questions.length;
+  byId("modules").replaceChildren(...modules.map((item, moduleIndex) => {
+    const moduleButton = button("", () => {
+      const pending = item.questions.findIndex((_, index) => !own(state.answers, keyFor(moduleIndex, index)));
+      if (compact.matches) byId("directory").open = false;
+      go(moduleIndex, moduleIndex === state.moduleIndex ? state.questionIndex : Math.max(0, pending));
+    });
+    moduleButton.setAttribute("aria-current", String(moduleIndex === state.moduleIndex));
+    moduleButton.append(element("span", String(moduleIndex + 1).padStart(2, "0"), "count"),
+      element("span", item.title), element("span", answers[moduleIndex].length + "/" + item.questions.length, "count"));
+    return moduleButton;
+  }));
+  byId("questions").replaceChildren(...module.questions.map((question, index) => {
+    const key = keyFor(state.moduleIndex, index);
+    const submitted = own(state.answers, key);
+    const mark = !submitted ? "" : question.type === "W" ? "written" :
+      state.answers[key] === question.correct ? "correct" : "incorrect";
+    const questionButton = button(String(index + 1), () => go(state.moduleIndex, index));
+    const hint = {correct: "答对", incorrect: "答错", written: "简答已提交"}[mark] ||
+      (own(state.drafts, key) ? "有草稿" : "未提交");
+    questionButton.dataset.mark = mark;
+    questionButton.setAttribute("aria-current", String(index === state.questionIndex));
+    questionButton.setAttribute("aria-label", "第 " + (index + 1) + " 题，" + hint);
+    questionButton.title = hint;
+    return questionButton;
+  }));
+  byId("export-count").textContent = "本模块已提交 " + currentWritten + " 道简答 · 全部已提交 " + written + " 道简答";
+  byId("download-module").disabled = currentWritten === 0;
+  byId("download-all").disabled = written === 0;
+}
+
+function renderQuestion() {
+  const question = activeQuestion();
+  const key = activeKey();
+  const isChoice = question.type === "C";
+  const submitted = own(state.answers, key);
+  const editing = own(state.drafts, key);
+  const showResult = submitted && !editing;
+  const module = modules[state.moduleIndex];
+  byId("question-meta").textContent = "第 " + (state.questionIndex + 1) + " / " + module.questions.length +
+    " 题 · " + (isChoice ? "单选题" : "简答题");
+  byId("question").textContent = question.prompt;
+  byId("quiz").hidden = showResult;
+  byId("choice").hidden = !isChoice;
+  byId("writing").hidden = isChoice;
+  byId("retry").hidden = !showResult;
+  byId("error").hidden = true;
+  byId("feedback").hidden = !showResult;
+  byId("options").replaceChildren();
+  byId("response").value = "";
+  if (showResult) {
+    renderFeedback(question, state.answers[key]);
+  } else if (isChoice) {
+    question.options.forEach((option, index) => {
+      const label = element("label", "", "option");
+      const input = document.createElement("input");
+      input.type = "radio";
+      input.name = "option";
+      input.value = String(index);
+      input.checked = state.drafts[key] === index;
+      label.append(input, element("span", letters[index] + "  " + option));
+      byId("options").append(label);
+    });
+  } else {
+    byId("response").value = state.drafts[key] ?? "";
+  }
+  const isFirst = state.questionIndex === 0;
+  const isLast = state.questionIndex === module.questions.length - 1;
+  byId("previous").textContent = isFirst && state.moduleIndex > 0 ? "上一个模块" : "上一题";
+  byId("next").textContent = isLast && state.moduleIndex < modules.length - 1 ? "下一个模块" : "下一题";
+  byId("previous").disabled = isFirst && state.moduleIndex === 0;
+  byId("next").disabled = isLast && state.moduleIndex === modules.length - 1;
+}
+
+function renderFeedback(question, response) {
+  const feedback = byId("feedback");
+  const showReference = element("details", "", "reference");
+  if (question.type === "C") {
+    const correct = response === question.correct;
+    feedback.dataset.state = correct ? "correct" : "incorrect";
+    feedback.replaceChildren(
+      element("strong", correct ? "回答正确" : "回答有误"),
+      element("p", "你的选择 " + letters[response] + " · " + question.options[response]),
+      element("p", "正确答案 " + letters[question.correct] + " · " + question.options[question.correct]),
+      element("p", question.reference)
+    );
+  } else {
+    feedback.dataset.state = "written";
+    showReference.append(element("summary", "展开参考要点"), element("p", question.reference));
+    const answer = element("p", response);
+    answer.style.whiteSpace = "pre-wrap";
+    feedback.replaceChildren(element("strong", "简答已提交，可以导出批改"), answer, showReference);
+  }
+}
+
+function go(moduleIndex, questionIndex) {
+  state.moduleIndex = moduleIndex;
+  state.questionIndex = questionIndex;
+  save();
+  renderNavigation();
+  renderQuestion();
+  byId("question").focus();
+}
+
+function move(direction) {
+  const nextIndex = state.questionIndex + direction;
+  if (modules[state.moduleIndex].questions[nextIndex]) {
+    go(state.moduleIndex, nextIndex);
+    return;
+  }
+  const nextModule = state.moduleIndex + direction;
+  if (modules[nextModule]) {
+    go(nextModule, direction > 0 ? 0 : modules[nextModule].questions.length - 1);
+  }
+}
+
+function getResponse() {
+  if (activeQuestion().type === "W") return byId("response").value;
+  const input = byId("options").querySelector("input:checked");
+  return input ? Number(input.value) : null;
+}
+
+function saveDraft() {
+  const value = getResponse();
+  if (value === null) return;
+  state.drafts[activeKey()] = value;
+  byId("error").hidden = true;
+  save();
+}
+
+function submit(event) {
+  event.preventDefault();
+  const question = activeQuestion();
+  const value = getResponse();
+  if (value === null || (typeof value === "string" && !value.trim())) {
+    byId("error").textContent = question.type === "C" ? "请先选择一项。" : "请先写下你的答案。";
+    byId("error").hidden = false;
+    if (question.type === "W") byId("response").focus();
+    return;
+  }
+  state.answers[activeKey()] = typeof value === "string" ? value.trim() : value;
+  delete state.drafts[activeKey()];
+  save();
+  renderNavigation();
+  renderQuestion();
+  byId("feedback").focus();
+}
+
+function reviewText(moduleIndexes) {
+  const content = [
+    "亚马逊跨境入门练习 · 简答批改单",
+    "请按题号批改。每题给出正确点、需要补充或纠正的地方，以及一份修改后的答案。"
+  ];
+  for (const index of moduleIndexes) {
+    const entries = moduleAnswers(index).filter(({question}) => question.type === "W");
+    if (!entries.length) continue;
+    content.push("模块 " + (index + 1) + " · " + modules[index].title);
+    for (const {question, key, response} of entries) {
+      content.push("题号 " + key + "\n原题\n" + question.prompt +
+        "\n我的答案\n" + response + "\n参考要点\n" + question.reference);
+    }
+  }
+  return content.join("\n\n") + "\n";
+}
+
+function download(allModules) {
+  const indexes = allModules ? modules.map((_, index) => index) : [state.moduleIndex];
+  const blob = new Blob(["\uFEFF", reviewText(indexes)], {type: "text/plain;charset=utf-8"});
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = "亚马逊简答批改单-" + (allModules ? "全部模块" : modules[state.moduleIndex].title) + ".txt";
+  document.body.append(link);
+  link.click();
+  link.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+  byId("export-status").textContent = "已发起下载。请把批改单上传到当前对话。";
+}
+
+const compact = matchMedia("(max-width:690px)");
+if (compact.matches) {
+  byId("directory").open = false;
+  byId("lesson-directory").open = false;
+}
+byId("lesson-menu").replaceChildren(...lessonButtons);
+byId("show-learning").addEventListener("click", () => showView("learning"));
+byId("show-practice").addEventListener("click", () => showView("practice"));
+byId("previous-lesson").addEventListener("click", () => chooseLesson(state.lessonIndex - 1));
+byId("next-lesson").addEventListener("click", () => chooseLesson(state.lessonIndex + 1));
+document.querySelectorAll("[data-practice]").forEach(item => {
+  item.addEventListener("click", () => {
+    const index = Number(item.dataset.practice);
+    const firstPending = modules[index].questions.findIndex((_, questionIndex) => !own(state.answers, keyFor(index, questionIndex)));
+    const target = index === state.moduleIndex ? state.questionIndex : Math.max(0, firstPending);
+    showView("practice", false);
+    go(index, target);
+  });
+});
+byId("quiz").addEventListener("submit", submit);
+byId("options").addEventListener("change", saveDraft);
+byId("response").addEventListener("input", saveDraft);
+byId("previous").addEventListener("click", () => move(-1));
+byId("next").addEventListener("click", () => move(1));
+byId("retry").addEventListener("click", () => {
+  state.drafts[activeKey()] = state.answers[activeKey()];
+  save();
+  renderQuestion();
+  const focus = activeQuestion().type === "W" ? byId("response") : byId("options").querySelector("input:checked");
+  focus?.focus();
+});
+byId("download-module").addEventListener("click", () => download(false));
+byId("download-all").addEventListener("click", () => download(true));
+if (!storageAvailable) showStorageNotice();
+renderLesson();
+renderNavigation();
+renderQuestion();
+showView(state.view, false);
+</script>
+</body>
+</html>
